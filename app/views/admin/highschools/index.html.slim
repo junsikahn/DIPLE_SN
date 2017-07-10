@@ -1,0 +1,22 @@
+table.ui.celled.striped.table
+  thead
+    tr
+      th.center.aligned Name
+      th.center.aligned 상세
+      th.center.aligned 편집
+      th.center.aligned 삭제
+
+  tbody
+    - @admin_highschools.each do |admin_highschool|
+      tr
+        td = admin_highschool.name
+        td = link_to 'Show', admin_highschool
+        td = link_to 'Edit', edit_admin_highschool_path(admin_highschool)
+        td = link_to 'Destroy', admin_highschool, data: { confirm: 'Are you sure?' }, method: :delete
+  tfoot
+    tr.right.aligned
+      th colspan="20"
+        = paginate @admin_highschools, views_prefix: 'admin'
+    tr.right.aligned
+      th colspan="20"
+        = link_to "#{semantic_icon('plus')}추가".html_safe, new_admin_highschool_path, class: 'ui positive labeled icon large button'

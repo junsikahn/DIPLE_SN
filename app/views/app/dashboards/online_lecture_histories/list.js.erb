@@ -1,0 +1,16 @@
+$(function(){
+  var teacher_input = $('#online_lecture_history_online_teacher_id');
+  var lecture_input = $('#online_lecture_history_online_lecture_id');
+  <% if !@online_teachers.nil? %>
+    teacher_input.html('').dropdown('clear');
+    lecture_input.html('').dropdown('clear');
+    <% @online_teachers.each do |teacher| %>
+      teacher_input.append('<option value="<%= teacher.id %>"><%= teacher.name %></option>');
+    <% end %>
+  <% elsif !@online_lectures.nil? %>
+    lecture_input.html('').dropdown('clear');
+    <% @online_lectures.each do |lecture| %>
+      lecture_input.append('<option value="<%= lecture.id %>"><%= lecture.title %></option>')
+    <% end %>
+  <% end %>
+});

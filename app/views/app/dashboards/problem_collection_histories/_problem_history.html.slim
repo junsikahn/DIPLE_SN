@@ -1,0 +1,27 @@
+- problem = problem_history.problem
+div.problem_container.clearfix
+  span.ui.horizontal.label class="#{problem_history.correct? ? 'green' : 'red'}" = "#{order}번"
+  span.ui.horizontal.basic.label class="#{problem_history.correct? ? 'green' : 'red'}" = "#{problem.score}점"
+  - if problem.audio?
+    div.ui.segment
+      == audio_tag problem.audio.url(:original), controls: true, style: 'width: 100%;'
+  div.ui.top.attached.segment.clearfix.problem_seg class="#{problem_history.correct? ? 'green' : 'red'}"
+    == problem.content
+  - if problem.objective?
+    div.ui.attached.segment.exm_seg
+      div.ui.very.relaxed.selection.list
+        - (1..5).each do |index|
+          span.item class="#{problem.answer.to_i == index ? 'active' : 'disabled'}"
+            span.ui.circular.mini.horizontal.label class="#{problem.answer.to_i == index ? (problem_history.correct? ? 'green' : 'red') : (problem_history.users_answer.to_i == index ? 'black' : 'basic')}" = index
+            == problem['exm_' + index.to_s]
+  - if problem.problem_id?
+    div.ui.attached.segment.clearfix.problem_seg == problem.problem_set.content
+  div.ui.attached.secondary.segment.exm_answer_seg == problem.explanation
+  - if problem.objective?
+    div.ui.bottom.attached.right.aligned.secondary.segment.exm_answer_seg
+      | 정답은&nbsp;
+      span.ui.circular.mini.horizontal.label.basic = problem.answer
+      | 번입니다.
+  - else
+    div.ui.bottom.attached.right.aligned.secondary.segment.exm_answer_seg
+      = "정답은 #{problem.answer} 입니다."

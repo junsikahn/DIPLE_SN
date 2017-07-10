@@ -1,0 +1,13 @@
+div.ui.card.fluid
+  a.image href="#{mentor_path(mentor)}"
+    = image_tag mentor.user.avatar.url(:thumbnail)
+  div.content
+    a.header href="#{mentor_path(mentor)}" = mentor.user.name
+    div.meta
+      span.date = "Joined in #{mentor.user.created_at.year}"
+    div.description
+      = simple_format mentor.self_introduction
+  div.extra.content
+    a
+      i.user.icon
+      = mentor.user.gender? ? '남자' : '여자'

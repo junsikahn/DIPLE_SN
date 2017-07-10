@@ -1,0 +1,26 @@
+= simple_nested_form_for @admin_problem_collection do |f|
+  = f.error_notification
+
+  table.ui.table
+    thead
+      tr
+        th 입력해주세요
+    tbody
+      tr
+        td = f.association :problem_source
+      tr
+        td = f.association :subject, collection: Standard::Subject.main_subjects
+      tr
+        td = f.input :test_day
+      tr
+        td = f.input :name
+  table.ui.table
+    thead
+      tr
+        th.sixteen.wide 저장하시겠습니까?
+        th.collapsing = f.button :button, '저장'
+
+javascript:
+  $(function(){
+    $('select').dropdown();
+  });

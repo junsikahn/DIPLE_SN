@@ -1,0 +1,8 @@
+$(function(){
+  $('#book_history_book_id').html('').dropdown('clear');
+  <% if !@books.nil? %>
+    <% @books.each do |book| %>
+      $('#book_history_book_id').append('<option value="<%= book.id %>"><%= book.name %></option>');
+    <% end %>
+  <% end %>
+});

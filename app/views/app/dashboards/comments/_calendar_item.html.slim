@@ -1,0 +1,25 @@
+div.comment
+  div.avatar
+    = image_tag comment.user.avatar.url(:thumbnail)
+  div.content
+    div.text == comment.content
+    div.actions
+      = link_to '답글 작성',
+                new_dashboard_comment_path(match_id: params[:dashboard_id],
+                                           subject_id: comment.subject_id,
+                                           comment_id: comment.id,
+                                           format: :js), remote: true, method: :get
+  - unless comment.reply_comments.blank?
+    div.comments
+      - comment.reply_comments.each do |reply|
+        div.comment
+          div.avatar
+            = image_tag reply.user.avatar.url(:thumbnail)
+          div.content
+            div.text = reply.content
+            div.actions
+              = link_to '답글 작성',
+                        new_dashboard_comment_path(match_id: params[:dashboard_id],
+                                                   subject_id: comment.subject_id,
+                                                   comment_id: comment.id,
+                                                   format: :js), remote: true, method: :get

@@ -1,0 +1,38 @@
+i.close.icon
+div.content
+  div.test_wrapper
+      div.problems_wrapper
+        div.ui.attached.secondary.segment.problems_header.clearfix
+          h3.ui.left.floated.header == "#{@problem_collection_history.problem_collection.name}"
+          span.ui.left.floated.header.labels
+            span.ui.horizontal.label = "#{@problem_collection_history.problem_collection.subject.name}"
+            span.ui.horizontal.label = "#{@problem_collection_history.problem_collection.test_day}"
+            span.ui.horizontal.label = "#{@problem_collection_history.problem_collection.total_score}점 만점"
+            span.ui.horizontal.label = "문제 #{@problem_collection_history.problem_collection.problem_count}개"
+        div.problems_seg
+          = render 'problems', problems: @problem_collection_history.problem_collection.problems
+      div.answers_wrapper
+        = simple_nested_form_for @problem_collection_history, url: dashboard_problem_collection_histories_path(params[:dashboard_id]), remote: true, html: { style: 'height: 100%;' } do |f|
+          = f.hidden_field :match_id
+          = f.hidden_field :problem_collection_id
+          div.ui.attached.center.aligned.secondary.segment.problems_header - 답안지 -
+          div.ui.attached.segment.answers_seg
+            table.ui.very.basic.selectable.table
+              tbody
+                = f.simple_fields_for :problem_histories, wrapper: false do |h|
+                  tr class="#{'error' unless h.object.errors.messages.empty?}"
+                    td.two.wide.center.aligned
+                      small
+                        b = "#{h.index + 1}번"
+                        = h.hidden_field :match_id
+                        = h.hidden_field :subject_id
+                        = h.hidden_field :problem_collection_id
+                        = h.hidden_field :problem_id
+                    - if h.object.problem.objective?
+                      - 5.times do |index|
+                        td.two.wide.center.aligned.answer_radio data-answer="#{index + 1}"
+                          a.ui.circular.mini.icon.button class="#{h.object.users_answer.to_i == index + 1 ? 'black' : 'basic'}" = "#{index + 1}"
+                      = h.hidden_field :users_answer
+                    - else
+                      td.answer_input colspan="5" = h.input :users_answer, label: false, error: false
+          = f.button :button, "#{semantic_icon('add')}제출".html_safe, class: 'fluid attached large'

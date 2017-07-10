@@ -1,0 +1,20 @@
+table.ui.celled.striped.table
+  thead
+    tr
+      th.center.aligned 상세
+      th.center.aligned 편집
+      th.center.aligned 삭제
+
+  tbody
+    - @admin_matches.each do |admin_match|
+      tr
+        td = link_to 'Show', admin_match
+        td = link_to 'Edit', edit_admin_match_path(admin_match)
+        td = link_to 'Destroy', admin_match, data: { confirm: 'Are you sure?' }, method: :delete
+  tfoot
+    tr.right.aligned
+      th colspan="20"
+        = paginate @admin_matches, views_prefix: 'admin'
+    tr.right.aligned
+      th colspan="20"
+        = link_to "#{semantic_icon('plus')}추가".html_safe, new_admin_match_path, class: 'ui positive labeled icon large button'

@@ -1,0 +1,95 @@
+table.ui.celled.striped.table
+  thead
+    tr
+      th.center.aligned 타입
+      th.center.aligned 과목
+      th.center.aligned 이름
+      th.center.aligned 문제갯수
+      th.center.aligned 총점
+      th.center.aligned 시험일자
+      th.center.aligned 완료횟수
+      th.center.aligned 발행여부
+  tbody
+    tr
+      td = @admin_problem_collection.problem_source.name
+      td = @admin_problem_collection.subject.name
+      td = @admin_problem_collection.name
+      td = "#{@admin_problem_collection.problem_count}개"
+      td = "#{@admin_problem_collection.total_score}점"
+      td = @admin_problem_collection.test_day
+      td = @admin_problem_collection.solved_count
+      td == "#{@admin_problem_collection.published ? semantic_icon('check green') : semantic_icon('remove red')}"
+  tfoot
+    tr.right.aligned
+      th colspan="20"
+        = link_to "#{semantic_icon('edit')}편집".html_safe, edit_admin_problem_collection_path(@admin_problem_collection), class: 'ui positive labeled icon button'
+        = link_to "#{semantic_icon('trash')}삭제".html_safe, @admin_problem_collection, data: { confirm: 'Are you sure?' }, method: :delete, class: 'ui negative labeled icon button'
+    tr.right.aligned
+      th colspan="20"
+        = link_to "#{semantic_icon('plus')}문제추가".html_safe, new_admin_problem_collection_problem_path(@admin_problem_collection.id), class: 'ui positive labeled icon button'
+        = link_to "#{semantic_icon('plus')}문제세트추가".html_safe, new_admin_problem_collection_problem_set_path(@admin_problem_collection.id), class: 'ui positive labeled icon button'
+    tr.right.aligned
+      th colspan="20"
+        - if @admin_problem_collection.published
+          = link_to "#{semantic_icon('remove')}발행취소".html_safe, publish_admin_problem_collection_path(@admin_problem_collection), method: :patch, class: 'ui negative labeled icon button'
+        - else
+          = link_to "#{semantic_icon('plus')}발행".html_safe, publish_admin_problem_collection_path(@admin_problem_collection), method: :patch, class: 'ui positive labeled icon button'
+
+table.ui.celled.structured.table#problems_table
+  thead
+    tr
+      th.center.aligned rowspan="3" 번호
+      th.center.aligned colspan="3" 문제
+      th.center.aligned colspan="3" 해설
+    tr
+      th.center.aligned 보기1
+      th.center.aligned 보기2
+      th.center.aligned 보기3
+      th.center.aligned 보기4
+      th.center.aligned 보기5
+      th.center.aligned 정답
+    tr
+      th.center.aligned 과목
+      th.center.aligned
+      th.center.aligned
+      th.center.aligned 정답률
+      th.center.aligned 수정
+      th.center.aligned 삭제
+  - order = 0
+  - @admin_problem_collection.problems.each_with_index do |problem, index|
+    - if problem.set?
+      tbody
+        tr
+          td.two.wide.center.aligned rowspan="1" = "#{order + 1}~#{order + problem.set_problems.size}번"
+          td.seven.wide colspan="3"
+            div.problem_container.problem_seg style="max-width: 500px;" == problem.content
+          td.two.wide
+          td.two.wide = link_to "#{semantic_icon('edit')}수정".html_safe, edit_admin_problem_collection_problem_set_path(@admin_problem_collection, problem), class: 'ui icon positive basic fluid button'
+          td.two.wide = link_to "#{semantic_icon('trash')}삭제".html_safe, admin_problem_collection_problem_set_path(@admin_problem_collection, problem), class: 'ui icon negative basic fluid button', data: { confirm: 'Are you sure?' }, method: :delete
+        - problem.set_problems.each do |set_problem|
+          - order += 1
+          == render 'problem', problem: set_problem, order: order
+    - else
+      tbody
+        - order += 1
+        == render 'problem', problem: problem, order: order
+
+css:
+  #problems_table > tbody:not(:first-of-type) > tr:first-of-type > td {
+    border-top: 1px solid rgba(34, 36, 38, 0.1);
+  }
+
+
+javascript:
+  $(function(){
+    renderMathInElement(document.getElementById("problems_table"),
+      {
+          delimiters: [
+              {left: "$$", right: "$$", display: true},
+              {left: "\\[", right: "\\]", display: true},
+              {left: "$", right: "$", display: false},
+              {left: "\\(", right: "\\)", display: false}
+          ]
+      }
+    );
+  });

@@ -1,0 +1,29 @@
+table.ui.celled.striped.selectable.table
+  thead
+    tr
+      th.center.aligned 타입
+      th.center.aligned 과목
+      th.center.aligned 이름
+      th.center.aligned 문제갯수
+      th.center.aligned 총점
+      th.center.aligned 시험일자
+      th.center.aligned 완료횟수
+      th.center.aligned 발행여부
+  tbody
+    - @admin_problem_collections.each do |admin_problem_collection|
+      tr style="cursor: pointer" onclick='location.href="#{admin_problem_collection_path(admin_problem_collection)}"'
+        td = admin_problem_collection.problem_source.name
+        td = admin_problem_collection.subject.name
+        td = admin_problem_collection.name
+        td = "#{admin_problem_collection.problem_count}개"
+        td = "#{admin_problem_collection.total_score}점"
+        td = admin_problem_collection.test_day
+        td = admin_problem_collection.solved_count
+        td == "#{admin_problem_collection.published ? semantic_icon('check green') : semantic_icon('remove red')}"
+  tfoot
+    tr.right.aligned
+      th colspan="20"
+        = paginate @admin_problem_collections, views_prefix: 'admin'
+    tr.right.aligned
+      th colspan="20"
+        = link_to "#{semantic_icon('plus')}추가".html_safe, new_admin_problem_collection_path, class: 'ui positive labeled icon large button'

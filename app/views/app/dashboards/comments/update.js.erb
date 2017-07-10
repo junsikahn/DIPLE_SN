@@ -1,0 +1,6 @@
+$(function(){
+  var start_date = $('#match_current_period').data('start');
+  var end_date = $('#match_current_period').data('end');
+  var show_url = '<%== dashboard_comments_path(dashboard_id: params[:dashboard_id], format: :js) %>' + '?start_date=' + start_date + '&end_date=' + end_date;
+  $.ajax({ url: show_url });
+});

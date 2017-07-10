@@ -1,0 +1,94 @@
+$(function(){
+  var test_screen = $('#test_screen');
+  test_screen.html("<%= escape_javascript(render 'show') %>").modal({
+    autofocus: false,
+    onHidden: function(){ $(this).empty(); }
+  }).modal('show');
+  var form = test_screen.find('form');
+
+  test_screen.on('touchmove', function(e){ return false; });
+  test_screen.find('.problems_row, .answers_seg').on('touchmove', function(e){
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+  });
+
+  renderMathInElement(document.getElementById("test_screen"),
+    {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "\\[", right: "\\]", display: true},
+            {left: "$", right: "$", display: false},
+            {left: "\\(", right: "\\)", display: false}
+        ]
+    }
+  );
+
+
+
+
+  function init(){
+    var seg = $('#test_screen').find('.problems_seg');
+    var col_1 = $('#test_screen').find('.problems_column').eq(0);
+    col_1.clone().insertAfter(col_1);
+    col_1.after('<div class="problems_row_divider"></div>');
+    var col_2 = $('#test_screen').find('.problems_column').eq(1);
+    var ch = seg.outerHeight();
+    var mh = col_1.outerHeight();
+    col_1.css({transform: 'translateY(-' + ch * 0 + 'px)', cursor: 'w-resize'}).off('click', prev).on('click', prev);
+    col_2.css({transform: 'translateY(-' + ch * 1 + 'px)', cursor: 'e-resize'}).off('click', next).on('click', next);
+  }
+
+  init();
+
+  function next(){
+      var seg = $('#test_screen').find('.problems_seg');
+      var row = seg.find('.problems_row');
+      var col_1 = seg.find('.problems_column').eq(0);
+      var col_2 = seg.find('.problems_column').eq(1);
+      var ch = seg.outerHeight();
+      var mh = col_1.outerHeight();
+      var cp = -parseInt(col_1.css('transform').split(',')[5])/ch;
+      var mp = Math.ceil(mh/ch);
+      // seg.transition({
+      //   animation: 'slide right',
+      //   duration: '.25s',
+      //   onComplete: function() {
+      // row.css({transition: 'transform .2s', transform: 'translateX(-20px)'});
+      // setTimeout(function(){
+        if (cp < mp - 2) {
+          col_1.css({transform: 'translateY(-' + ch * (cp + 1) +'px)'});
+          col_2.css({transform: 'translateY(-' + ch * (cp + 2) + 'px)'});
+        }
+      //   row.css({transition: 'transform 0s', transform: 'translateX(0)'});
+      // }, 200);
+      //     seg.transition({ animation: 'slide left', duration: '.25s' });
+      //   }
+      // });
+  };
+
+  function prev(){
+      var seg = $('#test_screen').find('.problems_seg');
+      var row = seg.find('.problems_row');
+      var col_1 = seg.find('.problems_column').eq(0);
+      var col_2 = seg.find('.problems_column').eq(1);
+      var ch = seg.outerHeight();
+      var mh = col_1.outerHeight();
+      var cp = -parseInt(col_1.css('transform').split(',')[5])/ch;
+      var mp = Math.ceil(mh/ch);
+      // seg.transition({
+      //   animation: 'slide left',
+      //   duration: '.25s',
+      //   onComplete: function() {
+      // row.css({transition: 'transform .2s', transform: 'translateX(20px)'});
+      // setTimeout(function(){
+        if (cp > 0) {
+          col_1.css({transform: 'translateY(-' + ch * (cp - 1) +'px)'});
+          col_2.css({transform: 'translateY(-' + ch * (cp - 0) + 'px)'});
+        }
+      //   row.css({transition: 'transform 0s', transform: 'translateX(0)'});
+      // }, 200);
+      //     seg.transition({ animation: 'slide right', duration: '.25s' });
+      //   }
+      // });
+  };
+});

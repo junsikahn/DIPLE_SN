@@ -1,0 +1,9 @@
+$(function() {
+  $('#user_form').empty().modal('hide');
+
+  $('#profile_loader').addClass('active');
+
+  setTimeout(function(){
+    $.ajax({url: '<%= users_profile_path(format: :js) %>'});
+  }, 500);
+});

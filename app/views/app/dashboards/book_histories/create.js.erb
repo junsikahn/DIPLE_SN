@@ -1,0 +1,7 @@
+$(function(){
+  var form = $('#book_form');
+  form.modal('hide');
+  $.ajax({
+    url: '<%== dashboard_book_histories_path(dashboard_id: params[:dashboard_id], start_date: params[:start_date], end_date: params[:end_date], format: :js) %>'
+  });
+});

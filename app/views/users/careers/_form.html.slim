@@ -1,0 +1,126 @@
+i.close.icon
+div.header 학력 추가하기
+div.content
+  = simple_nested_form_for current_user, url: users_career_path, remote: true do |f|
+    div
+      = f.error_notification
+
+      - if current_user.mentor?
+        div.ui.message.top.attached 대학교 입력
+        = f.simple_fields_for :univ_careers, wrapper: false do |c|
+          div.univ_careers.ui.segment.attached
+            div.ui.label.top.left.attached
+              i.university.icon
+              | 대학교
+            div.four.fields
+              = c.input :school,
+                        wrapper: :ui_search, icon: 'search',
+                        search_wrapper_html: { data: { category: 'univ' } },
+                        input_wrapper_html: { class: 'ui left icon input' }
+              = c.input :major_1,
+                        wrapper: :ui_search, icon: 'search',
+                        search_wrapper_html: { data: { category: 'major' } },
+                        input_wrapper_html: { class: 'ui left icon input' },
+                        required: true
+              = c.input :major_2,
+                        wrapper: :ui_search, icon: 'search',
+                        search_wrapper_html: { data: { category: 'major' } },
+                        input_wrapper_html: { class: 'ui left icon input' },
+                        input_html: { disabled: c.object.major_2.blank? }
+              = c.input :major_3,
+                        wrapper: :ui_search, icon: 'search',
+                        search_wrapper_html: { data: { category: 'major' } },
+                        input_wrapper_html: { class: 'ui left icon input' },
+                        input_html: { disabled: c.object.major_3.blank? }
+            div.two.fields
+              = c.input :status, as: :select,
+                        wrapper: :ui_select, input_html: { class: 'status' },
+                        collection: [['재학중', 1], ['졸업', 2]],
+                        include_blank: '재학 상태를 선택해주세요'
+              = c.input :entrance_year,
+                        wrapper: :ui_select, input_html: { class: 'search' },
+                        start_year: Date.today.year,
+                        end_year: 2000,
+                        prompt: { year: '입학 연도를 선택해주세요' },
+                        order: [:year]
+              = c.input :graduate_year,
+                        wrapper: :ui_select, input_html: { class: 'search', disabled: c.object.graduate_year.blank? },
+                        start_year: Date.today.year,
+                        end_year: 2000,
+                        prompt: { year: '졸업 연도를 선택해주세요' },
+                        order: [:year],
+                        required: c.object.status == '2'
+              = c.hidden_field :user_id
+              = c.hidden_field :category
+              = c.hidden_field :id
+              div.ui.field.one.wide
+                label 제거
+                = c.link_to_remove semantic_icon('trash'), class: 'ui button icon basic fluid', data: { association: 'univ_careers' }
+        = f.link_to_add '대학교 추가', :univ_careers, class: 'ui button basic fluid bottom attached', model_object: current_user.univ_careers.new
+        div.ui.divider
+
+        div.ui.message.top.attached 고등학교 입력
+        = f.simple_fields_for :high_careers, wrapper: false do |c|
+          div.high_careers.ui.segment.attached
+            div.ui.label.top.left.attached
+              i.hospital.icon
+              | 고등학교
+            div.three.fields
+              = c.input :school,
+                        wrapper: :ui_search, icon: 'search',
+                        search_wrapper_html: { data: { category: 'high' } },
+                        input_wrapper_html: { class: 'ui left icon input' }
+              = c.input :status, as: :select,
+                        wrapper: :ui_select, input_html: { class: 'status' },
+                        collection: [['재학중', 1], ['졸업', 2]],
+                        include_blank: '재학 상태를 선택해주세요'
+              = c.input :entrance_year,
+                        wrapper: :ui_select, input_html: { class: 'search' },
+                        start_year: Date.today.year,
+                        end_year: 2000,
+                        prompt: { year: '입학 연도를 선택해주세요' },
+                        order: [:year]
+              = c.input :graduate_year,
+                        wrapper: :ui_select, input_html: { class: 'search', disabled: c.object.graduate_year.blank? },
+                        start_year: Date.today.year,
+                        end_year: 2000,
+                        prompt: { year: '졸업 연도를 선택해주세요' },
+                        order: [:year],
+                        required: c.object.status == '2'
+              = c.hidden_field :user_id
+              = c.hidden_field :category
+              = c.hidden_field :id
+              div.ui.field.one.wide
+                label 제거
+                = c.link_to_remove semantic_icon('trash'), class: 'ui button icon basic fluid', data: { association: 'high_careers' }
+        = f.link_to_add '고등학교 추가', :high_careers, class: 'ui button basic fluid bottom attached', model_object: current_user.high_careers.new
+        div.ui.divider
+
+      - elsif current_user.mentee?
+        div.ui.message.top.attached 고등학교 입력
+        = f.simple_fields_for :high_careers, wrapper: false do |c|
+          div.high_careers.ui.segment.bottom.attached
+            div.ui.label.top.left.attached
+              i.hospital.icon
+              | 고등학교
+            div.two.fields
+              = c.input :school,
+                        wrapper: :ui_search, icon: 'search',
+                        search_wrapper_html: { data: { category: 'high' } },
+                        input_wrapper_html: { class: 'ui left icon input' }
+              = c.input :entrance_year,
+                        wrapper: :ui_select, input_html: { class: 'search' },
+                        start_year: Date.today.year,
+                        end_year: Date.today.year - 2,
+                        prompt: { year: '입학 연도를 선택해주세요' },
+                        order: [:year]
+              = c.hidden_field :status, value: 1
+              = c.hidden_field :user_id
+              = c.hidden_field :category
+              = c.hidden_field :id
+              div.ui.field.one.wide
+                label 제거
+                = c.link_to_remove semantic_icon('trash'), class: 'ui button icon basic fluid', data: { association: 'high_careers' }
+        div.ui.divider
+
+      = f.button :button, '저장'

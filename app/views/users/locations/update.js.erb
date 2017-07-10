@@ -1,0 +1,11 @@
+$(function() {
+  $('#user_form').empty().modal('hide');
+
+  $('#location_list').append('<div class="ui active loader"></div>');
+  $('#profile_loader').addClass('active');
+
+  setTimeout(function(){
+    $('#location_list').html("<%= escape_javascript(render(current_user.locations) || render('empty')) %>");
+    $.ajax({url: '<%= users_profile_path(format: :js) %>'});
+  }, 500);
+});

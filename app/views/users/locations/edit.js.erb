@@ -1,0 +1,106 @@
+$(function() {
+  var search_options = {
+    apiSettings: {
+      url: '<%= address_check_users_location_path %>?q={query}'
+    },
+    fields : {
+      results : 'results',
+      title   : 'title',
+    },
+    minCharacters : 3,
+    searchDelay   : 500,
+    onSelect: function(result, response) {
+      var parent_fields = $(this).closest('.fields');
+      parent_fields.find('.lng').val(result.lng);
+      parent_fields.find('.lat').val(result.lat);
+      parent_fields.find('.mountain').val(result.mountain);
+      parent_fields.find('.localName_1').val(result.localName_1);
+      parent_fields.find('.localName_2').val(result.localName_2);
+      parent_fields.find('.localName_3').val(result.localName_3);
+      parent_fields.find('.main_address').val(result.mainAddress);
+      parent_fields.find('.sub_address').val(result.subAddress);
+      parent_fields.find('.building_address').val(result.buildingAddress);
+      parent_fields.find('.is_new_address').val(result.isNewAddress);
+      parent_fields.find('.new_address').val(result.newAddress);
+      parent_fields.find('.zipcode').val(result.zipcode);
+      parent_fields.find('.zone_no').val(result.zone_no);
+      parent_fields.find('.is_checked').val(true);
+      parent_fields.find('i.icon').first().removeClass('search').addClass('check green');
+    },
+    onResultsAdd: function(html) {
+      var parent_fields = $(this).closest('.fields');
+      parent_fields.find('.lng').val('');
+      parent_fields.find('.lat').val('');
+      parent_fields.find('.mountain').val('');
+      parent_fields.find('.localName_1').val('');
+      parent_fields.find('.localName_2').val('');
+      parent_fields.find('.localName_3').val('');
+      parent_fields.find('.main_address').val('');
+      parent_fields.find('.sub_address').val('');
+      parent_fields.find('.building_address').val('');
+      parent_fields.find('.is_new_address').val('');
+      parent_fields.find('.new_address').val('');
+      parent_fields.find('.zipcode').val('');
+      parent_fields.find('.zone_no').val('');
+      parent_fields.find('.is_checked').val(false);
+      parent_fields.find('i.icon').first().addClass('search').removeClass('check green');
+    },
+    templates : {
+      message: function(message, type) {
+        if (type == 'empty') {
+          return '<div class="message empty"><div class="header">검색결과 없음</div><div class="description">주소를 정확히 입력해주세요</div></div>';
+        }
+      },
+      standard: function(response) {
+        var html = document.createElement('div');
+        $.each(response.results, function(index, result) {
+          var item = document.createElement('a');
+          var content = document.createElement('div');
+          var content2 = document.createElement('div');
+          $(item).append($(content).addClass('title').text(result.title));
+          $(item).append($(content2).addClass('description').text(result.localName_1));
+          $(item).addClass('result');
+          $(item).attr('data-mountain', result.mountain);
+          $(item).attr('data-localName_1', result.localName_1);
+          $(item).attr('data-localName_2', result.localName_2);
+          $(item).attr('data-localName_3', result.localName_3);
+          $(item).attr('data-main_address', result.mainAddress);
+          $(item).attr('data-sub_address', result.subAddress);
+          $(item).attr('data-building_address', result.buildingAddress);
+          $(item).attr('data-is_new_address', result.isNewAddress);
+          $(item).attr('data-new_address', result.newAddress);
+          $(item).attr('data-zipcode', result.zipcode);
+          $(item).attr('data-zone_no', result.zone_no);
+          $(html).append(item);
+        });
+        return html.innerHTML;
+      }
+    }
+  };
+
+  $('#user_form').html("<%= escape_javascript(render 'form') %>").modal({
+    observeChanges : true,
+    autofocus      : false,
+    onHide: function() {
+      $('#user_form').removeClass('large');
+      $(document)
+        .off('nested:fieldAdded')
+        .off('nested:fieldRemoved');
+    }
+  }).modal('show');
+  $('#user_form').find('select.select').dropdown();
+  $('#user_form').find('.ui.search').search(search_options);
+
+  $(document)
+    .off('nested:fieldAdded')
+    .on('nested:fieldAdded', function(event) {
+      var field = event.field;
+      var dropdownFields = field.find('select.select');
+      var addressFields = field.find('.ui.search');
+      dropdownFields.dropdown();
+      addressFields.search(search_options);
+    })
+    .off('nested:fieldRemoved')
+    .on('nested:fieldRemoved', function(event) {
+    });
+})

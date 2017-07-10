@@ -1,0 +1,17 @@
+= render '/users/step', step: 3
+div.ui.bottom.attached.padded.segment
+  div.ui.link.two.cards.stackable
+    div.card
+      = link_to users_role_path(selection: 'mentor'), method: :post, class: 'image' do
+        img src="/images/image_preview.png"
+      div.content
+        div.header Mentor
+        div.meta 과외선생님
+        div.description 과외 선생님이 되어보세요
+    div.card
+      = link_to users_role_path(selection: 'mentee'), method: :post, class: 'image' do
+        img src="/images/image_preview.png"
+      div.content
+        div.header Mentee
+        div.meta 수험생
+        div.description 과외 학생이 되어보세요

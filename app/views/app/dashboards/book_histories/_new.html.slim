@@ -1,0 +1,28 @@
+= simple_form_for @book_history, url: dashboard_book_histories_path, remote: true, html: { id: 'book_form', class: 'ui modal' } do |f|
+  i.close.icon
+  div.header 진도 등록하기
+  div.content.ui.form
+    = f.error_notification
+    = f.hidden_field :match_id
+    = f.input :subject_id, as: :select, include_blank: '선택해주세요',
+              collection: Standard::Subject.main_subjects,
+              wrapper_html: { class: 'required' },
+              input_html: { class: 'select required', data: { url: list_dashboard_book_histories_path(dashboard_id: params[:dashboard_id]), remote: true, method: :get } }
+    = f.input :book_publisher_id, as: :select, include_blank: '선택해주세요',
+              collection: Standard::BookPublisher.all,
+              wrapper_html: { class: 'required' },
+              input_html: { class: 'select required', data: { url: list_dashboard_book_histories_path(dashboard_id: params[:dashboard_id]), remote: true, method: :get } }
+    = f.input :book_id, as: :select, include_blank: '선택해주세요',
+              collection: f.object.book_id.nil? ? [] : Standard::Book.where(id: f.object.book_id),
+              wrapper_html: { class: 'required' },
+              input_html: { class: 'select required' }
+    div.fields
+      = f.input :started_at, as: :string,
+                wrapper_html: { class: 'ui calendar eight wide' },
+                input_html: { style: 'text-align: center;', value: f.object.started_at.nil? ? Date.today : f.object.started_at }
+      = f.input :planned_at, as: :string,
+                 wrapper_html: { class: 'ui calendar eight wide' },
+                 input_html: { style: 'text-align: center;', value: f.object.planned_at.nil? ? Date.today + 1.month : f.object.planned_at }
+  div.actions
+    = link_to "#{semantic_icon('question')}찾으시는 교재가 없으신가요?".html_safe, '#', class: 'ui button labeled icon basic button'
+    = f.button :button, "#{semantic_icon('add')}등록".html_safe, class: 'labeled icon'

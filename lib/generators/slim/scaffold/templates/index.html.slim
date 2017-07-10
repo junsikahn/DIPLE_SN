@@ -1,0 +1,26 @@
+table.ui.celled.striped.table
+  thead
+    tr
+<% attributes.each do |attribute| -%>
+      th.center.aligned <%= attribute.human_name %>
+<% end -%>
+      th.center.aligned 상세
+      th.center.aligned 편집
+      th.center.aligned 삭제
+
+  tbody
+    - @<%= plural_table_name %>.each do |<%= singular_table_name %>|
+      tr
+<% attributes.each do |attribute| -%>
+        td = <%= singular_table_name %>.<%= attribute.name %>
+<% end -%>
+        td = link_to 'Show', <%= singular_table_name %>
+        td = link_to 'Edit', edit_<%= singular_table_name %>_path(<%= singular_table_name %>)
+        td = link_to 'Destroy', <%= singular_table_name %>, data: { confirm: 'Are you sure?' }, method: :delete
+  tfoot
+    tr.right.aligned
+      th colspan="20"
+        = paginate @<%= plural_table_name %>, views_prefix: 'admin'
+    tr.right.aligned
+      th colspan="20"
+        = link_to "#{semantic_icon('plus')}추가".html_safe, new_<%= singular_table_name %>_path, class: 'ui positive labeled icon large button'

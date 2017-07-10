@@ -1,0 +1,7 @@
+i.close.icon
+div.header 자기소개 입력하기
+div.content
+  = simple_form_for current_user.mentor, url: users_introduction_path, remote: true do |f|
+    = f.error_notification
+    = f.input :self_introduction
+    = f.button :button, '저장'

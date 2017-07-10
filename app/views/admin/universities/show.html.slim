@@ -1,0 +1,11 @@
+table.ui.celled.striped.table
+  thead
+    tr
+      th.center.aligned Name
+  tbody
+    tr
+      td = @admin_university.name
+  tfoot
+    tr.right.aligned
+      th colspan="20"
+        = link_to "#{semantic_icon('edit')}편집".html_safe, edit_admin_university_path(@admin_university), class: 'ui positive labeled icon large button'

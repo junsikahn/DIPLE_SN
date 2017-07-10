@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>DIPLE</title>
+    <%= csrf_meta_tags %>
+    <%= action_cable_meta_tag %>
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  </head>
+  <body>
+    <nav class="ui right vertical menu sidebar inverted">
+      <% if current_user %>
+        <%= link_to '대쉬보드', dashboards_path, class: 'item' %>
+        <%= link_to '마이페이지', users_profile_path, class: 'item' %>
+      <% else %>
+        <%= link_to '회원가입', new_user_registration_path, class: 'item ui button red inverted' %>
+        <%= link_to '로그인', new_user_session_path, class: 'item ui button red inverted' %>
+      <% end %>
+    </nav>
+    <div class="pusher">
+      <header class="ui top-header clearfix">
+        <div class="ui container">
+            <div class="ui secondary menu">
+              <%= link_to root_path, class: 'header item' do %>
+                DIPLE
+              <% end %>
+              <div class="right menu">
+                <div class="ui simple red button fluid dropdown computer largescreen widescreen tablet only">
+                  <i class="caret down icon"></i>시작하기
+                  <div class="menu">
+                    <% if current_user %>
+                      <%= link_to '대쉬보드', dashboards_path, class: 'item' %>
+                      <%= link_to '마이페이지', users_profile_path, class: 'item' %>
+                    <% else %>
+                      <%= link_to '회원가입', new_user_registration_path, class: 'item ui button red inverted' %>
+                      <%= link_to '로그인', new_user_session_path, class: 'item ui button red inverted' %>
+                    <% end %>
+                  </div>
+                </div>
+                <div class="item mobile only">
+                  <%= link_to '#', class: 'ui button red inverted icon', id: 'nav-menu-icon' do %>
+                    <i class="icon content"></i>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+        </div>
+      </header>
+
+      <main class="ui container center-main">
+        <%= yield %>
+      </main>
+
+      <!-- <footer class="ui inverted vertical bottom-footer segment">
+        <div class="ui center aligned container">
+          <div class="ui stackable inverted divided grid">
+            <div class="seven wide column">
+              <h4 class="ui inverted header">Footer Header</h4>
+              <p>Extra space for a call to action inside the footer that could help re-engage users.</p>
+            </div>
+            <div class="three wide column">
+              <h4 class="ui inverted header">Group 1</h4>
+              <div class="ui inverted link list">
+                <a href="#" class="item">Link One</a>
+                <a href="#" class="item">Link Two</a>
+                <a href="#" class="item">Link Three</a>
+                <a href="#" class="item">Link Four</a>
+              </div>
+            </div>
+            <div class="three wide column">
+              <h4 class="ui inverted header">Group 2</h4>
+              <div class="ui inverted link list">
+                <a href="#" class="item">Link One</a>
+                <a href="#" class="item">Link Two</a>
+                <a href="#" class="item">Link Three</a>
+                <a href="#" class="item">Link Four</a>
+              </div>
+            </div>
+            <div class="three wide column">
+              <h4 class="ui inverted header">Group 3</h4>
+              <div class="ui inverted link list">
+                <a href="#" class="item">Link One</a>
+                <a href="#" class="item">Link Two</a>
+                <a href="#" class="item">Link Three</a>
+                <a href="#" class="item">Link Four</a>
+              </div>
+            </div>
+          </div>
+          <div class="ui inverted section divider"></div>
+          <div class="ui horizontal inverted small divided link list">
+            <a class="item" href="#">Site Map</a>
+            <a class="item" href="#">Contact Us</a>
+            <a class="item" href="#">Terms and Conditions</a>
+            <a class="item" href="#">Privacy Policy</a>
+            <a class="item" href="<%= admin_root_path %>">어드민 페이지</a>
+          </div>
+        </div>
+      </footer> -->
+    </div>
+
+    <script>
+      $(function(){
+        $('#nav-menu-icon').on('click', function(e) {
+          e.preventDefault();
+          $('.ui.sidebar').sidebar('toggle');
+        });
+
+        <% flash.each do |key, value| %>
+          new Noty({
+            type: '<%= flash_class key %>',
+            text: '<%= value %>',
+            layout: 'bottomRight',
+            theme: 'semanticui',
+            timeout: 5000,
+            progressBar: true,
+            closeWith: ['click', 'button'],
+            animation: {
+              open: 'noty_effects_open',
+              close: 'noty_effects_close'
+            }
+          }).show();
+        <% end %>
+      });
+    </script>
+  </body>
+</html>

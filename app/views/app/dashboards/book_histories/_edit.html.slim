@@ -1,0 +1,81 @@
+= simple_form_for @book_history, url: dashboard_book_history_path(@book_history), method: :patch, remote: true, html: { id: 'book_form', class: 'ui fullscreen modal' } do |f|
+  i.close.icon
+  div.header
+    span.ui.circular.empty.mini.horizontal.label class="#{@book_history.tag_color}"
+    = @book_history.book.name
+  div.content.ui.form style="padding-bottom: 0;"
+    div.fields
+      div.ten.wide.field
+        - planned = @book_history.details.select{ |l| l.completed_at.nil? && !l.planned_at.nil? && l.planned_at < @end_date }
+        - completed = @book_history.details.select{ |l| !l.completed_at.nil? && l.completed_at < @end_date }
+        - completed_now = @book_history.details.select{ |l| !l.completed_at.nil? && @start_date < l.completed_at && l.completed_at < @end_date }
+
+        - total_count = @book_history.details.size
+        - completed_count = completed.size
+        - completed_rate = total_count.zero? ? 0 : 100 * completed_count / total_count
+        - completed_rate = 100 if completed_rate > 100
+        label 성취도
+        div.ui.indicating.progress.small data-percent="#{completed_rate}"
+          div.bar
+          div.label = "#{completed_count} 강 완료 / 총 #{total_count} 강"
+      = f.input :tag_color, as: :select, include_blank: '선택해주세요',
+                collection: [['빨강', 'red'], ['주황', 'orange'], ['노랑', 'yellow'], ['올리브', 'olive'], ['초록', 'green'], ['파랑', 'blue'], ['남색', 'violet'],
+                             ['보라', 'purple'], ['핑크', 'pink'], ['갈색', 'brown'], ['검정', 'black'], ['회색', 'grey'], ['제거', 'empty']],
+                wrapper_html: { class: 'two wide' },
+                input_html: { data: { url: change_period_dashboard_book_history_path(id: @book_history.id), remote: true, method: :patch } }
+      = f.input :started_at, as: :string,
+                wrapper_html: { class: 'ui calendar two wide' },
+                input_html: { style: 'text-align: center;', data: { url: change_period_dashboard_book_history_path(id: @book_history.id), remote: true, method: :patch } }
+      = f.input :planned_at, as: :string,
+                 wrapper_html: { class: 'ui calendar two wide' },
+                 input_html: { style: 'text-align: center;', data: { url: change_period_dashboard_book_history_path(id: @book_history.id), remote: true, method: :patch } }
+  div.main.content.ui.form
+    table.ui.celled.multiline.table#book_calendar
+      thead
+        tr.bottom.aligned
+          th.center.aligned colspan="2" 구분
+          - [1,2,3,4,5,6,0].each do |index|
+            th.two.wide.center.aligned = "#{t('date.day_names')[index]}"
+      - start_date = @book_history.started_at
+      - end_date = @book_history.planned_at
+      - (start_date.to_date.cweek..end_date.to_date.cweek).each do |week|
+        tbody
+          tr.top.aligned
+            td.middle.aligned.center.aligned colspan="2" 일자
+            - week_days = (start_date.to_date..end_date.to_date).select{|date| date.cweek == week}
+            - [1,2,3,4,5,6,0].each do |index|
+              - if !week_days.first.nil? && week_days.first.wday == index
+                - date = week_days.shift
+                td.two.wide.center.aligned.clearfix class="#{'positive' if date == Date.today}"
+                  span.ui.fluid.label class="#{date == Date.today ? 'green' : 'basic'}" == "#{date == Date.today ? '오늘' : l(date, format: :short)}"
+              - else
+                td.two.wide.center.aligned style="background-color: rgba(0, 0, 50, 0.02) !important;"
+        tbody
+          tr.top.aligned
+            td.one.wide.middle.aligned.center.aligned rowspan="3" 온라인<br>강의
+
+          tr.top.aligned
+            td.one.wide.middle.aligned.center.aligned style="border-left: 1px solid rgba(34, 36, 38, 0.1);" 계획
+            - week_days = (start_date.to_date..end_date.to_date).select{|date| date.cweek == week}
+            - [1,2,3,4,5,6,0].each do |index|
+              - if !week_days.first.nil? && week_days.first.wday == index
+                - date = week_days.shift
+                td.two.wide.left.aligned.ui.selection.divided.list.dragula.book-dragula.planned.clearfix class="#{'positive' if date == Date.today}" data-date="#{date}" data-planned="true"
+                  - planned = @book_history.details.select{ |l| l.completed_at.nil? && !l.planned_at.nil? && l.planned_at == date }
+                  - planned.each do |detail|
+                    == render 'calendar_item', book_history: @book_history, detail: detail
+              - else
+                td.two.wide.disabled style="background-color: rgba(0, 0, 50, 0.02);"
+
+          tr.top.aligned
+            td.one.wide.middle.aligned.center.aligned.positive style="border-left: 1px solid rgba(34, 36, 38, 0.1);" 완료
+            - week_days = (start_date.to_date..end_date.to_date).select{|date| date.cweek == week}
+            - [1,2,3,4,5,6,0].each do |index|
+              - if !week_days.first.nil? && week_days.first.wday == index
+                - date = week_days.shift
+                td.two.wide.left.aligned.ui.selection.divided.list.dragula.book-dragula.completed.positive.clearfix class="#{'positive' if date == Date.today}" data-date="#{date}" data-completed="true"
+                  - completed = @book_history.details.select{ |l| !l.completed_at.nil? && l.completed_at == date }
+                  - completed.each do |detail|
+                    == render 'calendar_item', book_history: @book_history, detail: detail
+              - else
+                td.two.wide.disabled style="background-color: rgba(0, 0, 50, 0.02);"

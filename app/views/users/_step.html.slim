@@ -1,0 +1,34 @@
+div.ui.top.attached.message
+  div.header 회원가입
+  p 디플에 오신 것을 환영합니다!
+  div.ui.divider
+  div.ui.ordered.four.steps.small.attached.computer.largescreen.widescreen.tablet.only
+    - step_1_class = step == 1 ? 'active step' : step > 1 ? 'completed step' : 'step'
+    = link_to new_user_registration_path, class: step_1_class do
+      div.content
+        div.title 휴대폰 번호 입력
+        div.description 휴대폰 번호로 로그인할 수 있습니다
+    - step_2_class = step == 2 ? 'active step' : step > 2 ? 'completed step' : 'step'
+    = link_to users_verify_path, class: step_2_class do
+      div.content
+        div.title 본인 인증
+        div.description 전송된 PIN 번호를 입력해주세요
+    - step_3_class = step == 3 ? 'active step' : step > 3 ? 'completed step' : 'step'
+    = link_to users_role_path, method: :delete, class: step_3_class do
+      div.content
+        div.title 역할 선택
+        div.description 당신의 역할을 선택해주세요
+    - step_4_class = step == 4 ? 'active step' : step > 4 ? 'completed step' : 'step'
+    = link_to users_profile_path, class: step_4_class do
+      div.content
+        div.title 프로필 입력
+        div.description 프로필을 입력하고 매칭을 등록하세요
+  div#sign_up_progress.ui.progress.tiny.mobile.only data-percent="#{step.to_i * 100 / 4}"
+    div.bar
+    div.label = "#{step} / 4"
+
+
+javascript:
+  $(function(){
+    $('#sign_up_progress').progress();
+  });

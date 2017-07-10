@@ -1,0 +1,54 @@
+table.ui.celled.striped.top.attached.table
+  thead
+    tr
+      th colspan="3" 기본 정보
+  tbody
+    tr
+      th.center.aligned 멘토
+      td colspan="2" = @admin_match.mentor.user.name
+    tr
+      th.center.aligned 멘티
+      td colspan="2" = @admin_match.mentee.user.name
+    - @admin_match.schedules.each_with_index do |schedule, index|
+      tr
+        th.center.aligned = "일정 #{index + 1}"
+        td colspan="2" = "#{schedule.day_name} #{l(schedule.time_start, format: :long)} ~ #{l(schedule.time_end, format: :long)}"
+table.ui.celled.striped.bottom.attached.table
+  thead
+    tr
+      th colspan="3" 초도상담내역
+  tbody
+    tr
+      th.center.aligned 학생부
+      td = @admin_match.study
+      td.four.wide.disabled
+        | - 내신, 출결, 수상실적, 봉사시간, 동아리 활동, 학생회 활동, 독서내역, 페이지수
+    tr
+      th.two.widecenter.aligned 학교
+      td.ten.wide = @admin_match.school
+      td.four.wide.disabled
+        | SKY, 의치한 진학률, 수시/정시 비율, 학교 및 현재 반 분위기 등
+    tr
+      th.two.widecenter.aligned 공부내역
+      td.ten.wide = @admin_match.history
+      td.four.wide.disabled
+        | - 초등학교, 중학교 때 공부 내역(학원, 문제집, 과외 경험 등)
+    tr
+      th.two.widecenter.aligned 국어공부
+      td.ten.wide = @admin_match.korean
+      td.four.wide.disabled
+        | 국어 공부의 역사<br> - 과거에 책 많이 읽었는지 여부<br> - 특히 좋아하는 분야<br> - 어휘력<br> - 모의고사 분석
+    tr
+      th.two.widecenter.aligned 영어공부
+      td.ten.wide = @admin_match.math
+      td.four.wide.disabled
+        | - 선행교육 여부<br> - 현재 듣는 학원수업 또는 인강 등<br> - 풀어본 문제집
+    tr
+      th.two.widecenter.aligned 수학공부
+      td.ten.wide = @admin_match.english
+      td.four.wide.disabled
+        | - 외국에 살다 왔는지 여부 혹은 토플, 토익 준비 여부 등<br> - 단어 수준<br> - 독해 수준<br> - 문법 준비 여부
+  tfoot
+    tr.right.aligned
+      th colspan="20"
+        = link_to "#{semantic_icon('edit')}편집".html_safe, edit_admin_match_path(@admin_match), class: 'ui positive labeled icon large button'

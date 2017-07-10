@@ -1,0 +1,45 @@
+i.close.icon
+div.header 위치 추가하기
+div.content
+  = simple_nested_form_for current_user, url: users_location_path, remote: true, html: { class: 'ui equal width form' } do |f|
+    = f.error_notification
+    = f.simple_fields_for :locations, wrapper: false do |l|
+      div.fields
+        - icon = l.object.is_checked ? 'green check' : 'search'
+        = l.input :full_address,
+                  wrapper: :ui_search, icon: icon,
+                  input_wrapper_html: { class: 'ui left icon input' }
+        = l.hidden_field :lng,              class: 'lng'
+        = l.hidden_field :lat,              class: 'lat'
+        = l.hidden_field :mountain,         class: 'mountain'
+        = l.hidden_field :localName_1,      class: 'localName_1'
+        = l.hidden_field :localName_2,      class: 'localName_2'
+        = l.hidden_field :localName_3,      class: 'localName_3'
+        = l.hidden_field :main_address,     class: 'main_address'
+        = l.hidden_field :sub_address,      class: 'sub_address'
+        = l.hidden_field :building_address, class: 'building_address'
+        = l.hidden_field :is_new_address,   class: 'is_new_address'
+        = l.hidden_field :new_address,      class: 'new_address'
+        = l.hidden_field :zipcode,          class: 'zipcode'
+        = l.hidden_field :zone_no,          class: 'zone_no'
+        = l.hidden_field :is_checked,       class: 'is_checked'
+
+        = l.input :distance, wrapper: :ui_select, as: :select,
+                  include_blank: '거리를 선택해주세요',
+                  collection: [['대중교통 15분 이내', 15],
+                               ['대중교통 30분 이내', 30],
+                               ['대중교통 45분 이내', 45],
+                               ['대중교통 1시간 이내', 60],
+                               ['대중교통 1시간 30분 이내', 90],
+                               ['상관없음', 120]]
+
+        = l.hidden_field :user_id, value: current_user.id
+        = l.hidden_field :id
+        div.ui.field.one.wide
+          label 제거
+          = l.link_to_remove semantic_icon('trash'), class: 'ui button icon basic fluid'
+        div.field.mobile.only.ui.divider
+    = f.link_to_add '추가', :locations, class: 'ui button basic fluid'
+
+    div.ui.divider
+    = f.button :button, '저장'

@@ -1,0 +1,28 @@
+- (start_date.to_date.cweek..end_date.to_date.cweek).each do |week|
+  tbody
+    tr.top.aligned
+      td.middle.aligned.center.aligned colspan="2" 일자
+      - week_days = (start_date.to_date..end_date.to_date).select{|date| date.cweek == week}
+      - [1,2,3,4,5,6,0].each do |index|
+        - if !week_days.first.nil? && week_days.first.wday == index
+          - date = week_days.shift
+          td.two.wide.center.aligned.clearfix class="#{'positive' if date == Date.today}"
+            span.ui.fluid.label class="#{date == Date.today ? 'green' : 'basic'}" == "#{date == Date.today ? '오늘' : l(date, format: :short)}"
+        - else
+          td.two.wide.center.aligned
+  tbody id="daily_test_calendar_#{week}"
+    tr.top.aligned.center.aligned.disabled
+      td colspan="2" 일일테스트
+      td colspan="7" = "불러오는 중입니다 #{semantic_icon('spinner loading')}".html_safe
+  tbody id="online_lecture_calendar_#{week}"
+    tr.top.aligned.center.aligned.disabled
+      td colspan="2" 온라인강의
+      td colspan="7" = "불러오는 중입니다 #{semantic_icon('spinner loading')}".html_safe
+  tbody id="book_calendar_#{week}"
+    tr.top.aligned.center.aligned.disabled
+      td colspan="2" 문제집진도
+      td colspan="7" = "불러오는 중입니다 #{semantic_icon('spinner loading')}".html_safe
+  tbody id="comment_calendar_#{week}"
+    tr.top.aligned.center.aligned.disabled
+      td colspan="2" 학습일지
+      td colspan="7" = "불러오는 중입니다 #{semantic_icon('spinner loading')}".html_safe

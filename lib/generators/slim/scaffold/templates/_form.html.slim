@@ -1,0 +1,18 @@
+= simple_nested_form_for @<%= singular_table_name %> do |f|
+  = f.error_notification
+
+  table.ui.table
+    thead
+      tr
+        th 입력해주세요
+    tbody
+<% attributes.each do |attribute| -%>
+      tr
+        td = f.input :<%= attribute.name %>
+<% end -%>
+
+  table.ui.table
+    thead
+      tr
+        th.sixteen.wide 저장하시겠습니까?
+        th.collapsing = f.button :button, '저장'

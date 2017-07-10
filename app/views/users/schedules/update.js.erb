@@ -1,0 +1,15 @@
+$(function(){
+  $('#user_form').empty().modal('hide');
+
+  $('#schedule_list').append('<div class="ui active loader"></div>');
+  $('#profile_loader').addClass('active');
+
+  setTimeout(function(){
+    $('#schedule_list').html("<%= escape_javascript(render(current_user.schedules) || render('empty')) %>");
+    $.ajax({url: '<%= users_profile_path(format: :js) %>'});
+  }, 500);
+
+  $(document)
+    .off('nested:fieldAdded')
+    .off('nested:fieldRemoved');
+});

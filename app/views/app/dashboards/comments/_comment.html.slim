@@ -1,0 +1,41 @@
+tr
+  - if comment.completed_at.nil?
+    td.collapsing.top.aligned
+      = link_to "#{semantic_icon('square outline')}".html_safe,
+                dashboard_comment_path(dashboard_id: params[:dashboard_id],
+                                       id: comment.id,
+                                       completed_at: true,
+                                       format: :js), remote: true, method: :patch, class: 'ui basic icon button'
+  - else
+    td.collapsing.top.aligned
+      = link_to "#{semantic_icon('check')}".html_safe,
+               dashboard_comment_path(dashboard_id: params[:dashboard_id],
+                                      id: comment.id,
+                                      completed_at: false,
+                                      format: :js), remote: true, method: :patch, class: 'ui positive icon button'
+  td.ui.comments
+    div.comment
+      div.avatar
+        = image_tag comment.user.avatar.url(:thumbnail)
+      div.content
+        span.author = comment.user.name
+        div.metadata
+          span.date = "#{distance_of_time_in_words comment.created_at, Time.zone.now} 전"
+        div.text == comment.content
+        div.actions
+          = link_to '답글 작성',
+                    new_dashboard_comment_path(match_id: params[:dashboard_id],
+                                               subject_id: comment.subject_id,
+                                               comment_id: comment.id,
+                                               format: :js), remote: true, method: :get
+      - unless comment.reply_comments.blank?
+        div.comments
+          - comment.reply_comments.each do |reply|
+            div.comment
+              div.avatar
+                = image_tag reply.user.avatar.url(:thumbnail)
+              div.content
+                span.author = reply.user.name
+                div.metadata
+                  span.date = "#{distance_of_time_in_words comment.created_at, Time.zone.now} 전"
+                div.text = reply.content

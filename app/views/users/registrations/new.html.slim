@@ -1,0 +1,26 @@
+= render '/users/step', step: 1
+div.ui.attached.segment
+  = simple_form_for resource, as: resource_name, url: registration_path(resource_name) do |f|
+    div
+      = f.error_notification
+      h4.ui.dividing.header 정보 입력
+      div.two.fields
+        = f.input :phone,
+                  icon: 'mobile', input_wrapper_html: { class: 'left icon' },
+                  autofocus: true
+        = f.input :name,
+                  icon: 'user', input_wrapper_html: { class: 'left icon' }
+      div.two.fields
+        = f.input :password,
+                  icon: 'lock', input_wrapper_html: { class: 'left icon' },
+                  required: true
+        = f.input :password_confirmation,
+                  icon: 'lock', input_wrapper_html: { class: 'left icon' },
+                  required: true
+      h4.ui.dividing.header 이용약관 동의
+      = f.input :agreed_at, as: :boolean, wrapper: :ui_checkbox
+    div.ui.divider
+    = f.button :button, '회원가입'
+
+div.ui.bottom.attached.warning.message
+  = link_to "#{semantic_icon('help')} 이미 회원이신가요? 여기에서 로그인 하세요".html_safe, new_session_path(resource_name)

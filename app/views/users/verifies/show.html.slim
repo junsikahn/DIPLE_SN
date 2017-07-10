@@ -1,0 +1,51 @@
+= render '/users/step', step: 2
+div.ui.attached.segment
+  = simple_form_for @user, url: users_verify_path do |f|
+    = f.error_notification
+    div.two.fields
+      = f.input :pin,
+                icon: 'unlock', input_wrapper_html: { class: 'left icon' },
+                required: true,
+                autofocus: true,
+                maxlength: 4, min: 1000, max: 9999, pattern: '[0-9]*'
+      = f.input :pin_sent_at, as: :string,
+                icon: 'clock', input_wrapper_html: { class: 'left icon' },
+                readonly: true
+    div.ui.divider
+    div.ui.message.yellow.fluid = "핀 번호는 #{current_user.pin} 입니다"
+    = f.button :button, '인증', id: 'verify_submit_button'
+    = link_to '재전송', users_verify_path, method: :put, id: 'verify_resend_button', class: 'ui button negative fluid', style: 'display: none'
+div.ui.bottom.attached.warning.message
+  = link_to "#{semantic_icon('help')} SMS를 받지 못하셨나요? 여기를 누르시면 재전송해드리겠습니다".html_safe, users_verify_path, method: :put
+
+
+javascript:
+  $(function() {
+    $('#user_pin').on('keydown', function(e){
+      if (e.keyCode !== 8 && e.keyCode !== 13 && e.target.value.length == 4) return false;
+    });
+
+    var verifyTimer = setInterval(function() {
+      var now = new Date();
+      var dday = new Date("#{current_user.pin_sent_at + 5 * 60}");
+
+      var days = (dday - now) / 1000 / 60 / 60 / 24;
+      var daysRound = Math.floor(days);
+      var hours = (dday - now) / 1000 / 60 / 60 - (24 * daysRound);
+      var hoursRound = Math.floor(hours);
+      var minutes = (dday - now) / 1000 /60 - (24 * 60 * daysRound) - (60 * hoursRound);
+      var minutesRound = Math.floor(minutes);
+      var seconds = (dday - now) / 1000 - (24 * 60 * 60 * daysRound) - (60 * 60 * hoursRound) - (60 * minutesRound);
+      var secondsRound = Math.round(seconds);
+
+      if (daysRound === 0) {
+        $('#user_pin_sent_at').val(minutesRound + '분 ' + secondsRound + '초');
+      } else {
+        $('#user_pin_sent_at').val('PIN 번호가 파기되었습니다').attr('disabled', true);
+        $('#verify_submit_button').hide();
+        $('#verify_resend_button').show();
+        clearInterval(verifyTimer);
+      }
+
+    }, 1000);
+  });

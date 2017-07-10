@@ -1,0 +1,14 @@
+i.close.icon
+div.header 계좌 입력하기
+div.content
+  = simple_form_for current_user.mentor, url: users_bank_info_path, remote: true do |f|
+    div
+      = f.error_notification
+      div.two.fields
+        = f.input :bank_name,
+                  wrapper: :ui_select,
+                  as: :select,
+                  collection: Standard::Bank.all.collect { |bank| [bank.name, bank.name] },
+                  prompt: '은행을 선택하세요'
+        = f.input :account_number, as: :numeric
+      = f.button :button, '저장'

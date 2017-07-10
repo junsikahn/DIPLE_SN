@@ -1,0 +1,88 @@
+div#user_form.ui.modal.transition
+
+div.ui.attached.message
+  div.header 마이페이지
+  p 프로필을 업데이트하세요
+div.ui.attached.segment
+  div.ui.grid.stackable.divided
+    div.row
+      div#profile_div.column.four.wide
+        = render 'profile'
+      div.column.twelve.wide.computer.largescreen.widescreen.tablet.only
+          - if current_user.mentor?
+            h4.ui.block.header.top.attached
+              i.bell.icon
+              div.content
+                | 자기소개 정보
+                div.sub.header 본인의 자기소개 정보를 입력해주세요
+            div.ui.attached.segment.center.aligned
+              div#mentor_introduction.ui.middle.aligned.selection.divided.relaxed.list
+                = current_user.mentor.self_introduction? ? simple_format(current_user.mentor.self_introduction) : render('empty')
+            = link_to '자기소개 입력하기', edit_users_introduction_path, remote: true, class: 'ui button basic fluid bottom attached'
+
+          h4.ui.block.header.top.attached
+            i.university.icon
+            div.content
+              | 학력 정보
+              div.sub.header 본인의 학력 정보를 입력해주세요
+          div.ui.attached.segment.center.aligned
+            div#career_list.ui.middle.aligned.selection.divided.relaxed.list
+              = render(current_user.careers.order(category: :desc)) || render('empty')
+          = link_to '학력 추가하기', edit_users_career_path, remote: true, class: 'ui button basic fluid bottom attached'
+
+          h4.ui.block.header.top.attached
+            i.book.icon
+            div.content
+              | 선호 과목 정보
+              div.sub.header 과외가 가능한 과목 정보를 입력해주세요
+          div.ui.attached.segment.center.aligned
+            div#subject_list.ui.middle.aligned.selection.divided.relaxed.list
+              = render(current_user.favored_subjects) || render('empty')
+          = link_to '선호과목 입력하기', edit_users_favored_subject_path, remote: true, class: 'ui button basic fluid bottom attached'
+
+          h4.ui.block.header.top.attached
+            i.globe.icon
+            div.content
+              | 선호 지역 정보
+              div.sub.header 과외 가능 지역을 입력해주세요
+          div.ui.attached.segment.center.aligned
+            div#location_list.ui.middle.aligned.selection.divided.relaxed.list
+              = render(current_user.locations) || render('empty')
+          = link_to '위치 추가하기', edit_users_location_path, remote: true, class: 'ui button basic fluid bottom attached'
+
+          h4.ui.block.header.top.attached
+            i.calendar.icon
+            div.content
+              | 선호 일정 정보
+              div.sub.header 과외 가능 일정 정보를 입력해주세요
+          div.ui.attached.segment.center.aligned
+            div#schedule_list.ui.middle.aligned.selection.divided.relaxed.list
+              = render(current_user.schedules) || render('empty')
+          = link_to '일정 추가하기', edit_users_schedule_path, remote: true, class: 'ui button basic fluid bottom attached'
+
+          - if current_user.mentor?
+            h4.ui.block.header.top.attached
+              i.money.icon
+              div.content
+                | 계좌 정보
+                div.sub.header 과외비 정산을 위한 본인 명의의 계좌를 입력해주세요
+            div.ui.attached.segment.center.aligned
+              div#bank_info.ui.middle.aligned.selection.divided.relaxed.list
+                = current_user.mentor.bank_name? ? simple_format("#{current_user.mentor.bank_name} : #{current_user.mentor.account_number}") : render('empty')
+            = link_to '계좌정보 입력하기', edit_users_bank_info_path, remote: true, class: 'ui button basic fluid bottom attached'
+
+div.ui.bottom.attached.segment
+  - if current_user.mentor? && !current_user.mentor.recruited_at? && !current_user.mentor.authorized_at?
+    p.ui.message 매칭을 신청하면 디플의 매칭 매니저가 개별적으로 연락을 드려 사전 인터뷰를 진행하게 됩니다
+    = link_to '매칭 신청하기', users_mentor_path, method: :post, class: 'ui button fluid green'
+  - elsif current_user.mentor? && current_user.mentor.recruited_at? && !current_user.mentor.authorized_at?
+    p.ui.message 현재 일정 조율중입니다
+    = link_to '매칭 신청 취소', users_mentor_path(current_user.mentor), method: :delete, class: 'ui button fluid red'
+  - elsif current_user.mentor? && current_user.mentor.recruited_at? && current_user.mentor.authorized_at?
+    p.ui.message 인증되었습니다
+    = link_to '매칭 신청 취소', users_mentor_path(current_user.mentor), method: :delete, class: 'ui button fluid red'
+
+div.ui.warning.message
+  = link_to "#{semantic_icon('remove user')} 회원탈퇴".html_safe, user_registration_path, method: :delete
+div.ui.warning.message
+  = link_to "#{semantic_icon('sign out')} 로그아웃".html_safe, destroy_user_session_path, method: :delete

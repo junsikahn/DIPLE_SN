@@ -1,0 +1,45 @@
+i.close.icon
+div.header 일정 추가하기
+div.content
+  div.ui.grid.stackable.divided
+    div.row
+      div.column.six.wide
+        div#calendar
+      div.column.ten.wide
+        = simple_nested_form_for current_user, url: users_schedule_path, remote: true, html: { class: 'ui equal width form' } do |f|
+          div
+            = f.error_notification
+            = f.simple_fields_for :schedules, wrapper: false do |s|
+              div.fields
+                = s.hidden_field :user_id, value: current_user.id
+                = s.hidden_field :id
+                = s.input :day_of_week, wrapper: :ui_select, as: :select,
+                          include_blank: '요일을 선택해주세요',
+                          collection: [['월요일', 1],
+                                       ['화요일', 2],
+                                       ['수요일', 3],
+                                       ['목요일', 4],
+                                       ['금요일', 5],
+                                       ['토요일', 6],
+                                       ['일요일', 0]]
+                = s.input :time_start,
+                          wrapper: :ui_select, input_html: { class: 'search' },
+                          as: :string,
+                          start_hour: 9,
+                          end_hour: 24,
+                          minute_step: 15,
+                          prompt: { hour: '시간을 선택해주세요', minute: '분을 선택해주세요' }
+                = s.input :time_end,
+                          wrapper: :ui_select, input_html: { class: 'search' },
+                          as: :string,
+                          start_hour: 9,
+                          end_hour: 24,
+                          minute_step: 15,
+                          prompt: { hour: '시간을 선택해주세요', minute: '분을 선택해주세요' }
+                div.ui.field.one.wide
+                  label 제거
+                  = s.link_to_remove semantic_icon('trash'), class: 'ui button icon basic fluid'
+                div.field.mobile.only.ui.divider
+            = f.link_to_add '추가', :schedules, class: 'ui button basic fluid'
+            div.ui.divider
+            = f.button :button, '저장'

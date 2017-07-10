@@ -1,0 +1,47 @@
+= simple_nested_form_for @admin_subject, url: @admin_subject.new_record? ? admin_subjects_path : admin_subject_path(@admin_subject) do |f|
+  = f.error_notification
+  table.ui.table
+    thead
+      tr
+        th 입력해주세요
+    tbody
+      tr
+        td
+          div.fields
+            = f.input :order, label: false, wrapper_html: { class: 'four wide' }
+            = f.input :name, label: false, wrapper_html: { class: 'twelve wide' }
+          table.ui.bottom.attached.table.black
+            tbody
+              = f.simple_fields_for :details, wrapper: false do |d1|
+                tr
+                  td
+                    div.fields
+                      = d1.input :order, label: false, wrapper_html: { class: 'four wide' }
+                      = d1.input :name, label: false, wrapper_html: { class: 'twelve wide' }
+                    table.ui.bottom.attached.table.grey
+                      tbody
+                        = d1.simple_fields_for :details, wrapper: false do |d2|
+                          tr
+                            td
+                              div.fields
+                                = d2.input :order, label: false, wrapper_html: { class: 'four wide' }
+                                = d2.input :name, label: false, wrapper_html: { class: 'twelve wide' }
+                        tr
+                          td = d1.link_to_add "#{d1.object.name.nil? ? '' : d1.object.title} 소분류 추가", :details, class: 'ui button basic fluid'
+            tr
+              td = f.link_to_add "#{f.object.name} 중분류 추가", :details, class: 'ui button basic fluid'
+  table.ui.table
+    thead
+      tr
+        th.sixteen.wide 저장하시겠습니까?
+        th.collapsing
+          = f.button :button, '저장'
+
+javascript:
+  $(function(){
+    $('form').find('select').dropdown();
+    window.NestedFormEvents.prototype.insertFields = function(content, assoc, link) {
+      var $tr = $(link).closest('tr');
+      return $(content).insertBefore($tr);
+    };
+  })

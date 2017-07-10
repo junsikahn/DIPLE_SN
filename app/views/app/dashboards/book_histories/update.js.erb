@@ -1,0 +1,22 @@
+$(function(){
+  var target_div = $('#book_history_' + '<%= @book_history.id %>');
+  target_div.replaceWith("<%= escape_javascript(render @book_history) %>");
+  var replaced_div = $('#book_history_' + '<%= @book_history.id %>');
+  replaced_div.find('.ui.progress').progress();
+  replaced_div.find('.button.collapse').on('click', function(e){
+    var icon = $(this).find('i');
+    $(this).parentsUntil('tbody', this).next('tr').transition('slide', 150, function(){
+      icon.toggleClass('rotated');
+    });
+  });
+  replaced_div.find('.ui.rating').rating({
+    onRate: function(value) {
+      $.ajax({
+        url: '<%= dashboard_book_histories_path(dashboard_id: params[:dashboard_id]) %>/' + $(this).data('id') +'/rating',
+        data: {rating: value},
+        dataType: 'script',
+        type: 'PATCH'
+      })
+    }
+  });
+});

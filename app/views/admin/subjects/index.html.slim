@@ -1,0 +1,39 @@
+table.ui.celled.selectable.table style="cursor: pointer;"
+  thead
+    tr
+      th.center.aligned style="border-bottom: 0;" 주요 과목 구분
+      th.center.aligned colspan="3" style="border-bottom: 0;" 상세 과목 구분
+  - @admin_subjects.each do |admin_subject|
+    tbody onclick='//location.href="#{edit_admin_subject_path(admin_subject.id)}"'
+      tr
+        - row_count = admin_subject.details.size + 1
+        - admin_subject.details.each do |depth1|
+          - row_count += depth1.details.size
+          - depth1.details.each do |depth2|
+            - row_count += depth2.details.size
+        td.three.wide rowspan="#{row_count}" colspan="#{row_count == 1 ? 4 : 1}" style="border-top: 1px solid rgba(34, 36, 38, 0.1)"
+          span.ui.horizontal.label = admin_subject.order
+          = admin_subject.name
+          small style="float: right;" = admin_subject.path
+      - admin_subject.details.each do |depth1|
+        tr
+          - row_count = depth1.details.size + 1
+          - depth1.details.each do |depth2|
+            - row_count += depth2.details.size
+          td.three.wide rowspan="#{row_count}" colspan="#{row_count == 1 ? 3 : 1}" style="border-left: 1px solid rgba(34, 36, 38, 0.1)"
+            span.ui.horizontal.label = depth1.order
+            = depth1.name
+            small style="float: right;" = depth1.path
+        - depth1.details.each do |depth2|
+          tr
+            - row_count = depth2.details.size + 1
+            td.five.wide rowspan="#{row_count}" colspan="#{row_count == 1 ? 2 : 1}" style="border-left: 1px solid rgba(34, 36, 38, 0.1)"
+              span.ui.horizontal.label = depth2.order
+              = depth2.name
+              small style="float: right;" = depth2.path
+          - depth2.details.each do |depth3|
+            tr
+              td.five.wide style="border-left: 1px solid rgba(34, 36, 38, 0.1)"
+                span.ui.horizontal.label = depth3.order
+                = depth3.name
+                small style="float: right;" = depth3.path

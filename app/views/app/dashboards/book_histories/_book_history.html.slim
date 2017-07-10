@@ -1,0 +1,70 @@
+- planned = book_history.details.select{ |l| l.completed_at.nil? && !l.planned_at.nil? && l.planned_at < @end_date }
+- completed = book_history.details.select{ |l| !l.completed_at.nil? && l.completed_at < @end_date }
+- completed_now = book_history.details.select{ |l| !l.completed_at.nil? && @start_date < l.completed_at && l.completed_at < @end_date }
+
+- total_count = book_history.details.size
+- completed_count = completed.size
+- completed_rate = total_count.zero? ? 0 : 100 * completed_count / total_count
+- completed_rate = 100 if completed_rate > 100
+
+tbody id="book_history_#{book_history.id}"
+  tr
+    td.collapsing
+      button.ui.basic.icon.button.collapse.clearfix
+        - if planned.count.zero?
+          = semantic_icon('counterclockwise rotated caret down')
+        - else
+          = semantic_icon('counterclockwise caret down')
+          span.ui.red.circular.floating.mini.label == "#{planned.count}"
+    td.six.wide.collapsing
+      span.ui.circular.empty.mini.horizontal.label class="#{book_history.tag_color}"
+      small = "#{book_history.book.subject.name} / #{book_history.book.series}"
+      br
+      b = book_history.book.name
+    td.collapsing.center.aligned
+      == "#{l book_history.started_at, format: :short} ~ " + (book_history.planned_at.nil? ? '목표 없음' : "#{l book_history.planned_at, format: :short}")
+      br
+      == (book_history.completed_at.nil? ? '(미완료)' : "(#{l book_history.completed_at, format: :short} 완료함)")
+    td.eight.wide
+      div.ui.indicating.progress.small data-percent="#{completed_rate}"
+        div.bar
+        div.label = "#{completed_count} 챕터 완료 / 총 #{total_count} 챕터"
+    td.collapsing
+      = link_to "#{semantic_icon('edit')}".html_safe,
+                edit_dashboard_book_history_path(dashboard_id: params[:dashboard_id],
+                                                 id: book_history.id,
+                                                 start_date: l(@start_date, format: :date_dash),
+                                                 end_date: l(@end_date, format: :date_dash),
+                                                 format: :js), remote: true, method: :get, class: 'ui basic icon button'
+    tr.top.aligned.transition.content class="#{'hidden' if planned.count.zero?}"
+      td colspan="6"
+        div.ui.equal.width.grid.stackable
+          div.column
+            table.ui.table
+              thead
+                tr
+                  th.center.aligned colspan="4" 목표내역
+              tbody.dashboard-table empty="내역이 없습니다"
+                - planned.each do |detail|
+                  - tr_class = 'positive' if detail.planned_at.between?(@start_date, @end_date)
+                  - tr_class = 'error' if detail.planned_at < @start_date || detail.planned_at < Date.today
+                  tr class="#{tr_class}"
+                    td.sixteen.wide
+                      span.ui.horizontal.label = "~ #{detail.book_unit.page}p"
+                      = detail.book_unit.name
+                    td.collapsing = "#{l detail.planned_at, format: :short} 까지"
+          div.column
+            table.ui.table
+              thead
+                tr
+                  th.center.aligned colspan="4" 완료내역
+              tbody.dashboard-table empty="내역이 없습니다"
+                - completed_now.each do |detail|
+                  - tr_class = 'positive' if detail.completed_at.between?(@start_date, @end_date)
+                  tr class="#{tr_class}"
+                    td.sixteen.wide
+                      span.ui.horizontal.label = "~ #{detail.book_unit.page}p"
+                      = detail.book_unit.name
+                    td.collapsing = "#{l detail.completed_at, format: :short} 완료"
+                    td.collapsing
+                      div.ui.star.rating data-rating="#{detail.rating}" data-max-rating="3" data-id="#{detail.id}"

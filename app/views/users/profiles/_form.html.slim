@@ -1,0 +1,22 @@
+i.close.icon
+div.header 기본 정보 입력하기
+div.content
+  = simple_form_for current_user, url: users_profile_path, remote: true do |f|
+    div
+      = f.error_notification
+      = f.input :name, required: true, readonly: true
+      = f.input :gender,
+                as: :select,
+                wrapper: :ui_select,
+                collection: [['남자', true], ['여자', false]],
+                include_blank: '성별을 선택해주세요',
+                required: true
+      = f.input :birthday,
+                wrapper: :ui_select, input_html: { class: 'field search' },
+                start_year: Date.today.year - 12,
+                end_year: Date.today.year - 90,
+                prompt: { year: '연도', month: '월', day: '일' },
+                order: [:year, :month, :day],
+                required: true
+    div.ui.divider
+    = f.button :button, '입력'

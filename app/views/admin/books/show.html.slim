@@ -1,0 +1,35 @@
+table.ui.celled.striped.table
+  thead
+    tr
+      th.center.aligned 과목명
+      th.center.aligned 출판사
+      th.center.aligned 시리즈
+      th.center.aligned 제목
+  tbody
+    tr
+      td = @admin_book.subject.name
+      td = @admin_book.publisher.name
+      td = @admin_book.series
+      td = @admin_book.name
+  tfoot
+    tr.right.aligned
+      th colspan="20"
+        = link_to "#{semantic_icon('edit')}편집".html_safe, edit_admin_book_path(@admin_book), class: 'ui positive labeled icon large button'
+
+- unless @admin_book.units.blank?
+  table.ui.celled.striped.table
+    thead
+      tr
+        th.center.aligned colspan="13" 교재 목차
+      tr
+        th.center.aligned 순번
+        th.center.aligned colspan="#{@admin_book.units.pluck(:depth).max + 1}" 강의명
+        th.center.aligned 페이지
+    tbody
+      - @admin_book.units.each do |unit|
+        tr
+          td.one.wide = unit.order
+          - unit.depth.times do |depth|
+            td.one.wide.collpsing
+          td.collpsing colspan="#{@admin_book.units.pluck(:depth).max + 1 - unit.depth}" = unit.name
+          td.one.wide = unit.page

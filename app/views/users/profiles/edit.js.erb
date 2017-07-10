@@ -1,0 +1,11 @@
+$(function() {
+  $('#user_form').html("<%= escape_javascript(render 'form') %>").modal('show');
+
+  $('#user_gender').dropdown();
+  $.each($('#user_birthday_1i option'), function( index, value ) { if (index > 0) value.text += '년'; });
+  $.each($('#user_birthday_2i option'), function( index, value ) { if (index > 0) value.text += '월'; });
+  $.each($('#user_birthday_3i option'), function( index, value ) { if (index > 0) value.text += '일'; });
+  $('#user_birthday_1i').dropdown();
+  $('#user_birthday_2i').dropdown();
+  $('#user_birthday_3i').dropdown();
+});

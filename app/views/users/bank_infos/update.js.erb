@@ -1,0 +1,11 @@
+$(function() {
+  $('#user_form').empty().modal('hide');
+
+  $('#bank_info').append('<div class="ui active loader"></div>');
+  $('#profile_loader').addClass('active');
+
+  setTimeout(function(){
+    $('#bank_info').html("<%= current_user.mentor.bank_name + ' : ' + current_user.mentor.account_number %>")
+    $.ajax({url: '<%= users_profile_path(format: :js) %>'});
+  }, 500);
+});

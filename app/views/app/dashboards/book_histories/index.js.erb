@@ -1,0 +1,86 @@
+$(function(){
+  var target_div = $('#book_histories_list');
+  target_div.html("<%= escape_javascript(render @book_histories) %>");
+  var replaced_div = $('#book_histories_list');
+  replaced_div.find('.ui.progress').progress();
+  replaced_div.find('.button.collapse').on('click', function(e){
+    var icon = $(this).find('i');
+    $(this).parentsUntil('tbody', this).next('tr').transition('slide', 150, function(){
+      icon.toggleClass('rotated');
+    });
+    return false;
+  });
+  replaced_div.find('.ui.rating').rating({
+    onRate: function(value) {
+      $.ajax({
+        url: '<%= dashboard_book_histories_path(dashboard_id: params[:dashboard_id]) %>/' + $(this).data('id') +'/rating',
+        data: {rating: value},
+        dataType: 'script',
+        type: 'PATCH'
+      })
+    }
+  });
+
+  <% (@start_date.to_date.cweek..@end_date.to_date.cweek).each do |week| %>
+    $('#book_calendar_<%= week %>').replaceWith("<%= escape_javascript(render 'calendar', book_histories: @book_histories, start_date: params[:start_date], end_date: params[:end_date], week: week) %>");
+  <% end %>
+
+  var touchMoveFalse = function() { return false; };
+  var book_containers = [];
+  $.each($('.book-dragula'), function(index, value){
+    book_containers.push(value);
+    $(this).find('.item').on('touchmove', function(){
+      window.addEventListener('touchmove', touchMoveFalse);
+    });
+  });
+  dragula(book_containers)
+    .on('drag', function(el, source){
+      $('.book-dragula').addClass('warning');
+    })
+    .on('dragend', function(){
+      $('.book-dragula').removeClass('warning');
+      window.removeEventListener('touchmove', touchMoveFalse);
+    })
+    .on('drop', function(el, target, source, sibling) {
+      if (target == source) return;
+      var data;
+      if ($(target).data('planned')) {
+        data = {
+          planned_at: $(target).data('date'),
+          completed_at: 'false',
+          detail_id: $(el).data('detail'),
+          start_date: '<%= params[:start_date] %>',
+          end_date: '<%= params[:end_date] %>>'
+        };
+      } else if ($(target).data('completed')) {
+        data = {
+          completed_at: $(target).data('date'),
+          detail_id: $(el).data('detail'),
+          start_date: '<%= params[:start_date] %>',
+          end_date: '<%= params[:end_date] %>'
+        };
+      }
+
+      $.ajax({
+        url: '<%= dashboard_book_histories_path(dashboard_id: params[:dashboard_id]) %>/' + $(el).data('id'),
+        data: data,
+        dataType: 'script',
+        type: 'PATCH',
+        success: function(data) {
+          new Noty({
+            type: 'success',
+            text: '업데이트 성공!<br>' + $(el).html(),
+            layout: 'bottomRight',
+            theme: 'semanticui',
+            timeout: 5000,
+            progressBar: true,
+            closeWith: ['click', 'button'],
+            animation: {
+              open: 'noty_effects_open',
+              close: 'noty_effects_close'
+            }
+          }).show();
+        }
+      });
+    });
+});

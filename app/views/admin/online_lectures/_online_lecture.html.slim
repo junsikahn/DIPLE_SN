@@ -1,0 +1,15 @@
+tr class="#{status(online_lecture)}"
+  td = online_lecture.provider_name
+  td = online_lecture.subject.name
+  td = online_lecture.teacher.name
+  td = online_lecture.target
+  td = online_lecture.title
+  td = online_lecture.lecture_count
+  td = online_lecture.lists.size
+  td = semantic_icon(status_icon(online_lecture))
+  td = online_lecture.is_collected.nil? ? '' : semantic_icon("#{online_lecture.is_collected ? 'bookmark green' : 'exclamation red'}")
+  td = online_lecture.uid
+  - if action_name == 'index'
+    td = link_to 'Show', online_lecture
+    td = link_to 'Edit', edit_admin_online_lecture_path(online_lecture)
+    td = link_to 'Destroy', online_lecture, method: :delete, data: { confirm: 'Are you sure?' }

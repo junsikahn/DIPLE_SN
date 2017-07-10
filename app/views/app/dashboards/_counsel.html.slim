@@ -1,0 +1,13 @@
+= simple_form_for match, url: dashboard_path(match), method: :patch, remote: true, html: { id: 'counsel_form', class: 'ui modal' } do |f|
+  i.close.icon
+  div.header 초도 상담
+  div.content.ui.form
+    = f.error_notification
+    = f.input :study
+    = f.input :school
+    = f.input :history
+    = f.input :korean
+    = f.input :english
+    = f.input :math
+  div.actions
+    = f.button :button, '입력'

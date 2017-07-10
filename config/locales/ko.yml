@@ -1,0 +1,216 @@
+# Files in the config/locales directory are used for internationalization
+# and are automatically loaded by Rails. If you want to use locales other
+# than English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t 'hello'
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t('hello') %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# To learn more, please read the Rails Internationalization guide
+# available at http://guides.rubyonrails.org/i18n.html.
+
+ko:
+  breadcrumbs:
+    application:
+      index: Home
+  views:
+    pagination:
+      first: "&laquo; First"
+      last: "Last &raquo;"
+      previous: "&lsaquo; Prev"
+      next: "Next &rsaquo;"
+      truncate: "&hellip;"
+  helpers:
+    select:
+      prompt: 선택해주세요
+    submit:
+      create: 등록
+      submit: 제출
+      update: 수정
+    page_entries_info:
+      one_page:
+        display_entries:
+          zero: "No %{entry_name} found"
+          one: "Displaying <b>1</b> %{entry_name}"
+          other: "Displaying <b>all %{count}</b> %{entry_name}"
+      more_pages:
+        display_entries: "Displaying %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> of <b>%{total}</b> in total"
+  date:
+    abbr_day_names:
+    - 일
+    - 월
+    - 화
+    - 수
+    - 목
+    - 금
+    - 토
+    abbr_month_names:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    day_names:
+    - 일요일
+    - 월요일
+    - 화요일
+    - 수요일
+    - 목요일
+    - 금요일
+    - 토요일
+    month_names:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    order:
+    - :year
+    - :month
+    - :day
+    formats:
+      default: '%Y/%m/%d'
+      long: '%Y년 %m월 %d일 (%a)'
+      short: '%m/%d'
+  time:
+    am: 오전
+    pm: 오후
+    formats:
+      default: '%H시 %M분'   # "%Y/%m/%d %H:%M:%S"
+      long: '%p %l시 %M분'   # "%Y년 %m월 %d일, %H시 %M분 %S초 %Z"
+      short: '%H:%M'        # "%y/%m/%d %H:%M"
+      date_default: '%Y/%m/%d'
+      date_long: '%Y년 %m월 %d일 (%a)'
+      date_short: '%m/%d'
+      date_dash: '%Y-%m-%d'
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: 약 한 시간
+        other: 약 %{count}시간
+      about_x_months:
+        one: 약 한 달
+        other: 약 %{count}달
+      about_x_years:
+        one: 약 일 년
+        other: 약 %{count}년
+      almost_x_years:
+        one: 일 년 이하
+        other: "%{count}년 이하"
+      half_a_minute: 30초
+      less_than_x_minutes:
+        one: 일 분 이하
+        other: "%{count}분 이하"
+      less_than_x_seconds:
+        one: 일 초 이하
+        other: "%{count}초 이하"
+      over_x_years:
+        one: 일 년 이상
+        other: "%{count}년 이상"
+      x_days:
+        one: 하루
+        other: "%{count}일"
+      x_minutes:
+        one: 일 분
+        other: "%{count}분"
+      x_months:
+        one: 한 달
+        other: "%{count}달"
+      x_seconds:
+        one: 일 초
+        other: "%{count}초"
+    prompts:
+      day: 일
+      hour: 시
+      minute: 분
+      month: 월
+      second: 초
+      year: 년
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            phone:
+              blank: 휴대폰번호를 입력해주세요
+              taken: 이미 사용중인 휴대폰번호입니다
+              not_a_number: 숫자로 입력해주세요
+              too_short: 입력하신 휴대폰번호가 너무 짧습니다
+              too_long: 입력하신 휴대폰번호가 너무 깁니다
+              invalid: 입력하신 휴대폰번호가 유효하지 않습니다
+            name:
+              blank: 이름을 입력해주세요
+            password:
+              blank: 비밀번호를 입력해주세요
+              too_short: 비밀번호는 6자리 이상 입력해주세요
+            password_confirmation:
+              confirmation: 비밀번호가 일치하지 않습니다
+            agreed_at:
+              blank: 이용약관에 동의해주세요
+            email:
+              invalid: 이메일 주소 형식을 확인해주세요
+        mentor:
+          attributes:
+            self_introduction:
+              too_short: 10글자 이상 입력해주세요
+        career:
+          attributes:
+            school:
+              blank: 학교명을 입력해주세요
+              invalid: 검색결과를 선택해주세요
+            major_1:
+              blank: 전공을 입력해주세요
+              invalid: 검색결과를 선택해주세요
+            major_2:
+              invalid: 검색결과를 선택해주세요
+            major_3:
+              invalid: 검색결과를 선택해주세요
+            status:
+              blank: 재학상태를 선택해주세요
+            entrance_year:
+              blank: 입학년도를 입력해주세요
+            graduate_year:
+              blank: 졸업년도를 입력해주세요
+              present: 졸업하지 않은 경우 졸업년도를 비워놔주세요
+              invalid: 졸업년도가 입학년도보다 빠를 수 없어요
+        schedule:
+          attributes:
+            day_of_week:
+              blank: 요일을 선택해주세요
+            time_start:
+              blank: 시작시간을 선택해주세요
+              before: 종료시간보다 이전 시간을 입력해야 합니다
+            time_end:
+              blank: 종료시간을 선택해주세요
+              after: 시작시간보다 이후 시간을 입력해야 합니다
+        location:
+          attributes:
+            full_address:
+              blank: 주소를 입력해주세요
+              invalid: 검색결과 중에서 정확한 주소를 선택해주세요
+            distance:
+              blank: 거리를 선택해주세요

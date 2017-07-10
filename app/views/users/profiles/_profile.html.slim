@@ -1,0 +1,74 @@
+h4.ui.header
+  i.user.icon
+  div.content
+    | 기본 정보
+    div.sub.header 기본 정보입니다
+div.ui.card.fluid
+  div.blurring.dimmable.image
+    div.ui.dimmer
+      div.content
+        div.center
+          = link_to '프로필 변경', edit_users_avatar_path, remote: true, class: 'ui inverted button'
+    = image_tag current_user.avatar.url(:thumbnail)
+  div.content
+    div.header = current_user.name
+    div.meta: span.date == "#{time_ago_in_words current_user.created_at} 전 가입"
+    div.description
+      = simple_format current_user.mentor.self_introduction if current_user.mentor?
+  div.extra.content
+    div
+      i.user.icon
+      = current_user.gender? ? '남자' : '여자'
+
+div.ui.selection.animated.list
+  div.ui.divider
+  a.ui.ribbon.label.red 필수입력항목
+  div.ui.divider
+  = link_to edit_users_profile_path, remote: true, class: 'item' do
+    div.right.floated.content = current_user.recognized? ? semantic_icon('check', 'green inverted') : semantic_icon('remove', 'red inverted')
+    i.right.triangle.icon
+    div.content 기본 정보 입력
+  = link_to edit_users_avatar_path, remote: true, class: 'item' do
+    div.right.floated.content = !current_user.avatar.blank? ? semantic_icon('check', 'green inverted') : semantic_icon('remove', 'red inverted')
+    i.right.triangle.icon
+    div.content 프로필 사진 입력
+  - if current_user.mentor?
+    = link_to edit_users_introduction_path, remote: true, class: 'item' do
+      div.right.floated.content = current_user.mentor.self_introduction? ? semantic_icon('check', 'green inverted') : semantic_icon('remove', 'red inverted')
+      i.right.triangle.icon
+      div.content 자기소개 입력
+  = link_to edit_users_career_path, remote: true, class: 'item' do
+    div.right.floated.content = !current_user.careers.blank? ? semantic_icon('check', 'green inverted') : semantic_icon('remove', 'red inverted')
+    i.right.triangle.icon
+    div.content 학력 입력
+  div.ui.divider
+  a.ui.ribbon.label.orange 선택입력항목
+  div.ui.divider
+  - if current_user.mentor?
+    = link_to edit_users_favored_subject_path, remote: true, class: 'item' do
+      div.right.floated.content = !current_user.favored_subjects.blank? ? semantic_icon('check', 'green inverted') : semantic_icon('remove', 'red inverted')
+      i.right.triangle.icon
+      div.content 선호 과목 입력
+  = link_to edit_users_location_path, remote: true, class: 'item' do
+    div.right.floated.content = !current_user.locations.blank? ? semantic_icon('check', 'green inverted') : semantic_icon('remove', 'red inverted')
+    i.right.triangle.icon
+    div.content 선호 지역 입력
+  = link_to edit_users_schedule_path, remote: true, class: 'item' do
+    div.right.floated.content = !current_user.schedules.blank? ? semantic_icon('check', 'green inverted') : semantic_icon('remove', 'red inverted')
+    i.right.triangle.icon
+    div.content 선호 일정 입력
+  - if current_user.mentor?
+    = link_to edit_users_bank_info_path, remote: true, class: 'item' do
+      div.right.floated.content = current_user.mentor.account_number? ? semantic_icon('check', 'green inverted') : semantic_icon('remove', 'red inverted')
+      i.right.triangle.icon
+      div.content 계좌 정보 입력
+  div.ui.divider
+
+div.ui.message.small 선택 입력항목을 입력하지 않으면 매칭 우선순위에서 배제됩니다
+
+div#profile_loader.ui.loader
+
+javascript:
+  $('#profile_div .ui.card .image').dimmer({
+    on: 'hover'
+  });

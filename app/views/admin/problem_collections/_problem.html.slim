@@ -1,0 +1,29 @@
+tr
+  td.two.wide.center.aligned rowspan="3"
+    = "#{order}번"
+    br
+    = "(#{problem.score}점)"
+  td.seven.wide colspan="3"
+    div.problem_container.problem_seg style="max-width: 500px;" == problem.content
+  td.seven.wide colspan="3"
+    div.problem_container.problem_seg style="max-width: 500px;" == problem.explanation
+tr
+  - if problem.objective?
+    td.two.wide == problem.exm_1
+    td.two.wide == problem.exm_2
+    td.two.wide == problem.exm_3
+    td.two.wide == problem.exm_4
+    td.two.wide == problem.exm_5
+    td.two.wide == "정답 #{problem.answer}번"
+  - else
+    td.two.wide colspan="6" = "주관식 정답 #{problem.answer}"
+tr
+  td.two.wide == problem.subject.name
+  td.two.wide
+  td.two.wide
+  td.two.wide
+    == "총 #{problem.total_count}회 중 정답 #{problem.correct_count}회"
+    br
+    == "(#{problem.total_count.zero? ? '-'  : "정답률 #{problem.correct_count * 100 / problem.total_count}%"})"
+  td.two.wide = link_to "#{semantic_icon('edit')}수정".html_safe, edit_admin_problem_collection_problem_path(@admin_problem_collection, problem), class: 'ui icon positive basic fluid button'
+  td.two.wide = link_to "#{semantic_icon('trash')}삭제".html_safe, admin_problem_collection_problem_path(@admin_problem_collection, problem), class: 'ui icon negative basic fluid button', data: { confirm: 'Are you sure?' }, method: :delete

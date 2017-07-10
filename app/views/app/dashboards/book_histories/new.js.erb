@@ -1,0 +1,55 @@
+$(function(){
+  var form = $('#book_form');
+  if (form.length === 0) {
+    $('body').append("<%= escape_javascript(render 'new') %>");
+    form = $('#book_form');
+    form.modal({
+      autofocus: false,
+      onApprove: function() {
+        $(this).find('.content').addClass('loading');
+        return false;
+      },
+      onHidden: function(){
+        $(this).remove();
+      }
+    }).modal('show');
+  } else {
+    form.html("<%= escape_javascript(render 'new') %>").modal('refresh');
+  }
+
+  var start_date = $('#match_current_period').data('start');
+  var end_date = $('#match_current_period').data('end');
+  form.attr('action', form.attr('action') + '?start_date=' + start_date + '&end_date=' + end_date);
+
+  var dropdownFields = form.find('select');
+  dropdownFields.dropdown({
+    allowReselection: true
+  });
+
+  $('#book_history_subject_id, #book_history_book_publisher_id').on('ajax:before', function(event, xhr, settings){
+    $(this).data('params', $('#book_history_subject_id, #book_history_book_publisher_id').serialize());
+  });
+
+  var calendar_option = {
+    type: 'date',
+    formatInput: false,
+    text: {
+      months: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
+    },
+    formatter: {
+      dayHeader: function (date, settings) {
+        var month = settings.text.months[date.getMonth()];
+        var year = date.getFullYear();
+        return year + '년 ' + month + '월';
+      },
+      date: function (date, settings) {
+        if (!date) return '';
+        var day = date.getDate();
+        var month = settings.text.months[date.getMonth()];
+        var year = date.getFullYear();
+        return year + '-' + month + '-' + day;
+      }
+    }
+  };
+  form.find('.ui.calendar').calendar(calendar_option);
+});

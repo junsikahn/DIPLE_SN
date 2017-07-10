@@ -1,0 +1,18 @@
+i.close.icon
+div.header 프로필 이미지 입력하기
+div.content
+  = simple_form_for current_user, url: users_avatar_path, remote: true, multipart: true do |f|
+    div
+      = f.error_notification
+      = f.input :avatar do
+        div.ui.card.fluid
+          div.image
+            div.square_seg
+              div.square_img
+                = image_tag current_user.avatar.url(:thumbnail)
+                = f.file_field :avatar
+          div.ui.bottom.attached.button.basic.file-upload
+            i.class.add.icon
+            | 프로필 이미지 등록
+      div.ui.divider
+      = f.button :button, '입력'

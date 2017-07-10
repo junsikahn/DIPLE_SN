@@ -1,0 +1,65 @@
+table.ui.celled.striped.table
+  thead
+    tr
+      th.center.aligned 구분
+      th.center.aligned 과목
+      th.center.aligned 강사
+      th.center.aligned 제목
+      th.center.aligned 대상
+      th.center.aligned 예정
+      th.center.aligned 등록
+      th.center.aligned 완강
+      th.center.aligned 패키지
+      th.center.aligned UID
+  tbody
+    = render @admin_online_lecture
+  tfoot
+    tr.right.aligned
+      th colspan="13"
+        = link_to "#{semantic_icon('edit')}편집".html_safe, edit_admin_online_lecture_path(@admin_online_lecture), class: 'ui positive labeled icon large button'
+
+- unless @admin_online_lecture.lecture_count.zero?
+  table.ui.celled.striped.table
+    thead
+      tr
+        th.center.aligned colspan="13" 강의 목록
+      tr
+        th.center.aligned 회차
+        th.center.aligned 강의명
+        th.center.aligned 강의시간
+    tbody
+      - @admin_online_lecture.lists.each do |list|
+        tr
+          td = list.order_to_s
+          td = list.title
+          td = list.time_to_s
+
+- unless @admin_online_lecture.package_ids.blank?
+  table.ui.celled.striped.table
+    thead
+      tr
+        th.center.aligned colspan="13" 패키지 목록
+      tr
+        th.center.aligned 구분
+        th.center.aligned 과목
+        th.center.aligned 강사
+        th.center.aligned 제목
+        th.center.aligned 대상
+        th.center.aligned 예정
+        th.center.aligned 등록
+        th.center.aligned 완강
+        th.center.aligned 패키지
+        th.center.aligned UID
+    tbody
+      - package_ids = @admin_online_lecture.package_ids.split(',')
+      - @admin_online_lecture.packages.each do |package|
+        = render package
+        - package_ids = package_ids - [package.uid]
+      - package_ids.each do |package_id|
+        - url = "http://www.megastudy.net/lecmain/mains/chr_detail/lecture_detailview.asp?CHR_CD=#{package_id}" if @admin_online_lecture.online_provider_id == 1
+        - url = "http://www.mimacstudy.com/tcher/lctr/lctrDetail.ds?pid=#{package_id}" if @admin_online_lecture.online_provider_id == 2
+        - url = "http://www.skyedu.com/product/view.asp?code=#{package_id}" if @admin_online_lecture.online_provider_id == 3
+        - url = "http://www.etoos.com/lecture/LectureDetail.asp?LECTURE_ID=#{package_id}" if @admin_online_lecture.online_provider_id == 4
+        tr.error
+          td colspan="9" = link_to '등록하기', new_admin_online_lecture_path(subject_id: @admin_online_lecture.subject_id, uid: url), target: '_blank'
+          td = package_id

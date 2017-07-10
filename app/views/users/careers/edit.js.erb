@@ -1,0 +1,113 @@
+$(function() {
+  var school_options = {
+    apiSettings: {
+      url: '<%= preview_users_career_path %>?category={category}&q={query}'
+    },
+    fields : {
+      results : 'results',
+      title   : 'title',
+    },
+    searchDelay : 250,
+    selectFirstResult : true,
+    templates : {
+      message: function(message, type) {
+        if (type == 'empty') {
+          return '<div class="message empty"><div class="header">검색결과 없음</div><div class="description">검색어를 정확히 입력해주세요</div></div>';
+        }
+      },
+      standard: function(response) {
+        var html = document.createElement('div');
+        $.each(response.results, function(index, result) {
+          var item = document.createElement('a');
+          var content = document.createElement('div');
+          var content2 = document.createElement('div');
+          $(item).addClass('result');
+          $(item).append($(content).addClass('title').text(result.name));
+          $(html).append(item);
+        });
+        return html.innerHTML;
+      }
+    },
+    onSelect: function(result, response) {
+      $(this).parent().next().find('.disabled').removeClass('disabled');
+      $(this).parent().next().find('input').removeAttr('disabled');
+    }
+  };
+
+  var status_options = {
+    onChange: function(value, text, $choice) {
+      var parent_div = $(this).closest('.field');
+      var graduateField;
+      if (parent_div.hasClass('user_univ_careers_status')) {
+        graduateField = parent_div.parent().find('.user_univ_careers_graduate_year');
+      } else if (parent_div.hasClass('user_high_careers_status')) {
+        graduateField = parent_div.parent().find('.user_high_careers_graduate_year');
+      }
+      if (value == 2) {
+        graduateField.removeClass('optional').addClass('required').find('.disabled').removeClass('disabled');
+        graduateField.find('select').removeAttr('disabled');
+        graduateField.find('input').removeAttr('disabled');
+      } else {
+        graduateField.addClass('optional').removeClass('required').find('.dropdown').addClass('disabled');
+        graduateField.find('select').dropdown('clear');
+        graduateField.find('input.search').attr('disabled', true);
+      };
+    }
+  };
+
+  var date_options = {
+    className : { dropdown : 'ui dropdown year_select' },
+    onShow: function() {
+      if ($(this).parent().hasClass('optional')) $(this).dropdown('clear');
+    }
+  };
+
+  var removeRequired = function(e) {
+    if ($(this).hasClass('required') && $(this).find('.disabled').length > 0) {
+      $(this).find('.disabled').removeClass('disabled');
+      $(this).find('select').removeAttr('disabled');
+      $(this).find('input').removeAttr('disabled').focus();
+    }
+  }
+
+  $('#user_form').addClass('large').html("<%= escape_javascript(render 'form') %>").modal({
+    onHidden  : function() {
+      $('#user_form').empty().removeClass('large');
+      $(document)
+        .off('nested:fieldAdded')
+        .off('nested:fieldRemoved');
+    },
+    observeChanges: true
+  }).modal('show');
+
+  var schoolFields = $('#user_form').find('.ui.search');
+  var statusFields = $('#user_form').find('select.select.status');
+  var dateFields = $('#user_form').find('select.search.date');
+  schoolFields.search(school_options);
+  statusFields.dropdown(status_options);
+  dateFields.dropdown(date_options).parent().on('click', removeRequired);
+
+  $(document)
+    .off('nested:fieldAdded')
+    .on('nested:fieldAdded', function(event){
+      var field = event.field;
+      var schoolFields = field.find('.ui.search');
+      var statusFields = field.find('select.select.status');
+      var dateFields = field.find('select.search.date');
+      schoolFields.search(school_options);
+      statusFields.dropdown(status_options);
+      dateFields.dropdown(date_options);
+    })
+    .off('nested:fieldRemoved:univ_careers')
+    .on('nested:fieldRemoved:univ_careers', function(event){
+      event.field.closest('.univ_careers').hide();
+    })
+    .off('nested:fieldRemoved:high_careers')
+    .on('nested:fieldRemoved:high_careers', function(event){
+      event.field.closest('.high_careers').hide();
+    })
+    .off('nested:fieldRemoved')
+    .on('nested:fieldRemoved', function(event){
+      $('#user_form').modal('refresh');
+    });
+});

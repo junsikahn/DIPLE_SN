@@ -1,0 +1,15 @@
+$(function() {
+  $('#user_form').html("<%= escape_javascript(render 'form') %>").modal('show');
+  $('#user_form').find('select.select').dropdown();
+
+  $(document)
+    .off('nested:fieldAdded')
+    .on('nested:fieldAdded', function(event) {
+      var field = event.field;
+      var dropdownFields = field.find('select.select');
+      dropdownFields.dropdown();
+    })
+    .off('nested:fieldRemoved')
+    .on('nested:fieldRemoved', function(event) {
+    });
+});

@@ -1,0 +1,112 @@
+$(function(){
+  var form = $('#book_form');
+  if (form.length === 0) {
+    $('body').append("<%= escape_javascript(render 'edit') %>");
+    form = $('#book_form');
+    form.modal({
+      autofocus: false,
+      onHidden: function(){
+        $(this).remove();
+        $.ajax({
+          url: '<%== dashboard_book_histories_path(dashboard_id: params[:dashboard_id], start_date: params[:start_date], end_date: params[:end_date], format: :js) %>'
+        });
+      }
+    }).modal('show');
+  } else {
+    form.html("<%= escape_javascript(render 'edit') %>").modal('refresh');
+  }
+
+  form.find('.ui.progress').progress();
+
+  var touchMoveFalse = function() { return false; };
+  var book_containers = [];
+  $.each(form.find('.book-dragula'), function(index, value){
+    book_containers.push(value);
+    $(this).find('.item').on('touchmove', function(){
+      window.addEventListener('touchmove', touchMoveFalse);
+    });
+  });
+  dragula(book_containers, {
+  }).on('drag', function(el, source){
+      form.find('.book-dragula').addClass('warning');
+    })
+    .on('dragend', function(){
+      form.find('.book-dragula').removeClass('warning');
+      window.removeEventListener('touchmove', touchMoveFalse);
+    })
+    .on('drop', function(el, target, source, sibling) {
+      if (target == source) return;
+      var data;
+      if ($(target).data('planned')) {
+        data = {
+          planned_at: $(target).data('date'),
+          completed_at: 'false',
+          detail_id: $(el).data('detail'),
+          start_date: '<%= params[:start_date] %>',
+          end_date: '<%= params[:end_date] %>>'
+        };
+      } else if ($(target).data('completed')) {
+        data = {
+          completed_at: $(target).data('date'),
+          detail_id: $(el).data('detail'),
+          start_date: '<%= params[:start_date] %>',
+          end_date: '<%= params[:end_date] %>'
+        };
+      }
+
+      $.ajax({
+        url: '<%= dashboard_book_histories_path(dashboard_id: params[:dashboard_id]) %>/' + $(el).data('id'),
+        data: data,
+        dataType: 'script',
+        type: 'PATCH',
+        success: function(data) {
+          new Noty({
+            type: 'success',
+            text: '업데이트 성공!<br>' + $(el).html(),
+            layout: 'bottomRight',
+            theme: 'semanticui',
+            timeout: 5000,
+            progressBar: true,
+            closeWith: ['click', 'button'],
+            animation: {
+              open: 'noty_effects_open',
+              close: 'noty_effects_close'
+            }
+          }).show();
+        }
+      });
+    });
+
+  var calendar_option = {
+    type: 'date',
+    formatInput: false,
+    text: {
+      months: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
+    },
+    formatter: {
+      dayHeader: function (date, settings) {
+        var month = settings.text.months[date.getMonth()];
+        var year = date.getFullYear();
+        return year + '년 ' + month + '월';
+      },
+      date: function (date, settings) {
+        if (!date) return '';
+        var day = date.getDate();
+        var month = settings.text.months[date.getMonth()];
+        var year = date.getFullYear();
+        return year + '-' + month + '-' + day;
+      }
+    },
+    onChange: function(date, text, mode) {
+      $(this).find('input').val(text).trigger('change');
+      form.find('.main.content').addClass('loading');
+    }
+  };
+  form.find('.ui.calendar').calendar(calendar_option);
+
+  form.find('select').dropdown();
+
+  form.find('#book_history_tag_color').on('ajax:before', function(){
+    form.find('.main.content').addClass('loading');
+  });
+});

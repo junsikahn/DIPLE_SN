@@ -1,0 +1,4 @@
+div.item
+  div.middle.aligned.content
+    div.header = location.full_address
+    = "대중교통 #{location.distance}분 이내" unless location.distance.blank?

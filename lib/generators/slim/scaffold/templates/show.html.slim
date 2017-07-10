@@ -1,0 +1,15 @@
+table.ui.celled.striped.table
+  thead
+    tr
+<% attributes.each do |attribute| -%>
+      th.center.aligned <%= attribute.human_name %>
+<% end -%>
+  tbody
+    tr
+<% attributes.each do |attribute| -%>
+      td = @<%= singular_table_name %>.<%= attribute.name %>
+<% end -%>
+  tfoot
+    tr.right.aligned
+      th colspan="20"
+        = link_to "#{semantic_icon('edit')}편집".html_safe, edit_<%= singular_table_name %>_path(@<%= singular_table_name %>), class: 'ui positive labeled icon large button'

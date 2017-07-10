@@ -1,0 +1,85 @@
+= simple_nested_form_for @admin_online_lecture do |f|
+  = f.error_notification
+
+  table.ui.table
+    thead
+      tr
+        th 입력해주세요
+    tbody
+      tr
+        td = f.association :subject, collection: Standard::Subject.main_subjects
+      tr
+        td = f.input :uid, as: :url
+
+  - unless @admin_online_lecture.title.blank?
+    table.ui.table
+      thead
+        tr
+          th 강좌 정보
+      tbody
+        tr
+          td
+            div.two.fields
+              = f.hidden_field :is_collected
+              = f.input :title, wrapper_html: { class: 'twelve wide' }
+              = f.input :package_ids, wrapper_html: { class: 'four wide' }
+        tr
+          td
+            div.four.fields
+              = f.hidden_field :online_teacher_id
+              = f.input :online_provider_id, wrapper: :ui_select, as: :select, collection: Standard::OnlineProvider.all.collect { |provider| [provider.name, provider.id] }, wrapper_html: { class: 'four wide' }
+              = f.input :target, wrapper_html: { class: 'four wide' }
+              = f.input :lecture_count, wrapper_html: { class: 'four wide' }
+              = f.input :is_completed, wrapper: :ui_select, as: :select, collection: [['완강', true], ['진행중', false]], wrapper_html: { class: 'four wide' }
+
+  - unless @admin_online_lecture.teacher.blank?
+    table.ui.table
+      thead
+        tr
+          th 선생님 정보
+      tbody
+        = f.simple_fields_for :teacher, wrapper: false do |t|
+          tr
+            td
+              div.two.fields
+                = t.hidden_field :id
+                = t.hidden_field :uid
+                = t.input :online_provider_id, wrapper: :ui_select, as: :select, collection: Standard::OnlineProvider.all.collect { |provider| [provider.name, provider.id] }, wrapper_html: { class: 'four wide' }
+                = t.input :subject_id, wrapper: :ui_select, as: :select, collection: Standard::Subject.main_subjects, wrapper_html: { class: 'four wide' }
+                = t.input :name, wrapper_html: { class: 'eight wide' }
+
+  - unless @admin_online_lecture.title.blank?
+    table.ui.celled.striped.table
+      thead
+        tr
+          th 강의목록 정보
+      tbody
+        = f.simple_fields_for :lists, wrapper: false do |l|
+          tr
+            td
+              div.three.fields
+                = l.hidden_field :id
+                = l.hidden_field :online_lecture_id
+                = l.input :order, label: false, wrapper_html: { class: 'two wide' }
+                = l.input :title, label: false, wrapper_html: { class: 'twelve wide' }
+                = l.input :time, label: false, wrapper_html: { class: 'two wide' }
+                div.ui.field.one.wide
+                  = l.link_to_remove semantic_icon('trash'), class: 'ui button icon basic fluid'
+        tr
+          td = f.link_to_add '추가', :lists, class: 'ui button basic fluid'
+
+  table.ui.table
+    thead
+      tr
+        th.sixteen.wide 저장하시겠습니까?
+        th.collapsing = f.button :button, '저장'
+
+
+javascript:
+  $(function(){
+    $('select').dropdown();
+    window.NestedFormEvents.prototype.insertFields = function(content, assoc, link) {
+      var $tr = $(link).closest('tr');
+      return $(content).insertBefore($tr);
+    };
+  });

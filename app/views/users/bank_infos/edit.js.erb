@@ -1,0 +1,9 @@
+$(function() {
+  $('#user_form').html("<%= escape_javascript(render 'form') %>").modal('show');
+  $('#mentor_bank_name').dropdown({
+    showOnFocus     : false,
+    selectOnKeydown : false,
+    fullTextSearch  : true,
+    message : { noResults: '검색결과가 없습니다' }
+  });
+});

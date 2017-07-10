@@ -1,0 +1,27 @@
+table.ui.celled.striped.table
+  thead
+    tr
+      th.center.aligned 과목명
+      th.center.aligned 출판사
+      th.center.aligned 시리즈
+      th.center.aligned 제목
+      th.center.aligned 상세
+      th.center.aligned 편집
+      th.center.aligned 삭제
+  tbody
+    - @admin_books.each do |admin_book|
+      tr
+        td = admin_book.subject.name
+        td = admin_book.publisher.name
+        td = admin_book.series
+        td = admin_book.name
+        td = link_to 'Show', admin_book
+        td = link_to 'Edit', edit_admin_book_path(admin_book)
+        td = link_to 'Destroy', admin_book, data: { confirm: 'Are you sure?' }, method: :delete
+  tfoot
+    tr.right.aligned
+      th colspan="20"
+        = paginate @admin_books, views_prefix: 'admin'
+    tr.right.aligned
+      th colspan="20"
+        = link_to "#{semantic_icon('plus')}추가".html_safe, new_admin_book_path, class: 'ui positive labeled icon large button'

@@ -1,0 +1,18 @@
+div.problems_row
+  div.problems_column
+    - order = 0
+    - problems.each do |problem|
+      - if problem.set?
+        div.problem_container.clearfix
+          span.ui.horizontal.label = "#{order + 1}~#{order + problem.set_problems.size}번"
+          div.ui.tall.stacked.segment.clearfix.problem_seg class="#{'top attached' if problem.objective?}"
+            == problem.content
+        - problem.set_problems.each do |set_problem|
+          - order += 1
+          == render 'problem', problem: set_problem, order: order
+      - else
+        - order += 1
+        == render 'problem', problem: problem, order: order
+    div.ui.basic.segment.center.aligned
+      div.ui.divider
+      | 준비된 문제는 여기까지입니다.<br>답안지의 해당란에 필요한 내용을 정확히 기입(표기)했는지 확인하세요.

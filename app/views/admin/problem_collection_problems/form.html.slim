@@ -1,0 +1,222 @@
+= simple_nested_form_for @admin_problem, url: @admin_problem.new_record? ? admin_problem_collection_problems_path(@admin_problem_collection, @admin_problem) : admin_problem_collection_problem_path(@admin_problem_collection, @admin_problem), html: { id: 'problem_form' } do |f|
+  div.ui.grid
+    div.ui.column.eight.wide
+      div.problem_container.clearfix style="max-width: 500px; margin: 0 auto;"
+        span.ui.horizontal.black.label 문제번호
+        span.ui.horizontal.basic.label
+          span.preview_score 0
+          | 점
+        div.ui.top.attached.black.segment.clearfix.problem_seg
+          div.preview_content
+        div.ui.attached.segment
+          div.ui.very.relaxed.list
+            span.item
+              span.ui.circular.basic.mini.horizontal.label 1
+              span.preview_exm_1
+            span.item
+              span.ui.circular.basic.mini.horizontal.label 2
+              span.preview_exm_2
+            span.item
+              span.ui.circular.basic.mini.horizontal.label 3
+              span.preview_exm_3
+            span.item
+              span.ui.circular.basic.mini.horizontal.label 4
+              span.preview_exm_4
+            span.item
+              span.ui.circular.basic.mini.horizontal.label 5
+              span.preview_exm_5
+        div.ui.attached.secondary.segment.problem_seg
+          div.preview_explanation
+        div.ui.bottom.attached.right.aligned.secondary.segment.problem_seg
+          | 정답은&nbsp;
+          span.ui.circular.mini.horizontal.label.basic.preview_answer
+          | 입니다
+    div.ui.column.eight.wide
+      = f.error_notification
+      table.ui.table
+        thead
+          tr
+            th 입력해주세요
+        tbody
+          tr
+            td
+              = f.association :subject,
+                              include_blank: '단원을 선택해주세요',
+                              collection: f.object.subject_id.nil? ? @admin_problem_collection.subject.details.collect{ |subject| [subject.path, subject.id] } : [[f.object.subject.path, f.object.subject.id], ['처음부터 다시 선택하려면 누르세요', @admin_problem_collection.subject.id]],
+                              input_html: { class: 'subject select', data: { url: "#{list_admin_problem_collection_problems_path(@admin_problem_collection)}", remote: true, type: :json } }
+          tr
+            td
+              = f.input :content, input_html: { class: 'problem_content' }
+              = f.input :exm_1, input_html: { rows: 1, class: 'problem_exm_1' }
+              = f.input :exm_2, input_html: { rows: 1, class: 'problem_exm_2' }
+              = f.input :exm_3, input_html: { rows: 1, class: 'problem_exm_3' }
+              = f.input :exm_4, input_html: { rows: 1, class: 'problem_exm_4' }
+              = f.input :exm_5, input_html: { rows: 1, class: 'problem_exm_5' }
+          tr
+            td
+              div.two.fields
+                = f.input :answer, as: :numeric, input_html: { class: 'problem_answer' }
+                = f.input :score, input_html: { class: 'problem_score' }
+              = f.input :explanation, input_html: { class: 'problem_explanation' }
+      table.ui.table
+        thead
+          tr
+            th.sixteen.wide 저장하시겠습니까?
+            th.collapsing
+              = f.button :button, '저장'
+
+css:
+  .preview_content:empty::before,
+  .preview_exm_1:empty::before,
+  .preview_exm_2:empty::before,
+  .preview_exm_3:empty::before,
+  .preview_exm_4:empty::before,
+  .preview_exm_5:empty::before,
+  .preview_explanation:empty::before {
+    content: '내용을 입력해주세요';
+    color: #ccc;
+  }
+
+javascript:
+  $(function(){
+    $('.subject.select').dropdown({
+    }).on('ajax:before', function(){
+      $(this).addClass('loading');
+    }).on('ajax:success', function(xhr, data, status){
+      $(this).removeClass('loading');
+      var select = $(this).find('select');
+      var details = JSON.parse(data['details']);
+      if (details.length === 0) {
+      } else {
+        select.html('');
+        $.each(details, function(index, value){
+          select.append('<option value="' + value.id + '">' + value.path + '</option>');
+        });
+        select.append('<option value="#{@admin_problem_collection.subject.id}">처음부터 다시 선택하려면 누르세요</option>');
+        $(this).dropdown('show');
+      }
+    })
+
+    var render_preview = function(){
+      $.each($('.preview_content'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_content').val()); });
+      $.each($('.preview_exm_1'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_1').val()); });
+      $.each($('.preview_exm_2'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_2').val()); });
+      $.each($('.preview_exm_3'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_3').val()); });
+      $.each($('.preview_exm_4'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_4').val()); });
+      $.each($('.preview_exm_5'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_5').val()); });
+      $.each($('.preview_answer'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_answer').val()); });
+      $.each($('.preview_score'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_score').val()); });
+      $.each($('.preview_explanation'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_explanation').val()); });
+      renderMathInElement(document.getElementById('problem_form'),
+        {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$",  right: "$",  display: false}
+          ]
+        }
+      );
+    };
+    render_preview();
+    $('form').on('input', function(e){
+      render_preview();
+    });
+  });
+
+/ var keyPressed = {};
+/ $('form').on('input', function(e){
+/   render_preview();
+/ }).on('keyup', function(e){
+/   keyPressed[e.keyCode] = false;
+/   var keyPressedTimer = setTimeout(function(){
+/     clearTimeout(keyPressedTimer);
+/     keyPressed = {};
+/   }, 1000);
+/ }).on('keydown', function(e){
+/   keyPressed[e.keyCode] = true;
+/   if (keyPressed[13] && keyPressed[16]) {
+/     e.preventDefault();
+/     insertAtCursor(e.target, '<br>');
+/     render_preview();
+/   } else if (keyPressed[13]) {
+/     insertParagraph(e.target);
+/     render_preview();
+/   } else if (keyPressed[91] && keyPressed[68]) {
+/     e.preventDefault();
+/     insertAtCursor(e.target, '\r<div class="ui segment">\r</div>', 6);
+/     render_preview();
+/   } else if (keyPressed[91] && keyPressed[66]) {
+/     var textarea = e.target;
+/     var startPos = textarea.selectionStart;
+/     var endPos = textarea.selectionEnd;
+/     var textLength = endPos - startPos;
+/     textarea.selectionStart = startPos;
+/     textarea.selectionStart = startPos;
+/     insertAtCursor(e.target, '<b>');
+/     textarea.selectionStart = textLength + endPos - 1;
+/     textarea.selectionStart = textLength + endPos - 1;
+/     insertAtCursor(e.target, '</b>');
+/   }
+/ });
+/ 
+/ function insertParagraph(textarea) {
+/   var strPos = 0;
+/   strPos = textarea.selectionStart;
+/   var front = (textarea.value).substring(0,strPos);
+/   var back = (textarea.value).substring(strPos,textarea.value.length);
+/ 
+/   var front_text = '';
+/   $.each(front.split(/\r?\n/), function(index, value) {
+/     if (value !== '') {
+/       if (value.indexOf('<p>') == -1 && value.indexOf('</p>') == -1) value = '<p>' + value + '</p>';
+/       front_text += value + '\r';
+/     }
+/   });
+/   strPos = strPos + (front_text.length - front.length - 1);
+/   var back_text = '';
+/   $.each(back.split(/\r?\n/), function(index, value) {
+/     if (value !== '') {
+/       if (value.indexOf('<p>') == -1 && value.indexOf('</p>') == -1) value = '<p>' + value + '</p>';
+/       back_text += value + '\r';
+/     }
+/   });
+/ 
+/   var text = front_text.replace(/\r$/, '') + back_text.replace(/\r$/, '');
+/   textarea.value = text;
+/   textarea.selectionStart = strPos;
+/   textarea.selectionEnd = strPos;
+/ }
+/ 
+/ function insertAtCursor(textarea, text, pointer) {
+/   // var textarea = document.getElementById(areaId);
+/   var scrollPos = textarea.scrollTop;
+/   var strPos = 0;
+/   var br = ((textarea.selectionStart || textarea.selectionStart == '0') ? "ff" : (document.selection ? "ie" : false ) );
+/ 
+/   if (br == "ie") {
+/       textarea.focus();
+/       var range = document.selection.createRange();
+/       range.moveStart('character', -textarea.value.length);
+/       strPos = range.text.length;
+/   } else if (br == "ff") {
+/       strPos = textarea.selectionStart;
+/   }
+/ 
+/   var front = (textarea.value).substring(0,strPos);
+/   var back = (textarea.value).substring(strPos,textarea.value.length);
+/   textarea.value = front + text + back;
+/   strPos = strPos + text.length;
+/   if (pointer !== undefined) strPos -= pointer;
+/   if (br == "ie") {
+/       textarea.focus();
+/       var range = document.selection.createRange();
+/       range.moveStart ('character', -textarea.value.length);
+/       range.moveStart ('character', strPos);
+/       range.moveEnd ('character', 0);
+/       range.select();
+/   } else if (br == "ff") {
+/       textarea.selectionStart = strPos;
+/       textarea.selectionEnd = strPos;
+/       textarea.focus();
+/   }
+/   textarea.scrollTop = scrollPos;
+/ };

@@ -1,0 +1,259 @@
+$(function(){
+  // Form 생성
+  $('#user_form').addClass('fullscreen').html("<%= escape_javascript(render 'form') %>").modal({
+    observeChanges: true,
+    autofocus: false,
+    onVisible: function() { $(window).trigger('resize'); },
+    onHidden: function() { $('#user_form').removeClass('fullscreen'); }
+  }).modal('show');
+
+  $('#user_form').find('select.select').dropdown();
+  var timeStartFields = $('#user_form').find('.user_schedules_time_start');
+  var timeEndFields = $('#user_form').find('.user_schedules_time_end');
+  $.each(timeStartFields, function(index, value) {
+    var endCalendar = $(this).next();
+    $(this).addClass('ui calendar').calendar({
+      type: 'time',
+      ampm: false,
+      disableMinute: true,
+      endCalendar: endCalendar,
+      onChange: function(date, text, mode) {
+        var id = $(this).prev().prev().val();
+        var day_of_week = parseInt($(this).prev().find('select').val()) + 1;
+        var time_start = date.getHours();
+        var time_end = $(this).next().calendar('get date');
+        console.log(time_end);
+        (time_end === null || time_end === undefined) ? time_start + 2 : time_end.getHours();
+        var eventToAttach = {
+          id: id,
+          start: '2001-04-0' + day_of_week + ' ' + time_start + ':00:00',
+          end: '2001-04-0' + day_of_week + ' ' + time_end + ':00:00'
+        }
+        $('#calendar').fullCalendar('removeEvents', eventToAttach.id);
+        $('#calendar').fullCalendar('renderEvent', eventToAttach, true);
+      }
+    });
+  });
+  $.each(timeEndFields, function(index, value) {
+    var startCalendar = $(this).prev();
+    $(this).addClass('ui calendar').calendar({
+      type: 'time',
+      ampm: false,
+      disableMinute: true,
+      startCalendar: startCalendar,
+      onChange: function(date, text, mode) {
+        var id = $(this).prev().prev().prev().val();
+        var day_of_week = parseInt($(this).prev().prev().find('select').val()) + 1;
+        var time_start = $(this).prev().calendar('get date').getHours();
+        var time_end = date.getHours();
+        var eventToAttach = {
+          id: id,
+          start: '2001-04-0' + day_of_week + ' ' + time_start + ':00:00',
+          end: '2001-04-0' + day_of_week + ' ' + time_end + ':00:00'
+        }
+        $('#calendar').fullCalendar('removeEvents', eventToAttach.id);
+        $('#calendar').fullCalendar('renderEvent', eventToAttach, true);
+      }
+    });
+  });
+
+  // 캘린더 생성
+  $('#calendar').fullCalendar({
+    defaultView: 'agendaWeek',
+    header: false,
+    contentHeight: 350,
+    allDaySlot: false,
+    slotLabelFormat: 'H시',
+    slotDuration: '01:00:00',
+    minTime: '09:00:00',
+    maxTime: '24:00:00',
+    defaultDate: '2001-04-01',
+    columnFormat: 'ddd',
+    viewRender: function(view, element) { $('#user_form').modal('refresh'); },
+    windowResize: function(view) { $('#user_form').modal('refresh'); },
+
+    // 기본 데이터
+    eventSources: [
+      {
+        events: [
+          <% current_user.schedules.each do |s| %>
+            { id: "<%= s.id %>", start: "<%=  s.time_start %>".replace(' +0900', ''), end: "<%=  s.time_end %>".replace(' +0900', '') },
+          <% end %>
+        ]
+      },
+      {
+        events: [
+          <% current_user.mentor_schedules.each do |s| %>
+            { id: "<%= s.id %>", start: "<%=  s.time_start %>".replace(' +0900', ''), end: "<%=  s.time_end %>".replace(' +0900', '') },
+          <% end %>
+        ],
+        color: 'red'
+      },
+      {
+        events: [
+          <% current_user.mentee_schedules.each do |s| %>
+            { id: "<%= s.id %>", start: "<%=  s.time_start %>".replace(' +0900', ''), end: "<%=  s.time_end %>".replace(' +0900', '') },
+          <% end %>
+        ],
+        color: 'yellow'
+      }
+    ],
+    eventTextColor: 'transparent',
+    eventOverlap: false,
+
+    // 이벤트 생성
+    selectable: true,
+    selectHelper: true,
+    select: function(start, end) {
+      var eventData = { start: start, end: end };
+      $('#calendar').fullCalendar('renderEvent', eventData, true);
+      $('#calendar').fullCalendar('unselect');
+    },
+    selectLongPressDelay: 0,
+
+    // 이벤트 수정
+    editable: true,
+    eventDrop: function(event, delta, revertFunc, jsEvent, ui, view) {
+      console.log('eventDrop');
+    },
+    eventResize: function(event, delta, revertFunc, jsEvent, ui, view) {
+      console.log('eventResize');
+    },
+
+    // 이벤트 삭제
+    eventClick: function(event) {
+      if (confirm('이 이벤트를 삭제하시겠어요?')) $('#calendar').fullCalendar('removeEvents', event._id);
+    },
+    eventLongPressDelay: 0,
+  });
+
+  $(document)
+    .off('nested:fieldAdded')
+    .off('nested:fieldRemoved')
+    .on('nested:fieldAdded', function(event){
+      var field = event.field;
+      var dropdownFields = field.find('select.select');
+      dropdownFields.dropdown();
+      var timeStartFields = field.find('.user_schedules_time_start');
+      var timeEndFields = field.find('.user_schedules_time_end');
+      $.each(timeStartFields, function(index, value) {
+        var endCalendar = $(this).next();
+        $(this).addClass('ui calendar').calendar({
+          type: 'time',
+          ampm: false,
+          disableMinute: true,
+          endCalendar: endCalendar,
+          onChange: function(date, text, mode) {
+            // var id = $(this).prev().prev().val();
+            // var day_of_week = parseInt($(this).prev().find('select').val()) + 1;
+            // var time_start = date.getHours();
+            // var time_end = $(this).next().calendar('get date');
+            // console.log(time_end);
+            // (time_end === null || time_end === undefined) ? time_start + 2 : time_end.getHours();
+            // var eventToAttach = {
+            //   id: id,
+            //   start: '2001-04-0' + day_of_week + ' ' + time_start + ':00:00',
+            //   end: '2001-04-0' + day_of_week + ' ' + time_end + ':00:00'
+            // }
+            // $('#calendar').fullCalendar('removeEvents', eventToAttach.id);
+            // $('#calendar').fullCalendar('renderEvent', eventToAttach, true);
+          },
+          onShow: function() {
+            var field = $(this).parent();
+            var id = field.prev().prev().val();
+            var day_of_week = field.prev().find('select').val();
+            console.log(day_of_week);
+            if (day_of_week === '' || day_of_week === undefined) { return } else { day_of_week = parseInt(day_of_week) + 1; }
+            var time_start = field.calendar('get date');
+            console.log(time_start);
+            if (time_end === '' || time_end === undefined) { return } else { time_end = time_start.getHours(); }
+            var time_end = field.next().calendar('get date');
+            console.log(time_end);
+            if (time_end === '' || time_end === undefined) { return } else { time_end = time_end.getHours(); }
+            var eventToAttach = {
+              id: id,
+              start: '2001-04-0' + day_of_week + ' ' + time_start + ':00:00',
+              end: '2001-04-0' + day_of_week + ' ' + time_end + ':00:00'
+            }
+            $('#calendar').fullCalendar('removeEvents', eventToAttach.id);
+            $('#calendar').fullCalendar('renderEvent', eventToAttach, true);
+          },
+          onHide: function() {
+            var field = $(this).parent();
+            var id = field.prev().prev().val();
+            var day_of_week = field.prev().find('select').val();
+            if (day_of_week === '' || day_of_week === undefined) { return } else { day_of_week = parseInt(day_of_week) + 1; }
+            var time_start = field.calendar('get date');
+            if (time_end === '' || time_end === undefined) { return } else { time_end = time_start.getHours(); }
+            var time_end = field.next().calendar('get date');
+            if (time_end === '' || time_end === undefined) { return } else { time_end = time_end.getHours(); }
+            var eventToAttach = {
+              id: id,
+              start: '2001-04-0' + day_of_week + ' ' + time_start + ':00:00',
+              end: '2001-04-0' + day_of_week + ' ' + time_end + ':00:00'
+            }
+            $('#calendar').fullCalendar('removeEvents', eventToAttach.id);
+            $('#calendar').fullCalendar('renderEvent', eventToAttach, true);
+          }
+        })
+      });
+      $.each(timeEndFields, function(index, value) {
+        var startCalendar = $(this).prev();
+        $(this).addClass('ui calendar').calendar({
+          type: 'time',
+          ampm: false,
+          disableMinute: true,
+          startCalendar: startCalendar,
+          onChange: function(date, text, mode) {
+            // var id = $(this).prev().prev().prev().val();
+            // var day_of_week = parseInt($(this).prev().prev().find('select').val()) + 1;
+            // var time_start = $(this).prev().calendar('get date').getHours();
+            // var time_end = date.getHours();
+            // var eventToAttach = {
+            //   id: id,
+            //   start: '2001-04-0' + day_of_week + ' ' + time_start + ':00:00',
+            //   end: '2001-04-0' + day_of_week + ' ' + time_end + ':00:00'
+            // }
+            // $('#calendar').fullCalendar('removeEvents', eventToAttach.id);
+            // $('#calendar').fullCalendar('renderEvent', eventToAttach, true);
+          },
+          onShow: function() {
+            var field = $(this).parent();
+            var id = field.prev().prev().val();
+            var day_of_week = field.prev().prev().find('select').val();
+            if (day_of_week === '' || day_of_week === undefined) { return } else { day_of_week = parseInt(day_of_week) + 1; }
+            var time_start = field.prev().calendar('get date');
+            if (time_end === '' || time_end === undefined) { return } else { time_end = time_start.getHours(); }
+            var time_end = field.calendar('get date');
+            if (time_end === '' || time_end === undefined) { return } else { time_end = time_end.getHours(); }
+            var eventToAttach = {
+              id: id,
+              start: '2001-04-0' + day_of_week + ' ' + time_start + ':00:00',
+              end: '2001-04-0' + day_of_week + ' ' + time_end + ':00:00'
+            }
+            $('#calendar').fullCalendar('removeEvents', eventToAttach.id);
+            $('#calendar').fullCalendar('renderEvent', eventToAttach, true);
+          },
+          onHide: function() {
+            var field = $(this).parent();
+            var id = field.prev().prev().val();
+            var day_of_week = field.prev().prev().find('select').val();
+            if (day_of_week === '' || day_of_week === undefined) { return } else { day_of_week = parseInt(day_of_week) + 1; }
+            var time_start = field.prev().calendar('get date');
+            if (time_end === '' || time_end === undefined) { return } else { time_end = time_start.getHours(); }
+            var time_end = field.calendar('get date');
+            if (time_end === '' || time_end === undefined) { return } else { time_end = time_end.getHours(); }
+            var eventToAttach = {
+              id: id,
+              start: '2001-04-0' + day_of_week + ' ' + time_start + ':00:00',
+              end: '2001-04-0' + day_of_week + ' ' + time_end + ':00:00'
+            }
+            $('#calendar').fullCalendar('removeEvents', eventToAttach.id);
+            $('#calendar').fullCalendar('renderEvent', eventToAttach, true);
+          }
+        })
+      });
+    })
+    .on('nested:fieldRemoved', function(event){
+    });
+})

@@ -1,0 +1,55 @@
+= simple_nested_form_for @admin_book do |f|
+  = f.error_notification
+
+  table.ui.table
+    thead
+      tr
+        th 입력해주세요
+    tbody
+      tr
+        td = f.association :subject, collection: Standard::Subject.main_subjects
+      tr
+        td = f.association :publisher
+      tr
+        td = f.input :name
+      tr
+        td = f.input :series
+      tr
+        td = f.input :total_page
+      tr
+        td = f.input :published_at
+
+  table.ui.celled.striped.table
+    thead
+      tr
+        th 교재목차 정보
+    tbody
+      = f.simple_fields_for :units, wrapper: false do |u|
+        tr
+          td
+            div.three.fields
+              = u.hidden_field :id
+              = u.hidden_field :subject_id, value: f.object.subject_id
+              = u.hidden_field :book_id
+              = u.input :depth, label: false, wrapper_html: { class: 'two wide' }
+              = u.input :name, label: false, wrapper_html: { class: 'twelve wide' }
+              = u.input :page, label: false, wrapper_html: { class: 'two wide' }
+              div.ui.field.one.wide
+                = u.link_to_remove semantic_icon('trash'), class: 'ui button icon basic fluid'
+      tr
+        td = f.link_to_add '추가', :units, class: 'ui button basic fluid'
+
+  table.ui.table
+    thead
+      tr
+        th.sixteen.wide 저장하시겠습니까?
+        th.collapsing = f.button :button, '저장'
+
+javascript:
+  $(function(){
+    $('select').dropdown();
+    window.NestedFormEvents.prototype.insertFields = function(content, assoc, link) {
+      var $tr = $(link).closest('tr');
+      return $(content).insertBefore($tr);
+    };
+  });

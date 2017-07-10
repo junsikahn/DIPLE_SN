@@ -1,0 +1,11 @@
+$(function() {
+  $('#user_form').empty().modal('hide');
+
+  $('#career_list').append('<div class="ui active loader"></div>');
+  $('#profile_loader').addClass('active');
+
+  setTimeout(function(){
+    $('#career_list').html("<%= escape_javascript(render(current_user.careers.order(category: :desc)) || render('empty')) %>");
+    $.ajax({url: '<%= users_profile_path(format: :js) %>'});
+  }, 500);
+});

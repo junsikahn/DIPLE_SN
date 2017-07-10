@@ -1,0 +1,34 @@
+div.ui.attached.message
+  div.header = "#{@mentor.user.name} 선생님"
+  p = "#{@mentor.user.name} 선생님의 프로필"
+div.ui.attached.padded.segment
+  div.ui.grid.stackable.divided
+    div.row
+      div.column.four.wide
+        h4.ui.dividing.header 기본 정보
+        = render @mentor
+      div.column.twelve.wide
+        h4.ui.dividing.header 자기소개 정보
+        div.ui.segment
+          div.ui.message#mentor_introduction
+            = simple_format @mentor.self_introduction
+
+        h4.ui.dividing.header 학력 정보
+        div.ui.segment
+          div#career_list.ui.middle.aligned.selection.divided.relaxed.list
+            = render partial: '/users/careers/career', collection: @mentor.careers.order(category: :desc)
+
+        h4.ui.dividing.header 과목 정보
+        div.ui.segment
+          div#subject_list.ui.middle.aligned.selection.divided.relaxed.list
+            = render partial: '/users/favored_subjects/favored_subject', collection: @mentor.favored_subjects
+
+        h4.ui.dividing.header 위치 정보
+        div.ui.segment
+          div#location_list.ui.middle.aligned.selection.divided.relaxed.list
+            = render partial: '/users/locations/location', collection: @mentor.locations
+
+        h4.ui.dividing.header 일정 정보
+        div.ui.segment
+          div#schedule_list.ui.middle.aligned.selection.divided.relaxed.list
+            = render partial: '/users/schedules/schedule', collection: @mentor.schedules

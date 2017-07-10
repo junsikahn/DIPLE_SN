@@ -1,0 +1,25 @@
+table.ui.celled.striped.table
+  thead
+    tr
+      th.center.aligned 구분
+      th.center.aligned 과목
+      th.center.aligned 강사
+      th.center.aligned 제목
+      th.center.aligned 대상
+      th.center.aligned 예정
+      th.center.aligned 등록
+      th.center.aligned 완강
+      th.center.aligned 패키지
+      th.center.aligned UID
+      th.center.aligned 상세
+      th.center.aligned 편집
+      th.center.aligned 삭제
+  tbody
+    = render @admin_online_lectures
+  tfoot
+    tr.right.aligned
+      th colspan="14"
+        = paginate @admin_online_lectures, views_prefix: 'admin'
+    tr.right.aligned
+      th colspan="14"
+        = link_to "#{semantic_icon('plus')}추가".html_safe, new_admin_online_lecture_path, class: 'ui positive labeled icon large button'

@@ -1,0 +1,11 @@
+$(function() {
+  $('#user_form').empty().modal('hide');
+
+  $('#mentor_introduction').append('<div class="ui active loader"></div>');
+  $('#profile_loader').addClass('active');
+
+  setTimeout(function(){
+    $('#mentor_introduction').html("<%= escape_javascript(simple_format current_user.mentor.self_introduction) %>")
+    $.ajax({url: '<%= users_profile_path(format: :js) %>'});
+  }, 500);
+});

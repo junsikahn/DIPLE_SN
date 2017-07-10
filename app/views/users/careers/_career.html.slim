@@ -1,0 +1,9 @@
+div.item
+  div.middle.aligned.content
+    div.header = career.school
+    div
+      = career.major_1 unless career.major_1.blank?
+      = career.major_2 unless career.major_2.blank?
+      = career.major_3 unless career.major_3.blank?
+    = "#{career.entrance_year.year}년 입학 ~ "
+    = career.graduate_year.blank? ? "#{Time.now.year}년 현재 재학중" : "#{career.graduate_year.year}년 졸업"

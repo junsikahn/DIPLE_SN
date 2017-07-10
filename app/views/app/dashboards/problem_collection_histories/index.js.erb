@@ -1,0 +1,5 @@
+$(function(){
+  <% (@start_date.to_date.cweek..@end_date.to_date.cweek).each do |week| %>
+    $('#daily_test_calendar_<%= week %>').replaceWith("<%= escape_javascript(render 'calendar', problem_collections: @problem_collections, start_date: params[:start_date], end_date: params[:end_date], week: week) %>");
+  <% end %>
+});

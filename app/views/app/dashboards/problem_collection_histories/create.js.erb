@@ -1,0 +1,25 @@
+$(function(){
+  var test_screen = $('#test_screen');
+  setTimeout(function(){
+    test_screen.html("<%= escape_javascript(render 'show') %>");
+
+    test_screen.on('touchmove', function(e){ return false; });
+    test_screen.find('.problems_row, .answers_seg').on('touchmove', function(e){
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    });
+
+    renderMathInElement(document.getElementById("test_screen"),
+      {
+          delimiters: [
+              {left: "$$", right: "$$", display: true},
+              {left: "\\[", right: "\\]", display: true},
+              {left: "$", right: "$", display: false},
+              {left: "\\(", right: "\\)", display: false}
+          ]
+      }
+    );
+  }, 3000);
+
+  $('#problem_collection_<%= @problem_collection_history.problem_collection_id %>').html("<%= escape_javascript(render 'calendar_item', problem_collection: @problem_collection_history.problem_collection, score: @problem_collection_history.score, start_date: params[:start_date], end_date: params[:end_date]) %>");
+});

@@ -1,0 +1,124 @@
+$(function(){
+  var test_screen = $('#test_screen');
+  test_screen.html("<%= escape_javascript(render 'new') %>").modal({
+    autofocus: false,
+    keyboardShortcuts: false,
+    onHidden: function(){ $(this).empty(); }
+  }).modal('show');
+  var form = test_screen.find('form');
+
+  test_screen.on('touchmove', function(e){ return false; });
+  test_screen.find('.problems_row, .answers_seg').on('touchmove', function(e){
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+  });
+
+  renderMathInElement(document.getElementById("test_screen"),
+    {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "\\[", right: "\\]", display: true},
+            {left: "$", right: "$", display: false},
+            {left: "\\(", right: "\\)", display: false}
+        ]
+    }
+  );
+
+  var start_date = $('#match_current_period').data('start');
+  var end_date = $('#match_current_period').data('end');
+  form.attr('action', form.attr('action') + '?start_date=' + start_date + '&end_date=' + end_date);
+  form.on('ajax:before', function(){
+    $(this).find('.answers_seg').addClass('loading');
+  });
+
+  test_screen.find('.answer_radio').on('click', function(e){
+    var tr = $(e.target).parentsUntil('tbody', this);
+    var td = $(e.target).parentsUntil('tr', this);
+    if (td.length === 0) td = $(e.target);
+    var answer = td.data('answer');
+    tr.find('.ui.button').removeClass('black').addClass('basic');
+    td.find('.ui.button').addClass('black').removeClass('basic');
+    tr.find('input').last().val(answer);
+  });
+
+  init();
+
+  test_screen.find('.exm_seg').find('.item').on('click', function(e){
+    var list = $(e.target).parentsUntil('.exm_seg', this);
+    var item = $(e.target).parentsUntil('.ui.list', this);
+    if (item.length === 0) item = $(e.target);
+    var problem_order = item.data('problem-order');
+    var exm_order = item.data('exm-order');
+    var answer_tr = test_screen.find('.answers_seg').find('tr')[problem_order - 1];
+    var answer_td = $(answer_tr).find('td')[exm_order];
+    list.find('.item').removeClass('active');
+    list.find('.ui.label').removeClass('black').addClass('basic');
+    item.addClass('active');
+    item.find('.ui.label').addClass('black').removeClass('basic');
+    answer_td.click();
+  });
+
+  test_screen.find('.exm_seg').find('input').on('input', function(e){
+    var problem_order = $(e.target).data('problem-order');
+    var answer_tr = test_screen.find('.answers_seg').find('tr')[problem_order - 1];
+    var answer_input = $(answer_tr).find('input');
+    answer_input.val($(e.target).val());
+  })
+
+
+
+
+  function init(){
+    var seg = $('#test_screen').find('.problems_seg');
+    var col_1 = $('#test_screen').find('.problems_column').eq(0);
+    var html = col_1.parent().html();
+    col_1.after(html);
+    col_1.after('<div class="problems_row_divider"></div>');
+    var col_2 = $('#test_screen').find('.problems_column').eq(1);
+    var ch = seg.outerHeight();
+    var mh = col_1.outerHeight();
+    col_1.css({transform: 'translateY(-' + ch * 0 + 'px)', cursor: 'w-resize'}); //.off('click', prev).on('click', prev);
+    col_2.css({transform: 'translateY(-' + ch * 1 + 'px)', cursor: 'e-resize'}); //.off('click', next).on('click', next);
+  }
+
+  function next(){
+      var seg = $('#test_screen').find('.problems_seg');
+      var col_1 = $('#test_screen').find('.problems_column').eq(0);
+      var col_2 = $('#test_screen').find('.problems_column').eq(1);
+      var ch = seg.outerHeight();
+      var mh = col_1.outerHeight();
+      var cp = -parseInt(col_1.css('transform').split(',')[5])/ch;
+      var mp = Math.ceil(mh/ch);
+      if (cp >= mp - 2) return;
+      // seg.transition({
+      //   animation: 'slide right',
+      //   duration: '.25s',
+      //   onComplete: function() {
+          col_1.css({transform: 'translateY(-' + ch * (cp + 2) +'px)'});
+          col_2.css({transform: 'translateY(-' + ch * (cp + 3) + 'px)'});
+      //     seg.transition({ animation: 'slide left', duration: '.25s' });
+      //   }
+      // });
+  };
+
+  function prev(){
+      var seg = $('#test_screen').find('.problems_seg');
+      var col_1 = $('#test_screen').find('.problems_column').eq(0);
+      var col_2 = $('#test_screen').find('.problems_column').eq(1);
+      var ch = seg.outerHeight();
+      var mh = col_1.outerHeight();
+      var cp = -parseInt(col_1.css('transform').split(',')[5])/ch;
+      var mp = Math.ceil(mh/ch);
+      if (cp == 0) return;
+      // seg.transition({
+      //   animation: 'slide left',
+      //   duration: '.25s',
+      //   onComplete: function() {
+          col_1.css({transform: 'translateY(-' + ch * (cp - 2) +'px)'});
+          col_2.css({transform: 'translateY(-' + ch * (cp - 1) + 'px)'});
+      //     seg.transition({ animation: 'slide right', duration: '.25s' });
+      //   }
+      // });
+  };
+
+});

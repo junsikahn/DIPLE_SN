@@ -1,0 +1,31 @@
+tbody id="book_calendar_#{week}"
+  tr.top.aligned
+    td.one.wide.middle.aligned.center.aligned rowspan="3" style="border-top-width: 2px;" 문제집<br>진도
+
+  tr.top.aligned
+    td.one.wide.middle.aligned.center.aligned style="border-left: 1px solid rgba(34, 36, 38, 0.1); border-top-width: 2px;" 계획
+    - week_days = (start_date.to_date..end_date.to_date).select{|date| date.cweek == week}
+    - [1,2,3,4,5,6,0].each do |index|
+      - if !week_days.first.nil? && week_days.first.wday == index
+        - date = week_days.shift
+        td.two.wide.left.aligned.ui.selection.divided.list.dragula.book-dragula.planned.clearfix class="#{'positive' if date == Date.today}" data-date="#{date}" data-planned="true" style="border-top-width: 2px;"
+          - book_histories.each do |book_history|
+            - planned = book_history.details.select{ |l| l.completed_at.nil? && !l.planned_at.nil? && l.planned_at == date }
+            - planned.each do |detail|
+              == render 'calendar_item', book_history: book_history, detail: detail
+      - else
+        td.two.wide.disabled style="background-color: rgba(0, 0, 50, 0.02); border-top-width: 2px;"
+
+  tr.top.aligned
+    td.one.wide.middle.aligned.center.aligned.positive style="border-left: 1px solid rgba(34, 36, 38, 0.1);" 완료
+    - week_days = (start_date.to_date..end_date.to_date).select{|date| date.cweek == week}
+    - [1,2,3,4,5,6,0].each do |index|
+      - if !week_days.first.nil? && week_days.first.wday == index
+        - date = week_days.shift
+        td.two.wide.left.aligned.ui.selection.divided.list.dragula.book-dragula.completed.positive.clearfix class="#{'positive' if date == Date.today}" data-date="#{date}" data-completed="true"
+          - book_histories.each do |book_history|
+            - planned = book_history.details.select{ |l| !l.completed_at.nil? && l.completed_at == date }
+            - planned.each do |detail|
+              == render 'calendar_item', book_history: book_history, detail: detail
+      - else
+        td.two.wide.disabled style="background-color: rgba(0, 0, 50, 0.02)"

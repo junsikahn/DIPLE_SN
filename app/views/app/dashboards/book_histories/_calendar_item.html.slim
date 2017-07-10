@@ -1,0 +1,7 @@
+a.item.clearfix.calendar-item data-id="#{book_history.id}" data-detail="#{detail.id}" data-subject="#{book_history.book.subject_id}" href="#{edit_dashboard_book_history_path(dashboard_id: params[:dashboard_id], start_date: params[:start_date], end_date: params[:end_date], id: book_history.id)}" data-remote="true" data-method="get"
+  div.clearfix
+    span.ui.circular.empty.mini.horizontal.label class="#{book_history.tag_color}"
+    b = "~ #{detail.book_unit.page}p"
+    small.inline.content style="float: right;" = book_history.book.name
+  div.inline.content
+    = detail.book_unit.name.truncate(40)

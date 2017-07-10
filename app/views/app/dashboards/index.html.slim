@@ -1,0 +1,7 @@
+- @matches.each do |match|
+  = link_to dashboard_path(match) do
+    div = match.mentor.user.name
+    div = match.mentee.user.name
+    - match.schedules.each do |schedule|
+      div = "매주 #{schedule.day_name} #{l schedule.time_start, format: :long} ~ #{l schedule.time_end, format: :long}"
+  br
