@@ -16,11 +16,6 @@
 //= require turbolinks
 //= require semantic-ui
 //= require jquery_nested_form
-//= require moment
-//= require fullcalendar
-//= require fullcalendar/lang/ko.js
-//= require semantic-ui-calendar
-//= require dragula
 //= require noty
 //= require katex
 //= require katex/contrib/auto-render.min

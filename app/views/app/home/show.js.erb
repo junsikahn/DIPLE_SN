@@ -1,0 +1,11 @@
+$(function(){
+  var test_screen = $('#test_screen');
+  test_screen.html("<%= escape_javascript(render 'show') %>").modal({
+    autofocus: false,
+    keyboardShortcuts: false,
+    onHidden: function(){ $(this).empty(); }
+  }).modal('show');
+
+  testFormInit();
+  $(window).off('resize', testFormInit).on('resize', testFormInit);
+});

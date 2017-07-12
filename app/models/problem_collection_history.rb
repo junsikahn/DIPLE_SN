@@ -1,5 +1,5 @@
 class ProblemCollectionHistory < ApplicationRecord
-  belongs_to :match
+  belongs_to :user
   belongs_to :problem_collection, class_name: 'Standard::ProblemCollection', counter_cache: :solved_count
 
   has_many :problem_histories, dependent: :destroy
@@ -11,10 +11,10 @@ class ProblemCollectionHistory < ApplicationRecord
     problem_collection.problems.each do |problem|
       if problem.set?
         problem.set_problems.each do |set_problem|
-          problem_histories.build(match_id: match_id, subject_id: set_problem.subject_id, problem_collection_id: problem_collection.id, problem_id: set_problem.id)
+          problem_histories.build(subject_id: set_problem.subject_id, problem_collection_id: problem_collection.id, problem_id: set_problem.id)
         end
       else
-        problem_histories.build(match_id: match_id, subject_id: problem.subject_id, problem_collection_id: problem_collection.id, problem_id: problem.id)
+        problem_histories.build(subject_id: problem.subject_id, problem_collection_id: problem_collection.id, problem_id: problem.id)
       end
     end
   end

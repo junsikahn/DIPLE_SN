@@ -11,9 +11,6 @@
  * It is generally better to create a new file per style scope.
  *
  *= require_tree .
- *= require fullcalendar
- *= require semantic-ui-calendar
- *= require dragula
  *= require noty
  *= require katex
  *= require_self
@@ -166,14 +163,8 @@ input[type='file'] {
     .problems_header { height: 50px; overflow: scroll; border-top: 0; }
     .problems_wrapper, .answers_wrapper { position: relative; display: inline-block; height: 100%; vertical-align: top; overflow: hidden; }
     .problems_wrapper { width: 75%; box-shadow: 1px 0 lightgrey;
-      // .problems_row { height: calc(100% - 50px); overflow: scroll; -webkit-overflow-scrolling: touch; }
-      // .problems_row_divider { position: absolute; top: 50px; left: 50%; width: 1px; height: calc(100% - 50px); background: lightgrey;}
-      // .problems_column { display: inline-block; width: 50%; min-height: 100%; padding: 20px; vertical-align: top;
-      //   .problem_container { padding-bottom: 40px; }
-      //   .problem_container:last-of-type { padding-bottom: 0; }
-      // }
       .problems_seg { width: 100%; height: calc(100% - 50px); overflow: hidden; }
-      .problems_row { min-width: 100%; height: 100%; }
+      .problems_row { min-width: 100%; height: 100%; transition: transform .25s; }
       .problems_row_divider { display: inline-block; float: left; width: 1px; height: 100%; margin-left: -1px; background: lightgrey;}
       .problems_column { display: inline-block; float: left; width: 540px; padding: 20px; vertical-align: top; }
     }
@@ -191,11 +182,13 @@ input[type='file'] {
 .problem_container img { max-width: 100%; }
 .problem_seg { overflow-x: scroll; overflow-y: hidden; }
 
-@media only screen and (min-width: 769px) and (max-width: 1480px) {
+@media only screen and (min-width: 942px) and (max-width: 1480px) {
   #test_screen {
-    .test_wrapper { max-width: 900px !important;
+    .test_wrapper { max-width: 902px !important;
       .problems_wrapper { width: 60% !important;
-        .problems_seg { overflow-y: scroll; -webkit-overflow-scrolling: touch; }
+        .problems_seg { overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; }
+        .problems_row { min-width: 100%; max-width: 100%; }
+        .problems_header .ui.buttons { display: none; }
         .problems_row_divider { display: none; }
         .problems_column { width: 100% !important; min-height: initial !important; }
       }
@@ -204,18 +197,21 @@ input[type='file'] {
   }
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 941px) {
   #test_screen {
-    .test_wrapper { max-width: 900px !important;
-      .problems_wrapper { width: 100% !important; height: 70% !important;
+    .test_wrapper { max-width: 542px !important;
+      .problems_wrapper { width: 100% !important; height: calc(100% - 50px) !important;
+        .problems_seg { overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; }
+        .problems_row { min-width: 100%; max-width: 100%; }
         .problems_header .ui.labels { display: none; }
+        .problems_header .ui.buttons { display: none; }
         .problems_row_divider { display: none; }
         .problems_column { width: 100% !important; min-height: initial !important; }
       }
-      .answers_wrapper { width: 100% !important; height: 30% !important; border-top: 1px dotted lightgrey;
+      .answers_wrapper { width: 100% !important; height: 50px !important;
         form { overflow: scroll; -webkit-overflow-scrolling: touch; }
         .problems_header { display: none; }
-        .answers_seg { height: initial !important; min-height: calc(100% - 50px); overflow: hidden !important; border: 0; margin: 0; width: 100%;
+        .answers_seg { display: none;
           tbody { display: table-row-group !important; }
           tr { display: table-row !important; }
           td { display: table-cell !important; padding-top: 20px 0 !important; padding-bottom: 20px 0 !important; }

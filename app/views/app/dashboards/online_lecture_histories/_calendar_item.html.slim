@@ -1,7 +1,0 @@
-a.item.clearfix.calendar-item data-id="#{online_lecture_history.id}" data-detail="#{detail.id}" data-subject="#{online_lecture_history.online_lecture.subject_id}" href="#{edit_dashboard_online_lecture_history_path(dashboard_id: params[:dashboard_id], start_date: params[:start_date], end_date: params[:end_date], id: online_lecture_history.id)}" data-remote="true" data-method="get"
-  div.clearfix
-    span.ui.circular.empty.mini.horizontal.label class="#{online_lecture_history.tag_color}"
-    b = detail.online_lecture_list.order_to_s
-    small.inline.content style="float: right;" = online_lecture_history.online_lecture.teacher.name
-  div.inline.content
-    = detail.online_lecture_list.title.truncate(40)

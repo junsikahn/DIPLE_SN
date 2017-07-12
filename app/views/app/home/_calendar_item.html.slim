@@ -1,0 +1,8 @@
+div id="problem_collection_#{problem_collection.id}"
+  small = problem_collection.name
+  = link_to new_problem_path(problem_collection_id: problem_collection.id,
+                             format: :js), remote: true, method: :get, class: 'ui basic fluid button'
+    - if score.nil?
+       = '시험보기'
+    - else
+      = "#{score}점 / #{problem_collection.total_score}점"

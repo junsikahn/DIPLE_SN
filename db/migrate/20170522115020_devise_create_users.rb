@@ -2,21 +2,12 @@ class DeviseCreateUsers < ActiveRecord::Migration[5.0]
   def change
     create_table :users do |t|
       ## Database authenticatable
-      t.string   :name,               null: false, default: ''
+      t.string   :uid,                null: false
       t.string   :encrypted_password, null: false, default: ''
 
-      t.string   :phone,              null: false
-      t.integer  :pin
-      t.datetime :pin_sent_at
-      t.datetime :verified_at
-
-      t.string   :email,              default: ''
-
+      t.string   :name,               null: false, default: ''
       t.boolean  :gender
       t.date     :birthday
-      t.attachment :avatar
-
-      t.datetime :agreed_at
 
       # Omniauthable
       # t.string :provider
@@ -30,11 +21,11 @@ class DeviseCreateUsers < ActiveRecord::Migration[5.0]
       t.datetime :remember_created_at
 
       ## Trackable
-      t.integer  :sign_in_count, default: 0, null: false
-      t.datetime :current_sign_in_at
-      t.datetime :last_sign_in_at
-      t.string   :current_sign_in_ip
-      t.string   :last_sign_in_ip
+      # t.integer  :sign_in_count, default: 0, null: false
+      # t.datetime :current_sign_in_at
+      # t.datetime :last_sign_in_at
+      # t.string   :current_sign_in_ip
+      # t.string   :last_sign_in_ip
 
       ## Confirmable
       # t.string   :confirmation_token
@@ -53,14 +44,12 @@ class DeviseCreateUsers < ActiveRecord::Migration[5.0]
       t.timestamps null: false
     end
 
-    add_index :users, :phone,                unique: true
+    add_index :users, :uid,                unique: true
     # add_index :users, :email,                unique: true
     # add_index :users, :reset_password_token, unique: true
     # add_index :users, :confirmation_token,   unique: true
     # add_index :users, :unlock_token,         unique: true
 
-    User.create(name: '안준식', phone: '01088627156', password: 'test1234', verified_at: Time.zone.now, gender: true, birthday: '1986-11-21', agreed_at: Time.zone.now)
-    User.create(name: '윤석기', phone: '01091740793', password: 'test1234', verified_at: Time.zone.now, gender: true, birthday: '1986-12-05', agreed_at: Time.zone.now)
-    User.create(name: '김학생', phone: '01098627156', password: 'test1234', verified_at: Time.zone.now, gender: false, birthday: '2000-11-21', agreed_at: Time.zone.now)
+    User.create(uid: '01088627156', password: 'test1234', name: '안준식', gender: true, birthday: '1986-11-21')
   end
 end

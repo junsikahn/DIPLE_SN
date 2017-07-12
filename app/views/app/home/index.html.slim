@@ -1,22 +1,215 @@
-div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; text-align: center;"
-  div style="display: table; width: 100%; height: 100%; vertical-align: middle; background-color: #333; color: #fff;"
-    div style="display: table-cell; vertical-align: middle;"
-      h1 style="font-size: 3vw; line-height: 3.5vw; display: inline-block;"
-        div
-          b style="font-size: 10vw;" DIPLE
-          | 은&nbsp;
-          b style="font-size: 7vw;" SKY
-          | 선생님들의
-        br
-        div
-          b style="font-size: 7vw; vertical-align: top;" 체계적
-          b style="font-size: 7vw; vertical-align: top;" ,
-          b style="font-size: 7vw; vertical-align: top;" 과학적
-          b style="position: relative; font-size: 10vw; vertical-align: top;"
-            | 관리
-            span style="position: absolute; width: 100%; height: .5vh; background: white; bottom: -.5vh; left: 0;"
-            span style="position: absolute; width: 100%; height: .5vh; background: white; bottom: -1.5vh; left: 0;"
-          | 다
+div#test_screen.ui.modal.fullscreen
+
+div.clearfix
+  h1.ui.left.floated.header
+    = "#{current_user.name} "
+    small 일일테스트
+
+table.ui.celled.multiline.table#match_calendar
+  thead
+    tr.bottom.aligned
+      th.center.aligned 구분
+      - [1,2,3,4,5,6,0].each do |index|
+        th.two.wide.center.aligned = "#{t('date.day_names')[index]}"
+  - (@start_date.to_date.cweek..@end_date.to_date.cweek).each do |week|
+    tbody
+      tr.top.aligned
+        td.middle.aligned.center.aligned 일자
+        - week_days = (@start_date.to_date..@end_date.to_date).select{|date| date.cweek == week}
+        - [1,2,3,4,5,6,0].each do |index|
+          - if !week_days.first.nil? && week_days.first.wday == index
+            - date = week_days.shift
+            td.two.wide.center.aligned.clearfix class="#{'positive' if date == Date.today}"
+              span.ui.fluid.label class="#{date == Date.today ? 'green' : 'basic'}" == "#{l(date, format: :short)}"
+          - else
+            td.two.wide.center.aligned
+    = render 'calendar', problem_collections: @problem_collections, start_date: @start_date, end_date: @end_date, week: week
 
 
-      p style="margin-top: 10vh; font-size: 2vw;" 디플에 오신 것을 환영합니다
+css:
+  .multiline.table > tbody > tr:only-of-type > td {
+    background-color: rgba(0, 0, 50, 0.02) !important;
+  }
+
+  .multiline.table > tbody:not(:first-of-type) > tr:first-of-type > td {
+    border-top: 1px solid rgba(34, 36, 38, 0.1);
+  }
+
+  .dashboard-table:empty::before {
+    content: attr(empty);
+    display: block;
+    text-align: center;
+    color: rgba(40, 40, 40, 0.3);
+    padding: 50px 0;
+  }
+
+
+javascript:
+  $(function(){
+    $('#match_calendar').delegate('.ui.button', 'ajax:beforeSend', function(){
+      $(this).addClass('loading');
+    }).delegate('.ui.button', 'ajax:complete', function(){
+      $(this).removeClass('loading');
+    });
+  });
+
+  function testFormInit(){
+    var test_screen = $('#test_screen');
+    test_screen.on('touchmove', function(e){ return false; });
+    test_screen.find('.problems_row, .answers_seg').on('touchmove', function(e){
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    });
+    renderMathInElement(document.getElementById("test_screen"),
+      {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$",  right: "$",  display: false}
+        ]
+      }
+    );
+
+    if ($(window).innerWidth() > 1480) {
+      // var seg = test_screen.find('.problems_seg');
+      // seg.scrollTop(0);
+      // var col_1 = test_screen.find('.problems_column');
+      // if (col_1.length == 1) {
+      //   var html = col_1.parent().html();
+      //   col_1.after(html);
+      //   col_1.after('<div class="problems_row_divider"></div>');
+      // }
+      // var col_2 = test_screen.find('.problems_column').eq(1);
+      // var ch = seg.outerHeight();
+      // var mh = col_1.outerHeight();
+      // col_1.css({transform: 'translateY(-' + ch * 0 + 'px)'});
+      // col_2.css({transform: 'translateY(-' + ch * 1 + 'px)'});
+
+      var seg = test_screen.find('.problems_seg');
+      var row = test_screen.find('.problems_row');
+      var col = test_screen.find('.problems_column');
+      var ch = seg.outerHeight();
+      var mh = col.outerHeight();
+      var cp = Math.ceil((-parseInt(row.css('transform').split(',')[4]) || 0)/540);
+      var mp = Math.ceil(mh/ch);
+      seg.scrollTop(0);
+      row.css({width: (50 * mp) + '%'});
+      if (mp - cp < 2) row.css({transform: 'translateX(-' + (540 * (mp - 2)) + 'px)'});
+      col.not(':first').remove();
+      test_screen.find('.problems_row_divider').remove();
+      for (var i=1; i<mp; i++) {
+        col.first().after(col.first().clone());
+        col.first().after('<div class="problems_row_divider"></div>');
+      }
+
+      var cols = test_screen.find('.problems_column');
+      $.each(cols, function(index, value){
+        $(this).css({transform: 'translateY(-' + (ch * index) + 'px)'})
+      });
+
+      var left_icon = $('.problems_header').find('a.ui.icon.button').eq(0);
+      var right_icon = $('.problems_header').find('a.ui.icon.button').eq(1);
+      left_icon.css({cursor: 'w-resize'}).off('click', testFormPrev).on('click', testFormPrev);
+      right_icon.css({cursor: 'e-resize'}).off('click', testFormNext).on('click', testFormNext);
+
+      $(document).off('keydown').on('keydown', function(e){
+        if (e.keyCode == 37) testFormPrev();
+        if (e.keyCode == 39) testFormNext();
+      });
+    } else {
+      test_screen.find('.problems_column').not(':first').remove();
+      test_screen.find('.problems_row_divider').remove();
+    }
+  }
+
+  function answerSegInit(){
+    var test_screen = $('#test_screen');
+    var form = test_screen.find('form');
+    form.on('ajax:before', function(){
+      $(this).find('.answers_seg').addClass('loading');
+    });
+
+    $.each($('.answers_seg').find('tr'), function(p_index, tr){
+      var problem_order = p_index + 1;
+      $.each($(tr).find('td'), function(e_index, td) {
+        var exm_order = e_index;
+        $(td).on('click', function(e){
+          if (e.target.tagName == 'INPUT' || $(e.target).hasClass('answer_input')) return;
+          if (exm_order == 0) return;
+
+          var list = $('.item[data-problem-order=' + problem_order + ']');
+          var item = $('.item[data-problem-order=' + problem_order + '][data-exm-order=' + exm_order + ']');
+          list.removeClass('active');
+          list.find('.ui.label').removeClass('black').addClass('basic');
+          item.addClass('active');
+          item.find('.ui.label').addClass('black').removeClass('basic');
+
+          $(tr).find('.ui.button').removeClass('black').addClass('basic');
+          $(td).find('.ui.button').addClass('black').removeClass('basic');
+
+          var input = $('#problem_collection_history_problem_histories_attributes_' + (problem_order - 1) + '_users_answer');
+          input.val(exm_order);
+        })
+      });
+      $(tr).find('input').on('input', function(e){
+        var exm_input = $('input[data-problem-order=' + problem_order + ']');
+        exm_input.val($(e.target).val());
+      });
+    });
+
+    $.each($('.exm_seg'), function(p_index, seg){
+      var problem_order = $(seg).data('problem-order');
+      $.each($(seg).find('.item'), function(e_index, item) {
+        var exm_order = $(item).data('exm-order');
+        $(item).on('click', function(e){
+          var list = $('.item[data-problem-order=' + problem_order + ']');
+          var item = $('.item[data-problem-order=' + problem_order + '][data-exm-order=' + exm_order + ']');
+          list.removeClass('active');
+          list.find('.ui.label').removeClass('black').addClass('basic');
+          item.addClass('active');
+          item.find('.ui.label').addClass('black').removeClass('basic');
+
+          var tr = $('.answers_seg').find('tr')[problem_order - 1];
+          var td = $(tr).find('td')[exm_order];
+          $(tr).find('.ui.button').removeClass('black').addClass('basic');
+          $(td).find('.ui.button').addClass('black').removeClass('basic');
+
+          var input = $('#problem_collection_history_problem_histories_attributes_' + (problem_order - 1) + '_users_answer');
+          input.val(exm_order);
+        });
+      });
+      $(seg).find('input').on('input', function(e){
+        var problem_order = $(e.target).data('problem-order');
+        var answer_tr = test_screen.find('.answers_seg').find('tr')[problem_order - 1];
+        var answer_input = $(answer_tr).find('input');
+        answer_input.val($(e.target).val());
+      });
+    });
+  }
+
+  function testFormNext(){
+    var test_screen = $('#test_screen');
+    var seg = test_screen.find('.problems_seg');
+    var row = test_screen.find('.problems_row');
+    var cols = test_screen.find('.problems_column');
+    if (cols.length == 1) return;
+    var ch = seg.outerHeight();
+    var mh = cols.outerHeight();
+    var mp = Math.ceil(mh/ch);
+    var cp = Math.ceil((-parseInt(row.css('transform').split(',')[4]) || 0)/540);
+    if (cp >= mp -2) return;
+    row.css({transform: 'translateX(-' + (540 * (cp + 1)) + 'px)'});
+  };
+
+  function testFormPrev(){
+    var test_screen = $('#test_screen');
+    var seg = test_screen.find('.problems_seg');
+    var row = test_screen.find('.problems_row');
+    var cols = test_screen.find('.problems_column');
+    if (cols.length == 1) return;
+    var ch = seg.outerHeight();
+    var mh = cols.outerHeight();
+    var mp = Math.ceil(mh/ch);
+    var cp = Math.ceil((-parseInt(row.css('transform').split(',')[4]) || 0)/540);
+    if (cp == 0) return;
+    row.css({transform: 'translateX(-' + (540 * (cp - 1)) + 'px)'});
+  };

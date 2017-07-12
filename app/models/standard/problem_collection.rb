@@ -9,6 +9,4 @@ class Standard::ProblemCollection < ApplicationRecord
   accepts_nested_attributes_for :problems
 
   has_many :problem_collection_histories, dependent: :destroy
-
-  # has_one :match_history, -> (match_id) { where(match_id: match_id) }, class_name: 'ProblemCollectionHistory', foreign_key: 'problem_collection_id'
 end

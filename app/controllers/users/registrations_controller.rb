@@ -1,32 +1,15 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   before_action :configure_sign_up_params, only: [:create]
   # before_action :configure_account_update_params, only: [:update]
-  skip_before_action :redirect_if_unverified
 
   # GET /resource/sign_up
   def new
-    # super
-    build_resource({})
-    yield resource if block_given?
-    respond_with resource
+    super
   end
 
   # POST /resource
   def create
-    # super
-    build_resource(sign_up_params)
-    resource.agreed_at = Time.now
-    resource.save
-    yield resource if block_given?
-    if resource.persisted?
-      set_flash_message! :notice, :"signed_up_but_#{resource.inactive_message}"
-      sign_up(resource_name, resource)
-      respond_with resource, location: after_inactive_sign_up_path_for
-    else
-      clean_up_passwords resource
-      set_minimum_password_length
-      respond_with resource
-    end
+    super
   end
 
   # GET /resource
@@ -63,7 +46,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # If you have extra params to permit, append them to the sanitizer.
   def configure_sign_up_params
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :phone, :agreed_at])
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:uid])
   end
 
   # If you have extra params to permit, append them to the sanitizer.
@@ -89,7 +72,6 @@ class Users::RegistrationsController < Devise::RegistrationsController
     # router_name = Devise.mappings[scope].router_name
     # context = router_name ? send(router_name) : self
     # context.respond_to?(:root_path) ? context.root_path : "/"
-    users_verify_path
   end
 
   # def after_update_path_for(resource)

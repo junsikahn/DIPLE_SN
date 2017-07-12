@@ -1,22 +1,6 @@
 class App::DashboardsController < ApplicationController
   before_action :set_date_params, only: :show
 
-  def index
-    if current_user.mentor?
-      @matches = Match.includes(:mentor, :mentor_users, :mentee, :mentee_users, :schedules).where(mentor_id: current_user.mentor.id)
-    elsif current_user.mentee?
-      @matches = Match.includes(:mentor, :mentor_users, :mentee, :mentee_users, :schedules).where(mentee_id: current_user.mentee.id)
-    end
-
-    if @matches.blank?
-      # 본인의 대쉬보드가 없을 경우 리다이렉트
-      redirect_to root_path
-    elsif @matches.size == 1
-      # 본인의 대쉬보드가 1개만 있을 경우 리다이렉트
-      redirect_to dashboard_path(@matches.first)
-    end
-  end
-
   def show
     respond_to do |format|
       format.html do

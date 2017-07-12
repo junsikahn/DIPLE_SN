@@ -96,13 +96,8 @@ gem 'validates_timeliness'
 gem 'semantic-ui-sass'
 # Rails asset-pipeline gem to provide underscore.js
 gem 'underscore-rails'
-# an asset gem containing Adam Shaw's excellent fullcalendar jquery plugin
-gem 'fullcalendar-rails'
-gem 'momentjs-rails'
 
 source 'https://rails-assets.org' do
-  # Drag and drop so simple it hurts https://bevacqua.github.io/dragula/
-  gem 'rails-assets-dragula'
   # NOTY is a notification library that makes it easy to create alert - success - error - warning - information - confirmation messages as an alternative the standard alert dialog.
   gem 'rails-assets-noty'
   # Fast math typesetting for the web. https://khan.github.io/KaTeX/

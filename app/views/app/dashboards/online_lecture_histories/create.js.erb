@@ -1,7 +1,0 @@
-$(function(){
-  var form = $('#online_lecture_form');
-  form.modal('hide');
-  $.ajax({
-    url: '<%== dashboard_online_lecture_histories_path(dashboard_id: params[:dashboard_id], start_date: params[:start_date], end_date: params[:end_date], format: :js) %>'
-  });
-});
