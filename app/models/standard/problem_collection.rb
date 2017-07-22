@@ -9,4 +9,8 @@ class Standard::ProblemCollection < ApplicationRecord
   accepts_nested_attributes_for :problems
 
   has_many :problem_collection_histories, dependent: :destroy
+
+  has_attached_file :audio,
+                    url: '/assets/problem_collections/:id/:attachment.:extension'
+  validates_attachment_content_type :audio, content_type: ['audio/mpeg', 'audio/x-mpeg', 'audio/mp3', 'audio/x-mp3', 'audio/mpeg3', 'audio/x-mpeg3', 'audio/mpg', 'audio/x-mpg', 'audio/x-mpegaudio']
 end

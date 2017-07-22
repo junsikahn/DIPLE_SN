@@ -20,4 +20,11 @@
 //= require katex
 //= require katex/contrib/auto-render.min
 //= require local_time_ko
+//= require chartjs
+//= require bowser
+//= require FileAPI
+//= require KeyboardJS/dist/keyboard
+//= require howler
+//= require wysiwyg
+//= require jQuery-contextMenu
 //= require_tree .

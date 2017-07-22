@@ -1,3 +1,25 @@
+- @start_date = Time.zone.parse('2017-07-21').beginning_of_day
+- @end_date = Time.zone.parse('2017-08-15').beginning_of_day
+table.ui.celled.multiline.table#match_calendar
+  thead
+    tr.bottom.aligned
+      th.center.aligned 구분
+      - [1,2,3,4,5,6,0].each do |index|
+        th.two.wide.center.aligned = "#{t('date.day_names')[index]}"
+  - (@start_date.to_date.cweek..@end_date.to_date.cweek).each do |week|
+    tbody
+      tr.top.aligned
+        td.middle.aligned.center.aligned 일자
+        - week_days = (@start_date.to_date..@end_date.to_date).select{|date| date.cweek == week}
+        - [1,2,3,4,5,6,0].each do |index|
+          - if !week_days.first.nil? && week_days.first.wday == index
+            - date = week_days.shift
+            td.two.wide.center.aligned.clearfix class="#{'positive' if date == Date.today}"
+              span.ui.fluid.label class="#{date == Date.today ? 'green' : 'basic'}" == "#{l(date, format: :short)}"
+          - else
+            td.two.wide.center.aligned
+    = render 'calendar', problem_collections: @admin_problem_collections, start_date: @start_date, end_date: @end_date, week: week
+
 table.ui.celled.striped.selectable.table
   thead
     tr
@@ -11,7 +33,7 @@ table.ui.celled.striped.selectable.table
       th.center.aligned 발행여부
   tbody
     - @admin_problem_collections.each do |admin_problem_collection|
-      tr style="cursor: pointer" onclick='location.href="#{admin_problem_collection_path(admin_problem_collection)}"'
+      tr onclick='location.href="#{admin_problem_collection_path(admin_problem_collection)}"'
         td = admin_problem_collection.problem_source.name
         td = admin_problem_collection.subject.name
         td = admin_problem_collection.name
@@ -24,6 +46,3 @@ table.ui.celled.striped.selectable.table
     tr.right.aligned
       th colspan="20"
         = paginate @admin_problem_collections, views_prefix: 'admin'
-    tr.right.aligned
-      th colspan="20"
-        = link_to "#{semantic_icon('plus')}추가".html_safe, new_admin_problem_collection_path, class: 'ui positive labeled icon large button'

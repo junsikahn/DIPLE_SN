@@ -6,8 +6,9 @@ class DeviseCreateUsers < ActiveRecord::Migration[5.0]
       t.string   :encrypted_password, null: false, default: ''
 
       t.string   :name,               null: false, default: ''
-      t.boolean  :gender
-      t.date     :birthday
+      t.boolean  :gender,             null: false
+      t.date     :birthday,           null: false
+      t.boolean  :liberal,            null: false
 
       # Omniauthable
       # t.string :provider
@@ -49,7 +50,5 @@ class DeviseCreateUsers < ActiveRecord::Migration[5.0]
     # add_index :users, :reset_password_token, unique: true
     # add_index :users, :confirmation_token,   unique: true
     # add_index :users, :unlock_token,         unique: true
-
-    User.create(uid: '01088627156', password: 'test1234', name: '안준식', gender: true, birthday: '1986-11-21')
   end
 end

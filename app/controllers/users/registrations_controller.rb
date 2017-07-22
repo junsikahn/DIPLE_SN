@@ -3,30 +3,37 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # before_action :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
-  def new
-    super
-  end
+  # def new
+  #   super
+  # end
 
   # POST /resource
-  def create
-    super
-  end
-
-  # GET /resource
-  def show
-    render :show
-  end
+  # def create
+  #   super
+  # end
 
   # GET /resource/edit
   def edit
-    redirect_to users_profile_path
-    # super
+    super
   end
 
   # PUT /resource
-  # def update
-  #   super
-  # end
+  def update
+    valid_user = resource.valid_password?(params[:user][:password])
+    valid_new_password = params[:user][:new_password] == params[:user][:password_confirmation]
+    if !valid_user
+      clean_up_passwords resource
+      resource.errors.add(:password)
+      render :edit
+    elsif !valid_new_password
+      resource.errors.add(:password_confirmation)
+      render :edit
+    else
+      resource.update(password: params[:user][:new_password])
+      bypass_sign_in resource, scope: resource_name
+      respond_with resource, location: after_sign_in_path_for(resource)
+    end
+  end
 
   # DELETE /resource
   # def destroy

@@ -2,6 +2,7 @@ div.problems_row
   div.problems_column
     - order = 0
     - problems.each do |problem|
+      - problem_history = my_problem_histories.select{|history| problem_id = problem.id}.first unless my_problem_histories.nil?
       - if problem.set?
         div.problem_container.clearfix
           span.ui.horizontal.label = "#{order + 1}~#{order + problem.set_problems.size}번"
@@ -9,10 +10,10 @@ div.problems_row
             == problem.content
         - problem.set_problems.each do |set_problem|
           - order += 1
-          == render 'problem', problem: set_problem, order: order, checked: problem_histories[order - 1].users_answer
+          == render 'problem', order: order, problem: set_problem, problem_history: problem_history
       - else
         - order += 1
-        == render 'problem', problem: problem, order: order, checked: problem_histories[order - 1].users_answer
+        == render 'problem', order: order, problem: problem, problem_history: problem_history
     div.ui.basic.segment.center.aligned
       div.ui.divider
       | 준비된 문제는 여기까지입니다.<br>답안지의 해당란에 필요한 내용을 정확히 기입(표기)했는지 확인하세요.

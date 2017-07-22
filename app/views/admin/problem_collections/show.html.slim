@@ -35,7 +35,7 @@ table.ui.celled.striped.table
         - else
           = link_to "#{semantic_icon('plus')}발행".html_safe, publish_admin_problem_collection_path(@admin_problem_collection), method: :patch, class: 'ui positive labeled icon button'
 
-table.ui.celled.structured.table#problems_table
+table.ui.celled.structured.table.multiline#problems_table
   thead
     tr
       th.center.aligned rowspan="3" 번호
@@ -74,11 +74,6 @@ table.ui.celled.structured.table#problems_table
         - order += 1
         == render 'problem', problem: problem, order: order
 
-css:
-  #problems_table > tbody:not(:first-of-type) > tr:first-of-type > td {
-    border-top: 1px solid rgba(34, 36, 38, 0.1);
-  }
-
 
 javascript:
   $(function(){
@@ -86,9 +81,7 @@ javascript:
       {
           delimiters: [
               {left: "$$", right: "$$", display: true},
-              {left: "\\[", right: "\\]", display: true},
-              {left: "$", right: "$", display: false},
-              {left: "\\(", right: "\\)", display: false}
+              {left: "$",  right: "$",  display: false}
           ]
       }
     );

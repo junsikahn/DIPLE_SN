@@ -8,7 +8,7 @@ class CreateProblems < ActiveRecord::Migration[5.0]
       t.references :subject
       t.references :main_subject
     end
-    subjects = %w(국어 영어 수학 사회탐구 과학탐구)
+    subjects = %w(국어 영어 수학)
     subjects.each_with_index do |name, index|
       order = (index + 1) * 1_000_000
       Standard::Subject.create(name: name, order: order, depth: 0, path: name)
@@ -135,7 +135,11 @@ class CreateProblems < ActiveRecord::Migration[5.0]
     create_table :problem_sources do |t|
       t.string     :name,            null: false, unique: true
     end
-    sources = %w(일일테스트 수능 모의고사)
+    # sources = %w(일일테스트 수능 모의고사)
+    # sources.each do |s|
+    #   Standard::ProblemSource.create(name: s)
+    # end
+    sources = %w(영어듣기 영어단어 수학가형 수학나형)
     sources.each do |s|
       Standard::ProblemSource.create(name: s)
     end
@@ -149,12 +153,9 @@ class CreateProblems < ActiveRecord::Migration[5.0]
       t.date       :test_day
       t.boolean    :published,       default: false
       t.integer    :solved_count,    default: 0
+      t.attachment :audio
       t.timestamps
     end
-
-    Standard::ProblemCollection.create(subject_id: 1, problem_source_id: 1, name: '국어 일일테스트', problem_count: 3, total_score: 30, test_day: Date.parse('2017-07-21'), published: true)
-    Standard::ProblemCollection.create(subject_id: 2, problem_source_id: 1, name: '영어 일일테스트', problem_count: 3, total_score: 30, test_day: Date.parse('2017-07-21'), published: true)
-    Standard::ProblemCollection.create(subject_id: 3, problem_source_id: 1, name: '수학 일일테스트', problem_count: 3, total_score: 30, test_day: Date.parse('2017-07-21'), published: true)
 
     create_table :problems do |t|
       t.references :subject,        null: false
@@ -172,21 +173,9 @@ class CreateProblems < ActiveRecord::Migration[5.0]
       t.integer    :correct_count,  default: 0
       t.references :problem
       t.boolean    :set
-      t.attachment :content_image
-      t.attachment :answer_image
       t.attachment :audio
       t.timestamps
     end
-
-    Standard::Problem.create(subject_id: 1, content: '국어 테스트 1번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
-    Standard::Problem.create(subject_id: 1, content: '국어 테스트 2번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
-    Standard::Problem.create(subject_id: 1, content: '국어 테스트 3번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
-    Standard::Problem.create(subject_id: 2, content: '영어 테스트 1번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
-    Standard::Problem.create(subject_id: 2, content: '영어 테스트 2번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
-    Standard::Problem.create(subject_id: 2, content: '영어 테스트 3번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
-    Standard::Problem.create(subject_id: 3, content: '수학 테스트 1번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
-    Standard::Problem.create(subject_id: 3, content: '수학 테스트 2번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
-    Standard::Problem.create(subject_id: 3, content: '수학 테스트 3번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
 
     create_table :problem_collection_to_problems do |t|
       t.references :problem_collection,  null: false
@@ -194,14 +183,37 @@ class CreateProblems < ActiveRecord::Migration[5.0]
       t.integer    :order
     end
 
-    Standard::ProblemCollectionToProblem.create(problem_collection_id: 1, problem_id: 1, order: 0)
-    Standard::ProblemCollectionToProblem.create(problem_collection_id: 1, problem_id: 2, order: 1)
-    Standard::ProblemCollectionToProblem.create(problem_collection_id: 1, problem_id: 3, order: 2)
-    Standard::ProblemCollectionToProblem.create(problem_collection_id: 2, problem_id: 4, order: 0)
-    Standard::ProblemCollectionToProblem.create(problem_collection_id: 2, problem_id: 5, order: 1)
-    Standard::ProblemCollectionToProblem.create(problem_collection_id: 2, problem_id: 6, order: 2)
-    Standard::ProblemCollectionToProblem.create(problem_collection_id: 3, problem_id: 7, order: 0)
-    Standard::ProblemCollectionToProblem.create(problem_collection_id: 3, problem_id: 8, order: 1)
-    Standard::ProblemCollectionToProblem.create(problem_collection_id: 3, problem_id: 9, order: 2)
+    User.create(uid: '01088627156', password: 'test1234', name: '안준식', gender: true, birthday: '1986-11-21', liberal: true)
+
+    # Standard::ProblemCollection.create(subject_id: 2, problem_source_id: 1, name: '영어듣기 일일테스트', problem_count: 3, total_score: 30, test_day: Date.parse('2017-07-21'), published: true)
+    # Standard::ProblemCollection.create(subject_id: 2, problem_source_id: 2, name: '영어단어 일일테스트', problem_count: 3, total_score: 30, test_day: Date.parse('2017-07-21'), published: true)
+    # Standard::ProblemCollection.create(subject_id: 3, problem_source_id: 3, name: '수학가형 일일테스트', problem_count: 3, total_score: 30, test_day: Date.parse('2017-07-21'), published: true)
+    # Standard::ProblemCollection.create(subject_id: 3, problem_source_id: 4, name: '수학나형 일일테스트', problem_count: 3, total_score: 30, test_day: Date.parse('2017-07-21'), published: true)
+    #
+    # Standard::Problem.create(subject_id: 2, content: '영어듣기 테스트 1번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
+    # Standard::Problem.create(subject_id: 2, content: '영어듣기 테스트 2번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
+    # Standard::Problem.create(subject_id: 2, content: '영어듣기 테스트 3번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
+    # Standard::Problem.create(subject_id: 2, content: '영어단어 테스트 1번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
+    # Standard::Problem.create(subject_id: 2, content: '영어단어 테스트 2번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
+    # Standard::Problem.create(subject_id: 2, content: '영어단어 테스트 3번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
+    # Standard::Problem.create(subject_id: 3, content: '수학가형 테스트 1번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
+    # Standard::Problem.create(subject_id: 3, content: '수학가형 테스트 2번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
+    # Standard::Problem.create(subject_id: 3, content: '수학가형 테스트 3번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
+    # Standard::Problem.create(subject_id: 3, content: '수학나형 테스트 1번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
+    # Standard::Problem.create(subject_id: 3, content: '수학나형 테스트 2번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
+    # Standard::Problem.create(subject_id: 3, content: '수학나형 테스트 3번 문제입니다', exm_1: '1', exm_2: '2', exm_3: '3', exm_4: '4', exm_5: '5', answer: '3', score: 10)
+    #
+    # Standard::ProblemCollectionToProblem.create(problem_collection_id: 1, problem_id: 1, order: 0)
+    # Standard::ProblemCollectionToProblem.create(problem_collection_id: 1, problem_id: 2, order: 1)
+    # Standard::ProblemCollectionToProblem.create(problem_collection_id: 1, problem_id: 3, order: 2)
+    # Standard::ProblemCollectionToProblem.create(problem_collection_id: 2, problem_id: 4, order: 0)
+    # Standard::ProblemCollectionToProblem.create(problem_collection_id: 2, problem_id: 5, order: 1)
+    # Standard::ProblemCollectionToProblem.create(problem_collection_id: 2, problem_id: 6, order: 2)
+    # Standard::ProblemCollectionToProblem.create(problem_collection_id: 3, problem_id: 7, order: 0)
+    # Standard::ProblemCollectionToProblem.create(problem_collection_id: 3, problem_id: 8, order: 1)
+    # Standard::ProblemCollectionToProblem.create(problem_collection_id: 3, problem_id: 9, order: 2)
+    # Standard::ProblemCollectionToProblem.create(problem_collection_id: 4, problem_id: 10, order: 0)
+    # Standard::ProblemCollectionToProblem.create(problem_collection_id: 4, problem_id: 11, order: 1)
+    # Standard::ProblemCollectionToProblem.create(problem_collection_id: 4, problem_id: 12, order: 2)
   end
 end

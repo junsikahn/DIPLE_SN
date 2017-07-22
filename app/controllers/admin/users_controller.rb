@@ -15,10 +15,12 @@ class Admin::UsersController < AdminController
   # GET /admin/users/new
   def new
     @admin_user = Admin::User.new
+    render :form
   end
 
   # GET /admin/users/1/edit
   def edit
+    render :form
   end
 
   # POST /admin/users
@@ -26,12 +28,15 @@ class Admin::UsersController < AdminController
   def create
     @admin_user = Admin::User.new(admin_user_params)
 
+    # 임시비밀번호 부여 (생년월일 6자리)
+    @admin_user.password = @admin_user.tmp_password
+
     respond_to do |format|
       if @admin_user.save
         format.html { redirect_to @admin_user, notice: 'User was successfully created.' }
         format.json { render :show, status: :created, location: @admin_user }
       else
-        format.html { render :new }
+        format.html { render :form }
         format.json { render json: @admin_user.errors, status: :unprocessable_entity }
       end
     end
@@ -45,7 +50,7 @@ class Admin::UsersController < AdminController
         format.html { redirect_to @admin_user, notice: 'User was successfully updated.' }
         format.json { render :show, status: :ok, location: @admin_user }
       else
-        format.html { render :edit }
+        format.html { render :form }
         format.json { render json: @admin_user.errors, status: :unprocessable_entity }
       end
     end
@@ -69,6 +74,8 @@ class Admin::UsersController < AdminController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def admin_user_params
-      params.fetch(:admin_user, {})
+      params
+        .fetch(:admin_user, {})
+        .permit(:uid, :name, :gender, :birthday)
     end
 end

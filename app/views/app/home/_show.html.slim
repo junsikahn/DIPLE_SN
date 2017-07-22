@@ -15,22 +15,24 @@ div.content
             a.ui.icon.button
               i.caret.right.icon
         div.problems_seg
-          = render 'problems', problems: @problem_collection_history.problem_collection.problems, problem_histories: @problem_collection_history.problem_histories
+          = render 'problems', problems: @problem_collection_history.problem_collection.problems, my_problem_histories: @my_problem_histories
       div.answers_wrapper
-        = simple_nested_form_for @problem_collection_history, url: '#', remote: true, html: { style: 'height: 100%;' } do |f|
-          div.ui.attached.center.aligned.secondary.segment.problems_header - 답안지 -
-          div.ui.attached.segment.answers_seg
-            table.ui.very.basic.selectable.table
-              tbody
-                = f.simple_fields_for :problem_histories, wrapper: false do |h|
-                  tr class="#{h.object.correct? ? 'positive' : 'error'}"
-                    td.two.wide.center.aligned
-                      small
-                        b = "#{h.index + 1}번"
-                    - if h.object.problem.objective?
-                      - 5.times do |index|
-                        td.two.wide.center.aligned.answer_radio data-answer="#{index + 1}"
-                          a.ui.circular.mini.icon.button class="#{h.object.users_answer.to_i == index + 1 ? 'black' : 'basic'}" = "#{index + 1}"
-                    - else
-                      td.answer_input colspan="5" = h.input :users_answer, label: false, readonly: true
-          div.ui.attached.center.aligned.inverted.segment.answers_score = "#{@problem_collection_history.score}점 / #{@problem_collection_history.problem_collection.total_score}점"
+        div.ui.attached.center.aligned.secondary.segment.problems_header - 답안지 -
+        div.answers_seg
+          table.ui.very.basic.table
+            tbody
+              - @my_problem_histories.each_with_index do |h, order|
+                tr class="#{h.correct? ? 'positive' : 'error'}"
+                  td.two.wide.center.aligned
+                    small
+                      b = "#{order + 1}번"
+                  - if h.problem.objective?
+                    - (1..5).each do |index|
+                      - if h.problem['exm_' + index.to_s].blank?
+                        td.two.wide.center.aligned.disabled
+                      - else
+                        td.two.wide.center.aligned.answer_radio data-answer="#{index}"
+                          a.ui.circular.mini.icon.button class="#{h.users_answer.to_i == index ? 'black' : 'basic'}" = "#{index}"
+                  - else
+                    td.answer_input colspan="5" = h.input :users_answer, label: false, readonly: true
+        div.ui.attached.center.aligned.inverted.segment.answers_score = "#{@problem_collection_history.score}점 / #{@problem_collection_history.problem_collection.total_score}점"

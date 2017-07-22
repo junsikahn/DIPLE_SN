@@ -13,6 +13,7 @@
  *= require_tree .
  *= require noty
  *= require katex
+ *= require jQuery-contextMenu
  *= require_self
  */
 
@@ -107,10 +108,6 @@
   padding: 5em 0 !important;
 }
 
-input[type='file'] {
-  display: none;
-}
-
 @media only screen and (max-width: 767px) {
   .ui.stackable.cards .card:first-child {
     margin-top: 1em !important;
@@ -151,6 +148,26 @@ input[type='file'] {
   border-top-right-radius: 0.28571429rem;
 }
 
+.multiline.table > tbody > tr:only-of-type > td {
+  background-color: rgba(0, 0, 50, 0.02) !important;
+}
+
+.multiline.table > tbody:not(:first-of-type) > tr:first-of-type > td {
+  border-top: 1px solid rgba(34, 36, 38, 0.1);
+}
+
+.selectable.table tr {
+  cursor: pointer;
+}
+
+.dashboard-table:empty::before {
+  content: attr(empty);
+  display: block;
+  text-align: center;
+  color: rgba(40, 40, 40, 0.3);
+  padding: 50px 0;
+}
+
 #test_screen {
   margin: 0 !important;
   width: 100% !important;
@@ -163,16 +180,42 @@ input[type='file'] {
     .problems_header { height: 50px; overflow: scroll; border-top: 0; }
     .problems_wrapper, .answers_wrapper { position: relative; display: inline-block; height: 100%; vertical-align: top; overflow: hidden; }
     .problems_wrapper { width: 75%; box-shadow: 1px 0 lightgrey;
-      .problems_seg { width: 100%; height: calc(100% - 50px); overflow: hidden; }
+      .problems_seg { width: 100%; height: calc(100% - 50px); background-color: #fff; overflow: hidden; }
       .problems_row { min-width: 100%; height: 100%; transition: transform .25s; }
       .problems_row_divider { display: inline-block; float: left; width: 1px; height: 100%; margin-left: -1px; background: lightgrey;}
-      .problems_column { display: inline-block; float: left; width: 540px; padding: 20px; vertical-align: top; }
+      .problems_column { position: relative; display: inline-block; float: left; width: 540px; padding: 20px; vertical-align: top; }
     }
     .answers_wrapper { width: 25%; box-shadow: -1px 0 lightgrey;
-      .answers_seg { height: calc(100% - 100px); overflow: scroll; -webkit-overflow-scrolling: touch; }
+      .answers_seg { height: calc(100% - 100px); background-color: #fff; overflow: scroll; -webkit-overflow-scrolling: touch;
+        & > table { border-radius: 0; box-shadow: 0 1px 0 lightgrey; }
+      }
       .answer_radio .button { margin: 0; padding: 0; width: 18px; height: 30px; line-height: 30px; }
       .answer_input { padding-right: 0.8em !important; }
       .submit.button, .answers_score { height: 50px; }
+    }
+  }
+
+  .test_wrapper.with_audio {
+    .answers_seg { height: calc(100% - 150px) !important; }
+    .audio_seg { position: relative; width: 100%; height: 50px; background-color: #fff; overflow: hidden; border-bottom: 1px solid lightgrey;
+      audio { display: none; }
+      .progress_bar { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background-color: rgba(33, 33, 33, 0.1); }
+      .basic.button, .basic.buttons { position: relative; background-color: #fff !important; }
+      .tiny.buttons { float: right; margin: 9px 6px 0 0; overflow: hidden; }
+      .playBtn { position: relative; display: inline-block; margin: 7px 0 7px 6px; }
+      .pauseBtn { position: relative; display: none; margin: 7px 0 7px 6px; }
+      .startBtn { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: crimson; color: white; transition: transform .5s; transform: translateY(0); cursor: pointer; }
+      .endBtn { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #eee; color: #999; transition: transform .5s; transform: translateY(100%); }
+      .volSlider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: lightgrey; overflow: hidden; transition: transform .25s, background-color .25s; transform: translateX(-100%); cursor: pointer; }
+      .volSlider.adjusting { transform: translateX(0); }
+      .volSlider:hover,
+      .volSlider:active { background-color: #999; }
+      .volSlider .volBar {
+        position: relative; height: 100%; width: 95%; background: rgba(33, 33, 33, 0.6); border-radius: 3px;
+        box-shadow: 1px 0 0px rgba(255, 255, 255, 1), 2px 0 0px rgba(99, 99, 99, 1), 3px 0 0px rgba(255, 255, 255, 1), 4px 0 0px rgba(99, 99, 99, 1), 5px 0 0px rgba(255, 255, 255, 1), 6px 0 0px rgba(99, 99, 99, 1);
+      }
+      &.started .startBtn { transform: translateY(100%); }
+      &.ended .endBtn { transform: translateY(0); }
     }
   }
 }
@@ -181,6 +224,7 @@ input[type='file'] {
 .problem_container:last-of-type { padding-bottom: 0; }
 .problem_container img { max-width: 100%; }
 .problem_seg { overflow-x: scroll; overflow-y: hidden; }
+.exm_container { display: inline-block; width: calc(100% - 30px); padding: 3px 0; float: right; }
 
 @media only screen and (min-width: 942px) and (max-width: 1480px) {
   #test_screen {
@@ -200,7 +244,7 @@ input[type='file'] {
 @media only screen and (max-width: 941px) {
   #test_screen {
     .test_wrapper { max-width: 542px !important;
-      .problems_wrapper { width: 100% !important; height: calc(100% - 50px) !important;
+      .problems_wrapper { width: 100% !important; height: calc(100% - 50px) !important; border-bottom: 1px solid lightgrey;
         .problems_seg { overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; }
         .problems_row { min-width: 100%; max-width: 100%; }
         .problems_header .ui.labels { display: none; }
@@ -217,6 +261,10 @@ input[type='file'] {
           td { display: table-cell !important; padding-top: 20px 0 !important; padding-bottom: 20px 0 !important; }
         }
       }
+    }
+    .test_wrapper.with_audio {
+      .problems_wrapper { height: calc(100% - 100px) !important; }
+      .answers_wrapper { height: 100px !important; }
     }
   }
 }

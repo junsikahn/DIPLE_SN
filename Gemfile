@@ -93,7 +93,7 @@ gem 'nested_form'
 gem 'validates_timeliness'
 
 # Sass-powered version of Semantic UI and ready to drop into Rails & Compass.
-gem 'semantic-ui-sass'
+gem 'semantic-ui-sass', '~> 2.2.10.1'
 # Rails asset-pipeline gem to provide underscore.js
 gem 'underscore-rails'
 
@@ -102,6 +102,18 @@ source 'https://rails-assets.org' do
   gem 'rails-assets-noty'
   # Fast math typesetting for the web. https://khan.github.io/KaTeX/
   gem 'rails-assets-katex'
+  # Simple HTML5 Charts using the <canvas> tag http://www.chartjs.org/
+  gem 'rails-assets-chartjs'
+  # A browser detector https://github.com/lancedikson/bowser
+  gem 'rails-assets-bowser'
+  # A JavaScript library for binding keyboard combos without the pain of key codes and key combo conflicts. https://github.com/RobertWHurst/KeyboardJS
+  gem 'rails-assets-KeyboardJS'
+  # Javascript audio library for the modern web. https://github.com/goldfire/howler.js
+  gem 'rails-assets-howler'
+  # A set of javascript tools for working with files. http://mailru.github.io/FileAPI/
+  gem 'rails-assets-FileAPI'
+  # Full featured context menu handler capable of handling thousands of elements https://swisnl.github.io/jQuery-contextMenu/
+  gem 'rails-assets-jQuery-contextMenu'
 end
 
 # Rails engine with helpers and JavaScript for displaying times and dates to users in their local time

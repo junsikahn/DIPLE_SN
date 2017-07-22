@@ -5,9 +5,9 @@ class ProblemHistory < ApplicationRecord
   belongs_to :problem_collection, class_name: 'Standard::ProblemCollection'
   belongs_to :problem_collection_history, optional: true
 
-  validate :scoring
+  validate :check_answer
 
-  def scoring
+  def check_answer
     errors.add(:users_answer) and return if users_answer.blank?
     self[:correct] = users_answer == problem.answer
   end

@@ -24,8 +24,8 @@ class ProblemCollectionHistory < ApplicationRecord
     self[:completed_at] = Time.zone.now
     problem_histories.each do |problem_history|
       next unless problem_history.correct?
-      problem_history.problem.correct_count += 1
       self[:score] += problem_history.problem.score
+      problem_history.problem.correct_count += 1
       problem_history.problem.save
     end
   end

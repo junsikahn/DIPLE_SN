@@ -7,18 +7,20 @@ class App::HomeController < ApplicationController
       Standard::ProblemCollection
         .joins("LEFT JOIN problem_collection_histories ON problem_collection_histories.problem_collection_id = problem_collections.id AND problem_collection_histories.user_id = #{current_user.id}")
         .select('problem_collections.*, problem_collection_histories.score')
-        .daily_tests(@start_date, @end_date)
+
+    @problem_histories = ProblemHistory.where(user_id: current_user.id, correct: false)
   end
 
   def new
     respond_to do |format|
       format.html
       format.js do
-        @problem_collection_history = ProblemCollectionHistory.includes(problem_collection: :problems, problem_histories: :problem).find_by(user_id: current_user.id, problem_collection_id: params[:problem_collection_id])
+        @problem_collection_history = ProblemCollectionHistory.includes(problem_collection: [:subject, problems: [:subject]]).find_by(user_id: current_user.id, problem_collection_id: params[:problem_collection_id])
         if @problem_collection_history.nil?
           @problem_collection_history = ProblemCollectionHistory.new(user_id: current_user.id, problem_collection_id: params[:problem_collection_id])
           @problem_collection_history.build_problems
         else
+          @my_problem_histories = ProblemHistory.includes(problem: :subject).where(user_id: current_user.id, problem_id: @problem_collection_history.problem_collection.problems.pluck(:id))
           render :show
         end
       end
@@ -27,8 +29,12 @@ class App::HomeController < ApplicationController
 
   def create
     @problem_collection_history = ProblemCollectionHistory.new(problem_collection_history_params)
-    return if @problem_collection_history.save
-    render :new
+    if @problem_collection_history.save
+      @my_problem_histories = ProblemHistory.includes(problem: :subject).where(user_id: current_user.id, problem_id: @problem_collection_history.problem_collection.problems.pluck(:id))
+      render :show
+    else
+      render :new
+    end
   end
 
   private

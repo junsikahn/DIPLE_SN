@@ -1,11 +1,10 @@
 div.ui.attached.message
   div.header 로그인
-  p 휴대폰 번호와 비밀번호를 입력해주세요
+  p 학번과 비밀번호를 입력해주세요
 div.ui.bottom.attached.segment
   = simple_form_for resource, as: resource_name, url: session_path(resource_name) do |f|
     div
       = f.error_notification
-      h4.ui.dividing.header 정보 입력
       div.two.fields
         = f.input :uid,
                   icon: 'user', input_wrapper_html: { class: 'left icon' },

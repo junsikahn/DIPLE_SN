@@ -1,0 +1,45 @@
+= simple_nested_form_for @admin_user do |f|
+  = f.error_notification
+
+  table.ui.table
+    thead
+      tr
+        th 입력해주세요
+    tbody
+      tr
+        td = f.input :uid
+      tr
+        td = f.input :name
+      tr
+        td = f.input :gender,
+                      as: :select,
+                      wrapper: :ui_select,
+                      collection: [['남자', true], ['여자', false]],
+                      include_blank: '성별을 선택해주세요',
+                      required: true
+      tr
+        td = f.input :liberal,
+                      as: :select,
+                      wrapper: :ui_select,
+                      collection: [['문과', true], ['이과', false]],
+                      include_blank: '전공을 선택해주세요',
+                      required: true
+      tr
+        td = f.input :birthday,
+                      wrapper: :ui_select, input_html: { class: 'field search' },
+                      start_year: Date.today.year - 12,
+                      end_year: Date.today.year - 90,
+                      prompt: { year: '연도', month: '월', day: '일' },
+                      order: [:year, :month, :day],
+                      required: true
+
+  table.ui.table
+    thead
+      tr
+        th.sixteen.wide 저장하시겠습니까?
+        th.collapsing = f.button :button, '저장'
+
+javascript:
+  $(function(){
+    $('select').dropdown();
+  });

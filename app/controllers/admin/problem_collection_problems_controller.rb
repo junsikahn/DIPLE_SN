@@ -68,6 +68,6 @@ class Admin::ProblemCollectionProblemsController < AdminController
     def admin_problem_params
       params
         .require(:admin_problem)
-        .permit(:subject_id, :content, :exm_1, :exm_2, :exm_3, :exm_4, :exm_5, :answer, :score, :explanation)
+        .permit(:subject_id, :content, :exm_1, :exm_2, :exm_3, :exm_4, :exm_5, :answer, :score, :explanation, :audio)
     end
 end

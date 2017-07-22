@@ -3,9 +3,6 @@ Rails.application.routes.draw do
     registrations: 'users/registrations',
     sessions: 'users/sessions'
   }
-  namespace :users do
-    resource :profile, only: [:show, :edit, :update]
-  end
 
   # constraints(ip: /120\.142\.\d+\.\d+/) do # 특정 IP주소 외의 접근을 차단함
     namespace :admin do

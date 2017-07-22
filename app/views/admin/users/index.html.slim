@@ -1,16 +1,22 @@
-table.ui.celled.striped.table
+table.ui.celled.striped.selectable.table
   thead
     tr
-      th.center.aligned 상세
-      th.center.aligned 편집
-      th.center.aligned 삭제
+      th.center.aligned ID
+      th.center.aligned 학번
+      th.center.aligned 이름
+      th.center.aligned 전공
+      th.center.aligned 성별
+      th.center.aligned 생년월일
 
   tbody
     - @admin_users.each do |admin_user|
-      tr
-        td = link_to 'Show', admin_user
-        td = link_to 'Edit', edit_admin_user_path(admin_user)
-        td = link_to 'Destroy', admin_user, data: { confirm: 'Are you sure?' }, method: :delete
+      tr onclick='location.href="#{admin_user_path(admin_user)}"'
+        td = admin_user.id
+        td = admin_user.uid
+        td = admin_user.name
+        td = admin_user.liberal ? '문과' : '이과'
+        td = admin_user.gender ? '남' : '여'
+        td = admin_user.birthday
   tfoot
     tr.right.aligned
       th colspan="20"

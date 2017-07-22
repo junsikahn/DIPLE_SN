@@ -11,11 +11,15 @@ class User < ApplicationRecord
   validates :uid,
             presence: true,
             uniqueness: true,
-            format: { with: /\A(010|011|016|018|019)[0-9]{7,8}\z/ },
-            numericality: { only_integer: true },
-            length: { in: 10..11 }
+            numericality: { only_integer: true }
+            # format: { with: /\A(010|011|016|018|019)[0-9]{7,8}\z/ },
+            # length: { in: 10..11 },
   validates :name,
             presence: true
+
+  def tmp_password
+    birthday.year.to_s.slice(2..3) + (birthday.month > 9 ? birthday.month.to_s : '0' + birthday.month.to_s) + (birthday.day > 9 ? birthday.day.to_s : '0' + birthday.day.to_s)
+  end
 
   def email_required?
     false

@@ -14,7 +14,7 @@ class Admin::ProblemCollectionsController < AdminController
 
   # GET /admin/problem_collections/new
   def new
-    @admin_problem_collection = Admin::ProblemCollection.new
+    @admin_problem_collection = Admin::ProblemCollection.new(problem_source_id: params[:problem_source_id], subject_id: params[:subject_id], test_day: params[:test_day])
   end
 
   # GET /admin/problem_collections/1/edit
@@ -64,6 +64,6 @@ class Admin::ProblemCollectionsController < AdminController
     def admin_problem_collection_params
       params
         .require(:admin_problem_collection)
-        .permit(:name, :test_day, :subject_id, :problem_source_id)
+        .permit(:name, :test_day, :subject_id, :problem_source_id, :audio)
     end
 end
