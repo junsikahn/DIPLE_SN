@@ -9,7 +9,7 @@ class Standard::Problem < ApplicationRecord
 
   has_attached_file :audio,
                     url: '/assets/problems/:id/:attachment.:extension'
-  validates_attachment_content_type :audio, content_type: ['audio/mpeg', 'audio/x-mpeg', 'audio/mp3', 'audio/x-mp3', 'audio/mpeg3', 'audio/x-mpeg3', 'audio/mpg', 'audio/x-mpg', 'audio/x-mpegaudio']
+  validates_attachment_content_type :audio, content_type: ['application/octet-stream', 'audio/mpeg', 'audio/x-mpeg', 'audio/mp3', 'audio/x-mp3', 'audio/mpeg3', 'audio/x-mpeg3', 'audio/mpg', 'audio/x-mpg', 'audio/x-mpegaudio']
 
   validates :content, presence: true
   validates :answer, presence: true, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 5, if: 'self.objective?' }
