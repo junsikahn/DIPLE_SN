@@ -3,7 +3,13 @@ div#test_screen.ui.modal.fullscreen
 div.clearfix
   h1.ui.left.floated.header
     = "#{current_user.name} "
-    small = "일일테스트 (#{current_user.liberal ? '문과' : '이과'})"
+    small
+      | 일일테스트
+      span.ui.horizontal.basic.label = "#{current_user.liberal ? '문과' : '이과'}"
+  div class="ui right floated header" style="margin-top: 15px;"
+    div class="ui red right ribbon large label"
+      i.bell.icon
+      = "#{current_user.name[1,2]}#{current_user.gender ? '군' : '양'}, 시험 밀리지 말고  꼭 보게나!"
 
 table.ui.celled.multiline.table#match_calendar
   thead
@@ -26,190 +32,190 @@ table.ui.celled.multiline.table#match_calendar
     = render 'calendar', problem_collections: @problem_collections, start_date: @start_date, end_date: @end_date, week: week
 
 
-div.clearfix
-  h1.ui.left.floated.header
-    = "#{current_user.name} "
-    small 오답노트
+/ div.clearfix
+/   h1.ui.left.floated.header
+/     = "#{current_user.name} "
+/     small 오답노트
+/ 
+/ div style="width: 100%; height: 400px;"
+/   div style="display: inline-block; position: relative; width: 33%; height: 400px;"
+/     canvas#myChart1
+/   div style="display: inline-block; position: relative; width: 33%; height: 400px;"
+/     canvas#myChart2
+/   div style="display: inline-block; position: relative; width: 33%; height: 400px;"
+/     canvas#myChart3
 
-div style="width: 100%; height: 400px;"
-  div style="display: inline-block; position: relative; width: 33%; height: 400px;"
-    canvas#myChart1
-  div style="display: inline-block; position: relative; width: 33%; height: 400px;"
-    canvas#myChart2
-  div style="display: inline-block; position: relative; width: 33%; height: 400px;"
-    canvas#myChart3
-
-javascript:
-  var ctx1 = document.getElementById("myChart1").getContext('2d');
-  var ctx2 = document.getElementById("myChart2").getContext('2d');
-  var ctx3 = document.getElementById("myChart3").getContext('2d');
-  var myChart = new Chart(ctx1, {
-    type: 'radar',
-    data: {
-        labels: #{{Standard::Subject.where(main_subject_id: 1, depth: 1).pluck(:name)}},
-        datasets: [{
-            label: '전체 푼 문제',
-            data: [12, 19, 3, 10, 2, 3, 10],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(0, 0, 0, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-                'rgba(0, 0, 0, 1)'
-            ],
-            borderWidth: 1
-        },
-        {
-            label: '오답률',
-            data: [3, 12, 1, 5, 1, 2, 9],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.8)',
-                'rgba(54, 162, 235, 0.8)',
-                'rgba(255, 206, 86, 0.8)',
-                'rgba(75, 192, 192, 0.8)',
-                'rgba(153, 102, 255, 0.8)',
-                'rgba(255, 159, 64, 0.8)',
-                'rgba(0, 0, 0, 0.8)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        maintainAspectRatio: false,
-        title: {
-            display: true,
-            text: '국어'
-        },
-        scales: {
-            display: false,
-        }
-    }
-  });
-  
-  var myChart = new Chart(ctx2, {
-    type: 'radar',
-    data: {
-        labels: #{{Standard::Subject.where(main_subject_id: 2, depth: 1).pluck(:name)}},
-        datasets: [{
-            label: '전체 푼 문제',
-            data: [12, 19, 3, 10, 2, 3, 10],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(0, 0, 0, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-                'rgba(0, 0, 0, 1)'
-            ],
-            borderWidth: 1
-        },
-        {
-            label: '오답률',
-            data: [3, 12, 1, 5, 1, 2, 9],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.8)',
-                'rgba(54, 162, 235, 0.8)',
-                'rgba(255, 206, 86, 0.8)',
-                'rgba(75, 192, 192, 0.8)',
-                'rgba(153, 102, 255, 0.8)',
-                'rgba(255, 159, 64, 0.8)',
-                'rgba(0, 0, 0, 0.8)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        maintainAspectRatio: false,
-        title: {
-            display: true,
-            text: '영어'
-        },
-        scales: {
-            display: false,
-        }
-    }
-  });
-  
-  var myChart = new Chart(ctx3, {
-    type: 'radar',
-    data: {
-        labels: #{{Standard::Subject.where(main_subject_id: 3, depth: 1).pluck(:name)}},
-        datasets: [{
-            label: '전체 푼 문제',
-            data: [12, 19, 3, 10, 2, 3, 10],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-                'rgba(0, 0, 0, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)',
-                'rgba(0, 0, 0, 1)'
-            ],
-            borderWidth: 1
-        },
-        {
-            label: '오답률',
-            data: [3, 12, 1, 5, 1, 2, 9],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.8)',
-                'rgba(54, 162, 235, 0.8)',
-                'rgba(255, 206, 86, 0.8)',
-                'rgba(75, 192, 192, 0.8)',
-                'rgba(153, 102, 255, 0.8)',
-                'rgba(255, 159, 64, 0.8)',
-                'rgba(0, 0, 0, 0.8)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        maintainAspectRatio: false,
-        title: {
-            display: true,
-            text: '수학'
-        },
-        scales: {
-            display: false,
-        }
-    }
-  });
-
-table.ui.celled.multiline.table#problem_histories
-  tbody
-    - @problem_histories.each do |problem_history|
-      tr
-        td = problem_history.problem.content
+/ javascript:
+/   var ctx1 = document.getElementById("myChart1").getContext('2d');
+/   var ctx2 = document.getElementById("myChart2").getContext('2d');
+/   var ctx3 = document.getElementById("myChart3").getContext('2d');
+/   var myChart = new Chart(ctx1, {
+/     type: 'radar',
+/     data: {
+/         labels: #{{Standard::Subject.where(main_subject_id: 1, depth: 1).pluck(:name)}},
+/         datasets: [{
+/             label: '전체 푼 문제',
+/             data: [12, 19, 3, 10, 2, 3, 10],
+/             backgroundColor: [
+/                 'rgba(255, 99, 132, 0.2)',
+/                 'rgba(54, 162, 235, 0.2)',
+/                 'rgba(255, 206, 86, 0.2)',
+/                 'rgba(75, 192, 192, 0.2)',
+/                 'rgba(153, 102, 255, 0.2)',
+/                 'rgba(255, 159, 64, 0.2)',
+/                 'rgba(0, 0, 0, 0.2)'
+/             ],
+/             borderColor: [
+/                 'rgba(255,99,132,1)',
+/                 'rgba(54, 162, 235, 1)',
+/                 'rgba(255, 206, 86, 1)',
+/                 'rgba(75, 192, 192, 1)',
+/                 'rgba(153, 102, 255, 1)',
+/                 'rgba(255, 159, 64, 1)',
+/                 'rgba(0, 0, 0, 1)'
+/             ],
+/             borderWidth: 1
+/         },
+/         {
+/             label: '오답률',
+/             data: [3, 12, 1, 5, 1, 2, 9],
+/             backgroundColor: [
+/                 'rgba(255, 99, 132, 0.8)',
+/                 'rgba(54, 162, 235, 0.8)',
+/                 'rgba(255, 206, 86, 0.8)',
+/                 'rgba(75, 192, 192, 0.8)',
+/                 'rgba(153, 102, 255, 0.8)',
+/                 'rgba(255, 159, 64, 0.8)',
+/                 'rgba(0, 0, 0, 0.8)'
+/             ],
+/             borderWidth: 1
+/         }]
+/     },
+/     options: {
+/         maintainAspectRatio: false,
+/         title: {
+/             display: true,
+/             text: '국어'
+/         },
+/         scales: {
+/             display: false,
+/         }
+/     }
+/   });
+/   
+/   var myChart = new Chart(ctx2, {
+/     type: 'radar',
+/     data: {
+/         labels: #{{Standard::Subject.where(main_subject_id: 2, depth: 1).pluck(:name)}},
+/         datasets: [{
+/             label: '전체 푼 문제',
+/             data: [12, 19, 3, 10, 2, 3, 10],
+/             backgroundColor: [
+/                 'rgba(255, 99, 132, 0.2)',
+/                 'rgba(54, 162, 235, 0.2)',
+/                 'rgba(255, 206, 86, 0.2)',
+/                 'rgba(75, 192, 192, 0.2)',
+/                 'rgba(153, 102, 255, 0.2)',
+/                 'rgba(255, 159, 64, 0.2)',
+/                 'rgba(0, 0, 0, 0.2)'
+/             ],
+/             borderColor: [
+/                 'rgba(255,99,132,1)',
+/                 'rgba(54, 162, 235, 1)',
+/                 'rgba(255, 206, 86, 1)',
+/                 'rgba(75, 192, 192, 1)',
+/                 'rgba(153, 102, 255, 1)',
+/                 'rgba(255, 159, 64, 1)',
+/                 'rgba(0, 0, 0, 1)'
+/             ],
+/             borderWidth: 1
+/         },
+/         {
+/             label: '오답률',
+/             data: [3, 12, 1, 5, 1, 2, 9],
+/             backgroundColor: [
+/                 'rgba(255, 99, 132, 0.8)',
+/                 'rgba(54, 162, 235, 0.8)',
+/                 'rgba(255, 206, 86, 0.8)',
+/                 'rgba(75, 192, 192, 0.8)',
+/                 'rgba(153, 102, 255, 0.8)',
+/                 'rgba(255, 159, 64, 0.8)',
+/                 'rgba(0, 0, 0, 0.8)'
+/             ],
+/             borderWidth: 1
+/         }]
+/     },
+/     options: {
+/         maintainAspectRatio: false,
+/         title: {
+/             display: true,
+/             text: '영어'
+/         },
+/         scales: {
+/             display: false,
+/         }
+/     }
+/   });
+/   
+/   var myChart = new Chart(ctx3, {
+/     type: 'radar',
+/     data: {
+/         labels: #{{Standard::Subject.where(main_subject_id: 3, depth: 1).pluck(:name)}},
+/         datasets: [{
+/             label: '전체 푼 문제',
+/             data: [12, 19, 3, 10, 2, 3, 10],
+/             backgroundColor: [
+/                 'rgba(255, 99, 132, 0.2)',
+/                 'rgba(54, 162, 235, 0.2)',
+/                 'rgba(255, 206, 86, 0.2)',
+/                 'rgba(75, 192, 192, 0.2)',
+/                 'rgba(153, 102, 255, 0.2)',
+/                 'rgba(255, 159, 64, 0.2)',
+/                 'rgba(0, 0, 0, 0.2)'
+/             ],
+/             borderColor: [
+/                 'rgba(255,99,132,1)',
+/                 'rgba(54, 162, 235, 1)',
+/                 'rgba(255, 206, 86, 1)',
+/                 'rgba(75, 192, 192, 1)',
+/                 'rgba(153, 102, 255, 1)',
+/                 'rgba(255, 159, 64, 1)',
+/                 'rgba(0, 0, 0, 1)'
+/             ],
+/             borderWidth: 1
+/         },
+/         {
+/             label: '오답률',
+/             data: [3, 12, 1, 5, 1, 2, 9],
+/             backgroundColor: [
+/                 'rgba(255, 99, 132, 0.8)',
+/                 'rgba(54, 162, 235, 0.8)',
+/                 'rgba(255, 206, 86, 0.8)',
+/                 'rgba(75, 192, 192, 0.8)',
+/                 'rgba(153, 102, 255, 0.8)',
+/                 'rgba(255, 159, 64, 0.8)',
+/                 'rgba(0, 0, 0, 0.8)'
+/             ],
+/             borderWidth: 1
+/         }]
+/     },
+/     options: {
+/         maintainAspectRatio: false,
+/         title: {
+/             display: true,
+/             text: '수학'
+/         },
+/         scales: {
+/             display: false,
+/         }
+/     }
+/   });
+/ 
+/ table.ui.celled.multiline.table#problem_histories
+/   tbody
+/     - @problem_histories.each do |problem_history|
+/       tr
+/         td = problem_history.problem.content
 
 
 css:

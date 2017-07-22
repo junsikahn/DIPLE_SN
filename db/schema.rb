@@ -33,20 +33,16 @@ ActiveRecord::Schema.define(version: 20170711000205) do
   end
 
   create_table "problem_collections", force: :cascade do |t|
-    t.integer  "subject_id",                         null: false
-    t.integer  "problem_source_id",                  null: false
-    t.string   "name",                               null: false
-    t.integer  "problem_count",      default: 0
-    t.integer  "total_score",        default: 0
+    t.integer  "subject_id",                        null: false
+    t.integer  "problem_source_id",                 null: false
+    t.string   "name",                              null: false
+    t.integer  "problem_count",     default: 0
+    t.integer  "total_score",       default: 0
     t.date     "test_day"
-    t.boolean  "published",          default: false
-    t.integer  "solved_count",       default: 0
-    t.string   "audio_file_name"
-    t.string   "audio_content_type"
-    t.integer  "audio_file_size"
-    t.datetime "audio_updated_at"
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.boolean  "published",         default: false
+    t.integer  "solved_count",      default: 0
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
     t.index ["problem_source_id"], name: "index_problem_collections_on_problem_source_id"
     t.index ["subject_id"], name: "index_problem_collections_on_subject_id"
   end

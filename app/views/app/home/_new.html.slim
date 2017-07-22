@@ -1,6 +1,6 @@
 i.close.icon
 div.content
-  div.test_wrapper.loading class="#{'with_audio' if @problem_collection_history.problem_collection.audio?}"
+  div.test_wrapper.loading class="#{'with_audio' if @problem_collection_history.problem_collection.problem_source_id == 1}"
       div.problems_wrapper
         div.ui.attached.secondary.segment.problems_header.clearfix
           h3.ui.left.floated.header#test == "#{@problem_collection_history.problem_collection.name}"
@@ -21,7 +21,7 @@ div.content
           = f.hidden_field :user_id, value: current_user.id
           = f.hidden_field :problem_collection_id
           div.ui.attached.center.aligned.secondary.segment.problems_header - 답안지 -
-          - if @problem_collection_history.problem_collection.audio?
+          - if @problem_collection_history.problem_collection.problem_source_id == 1
             div.audio_seg
               div.progress_bar
               div.ui.positive.icon.button.playBtn

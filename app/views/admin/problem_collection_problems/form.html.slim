@@ -40,6 +40,12 @@
         tbody
           tr
             td
+              = f.association :subject,
+                              include_blank: '단원을 선택해주세요',
+                              collection: f.object.subject_id.nil? ? @admin_problem_collection.subject.details.collect{ |subject| [subject.path, subject.id] } : [[f.object.subject.path, f.object.subject.id], ['처음부터 다시 선택하려면 누르세요', @admin_problem_collection.subject.id]],
+                              input_html: { class: 'subject select', data: { url: "#{list_admin_problem_collection_problems_path(@admin_problem_collection)}", remote: true, type: :json } }
+          tr
+            td
               = f.input :audio, input_html: { data: { preview: 'audio' } }
               - if @admin_problem.audio?
                 div.file_preview.center.aligned
