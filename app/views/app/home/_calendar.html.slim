@@ -1,7 +1,8 @@
 tbody id="daily_test_calendar_#{week}"
   - {1 => '영어듣기', 2 => '영어단어', 3 => '수학가형', 4 => '수학나형'}.each_pair do |problem_source_id, problem_source_name|
-    - next if problem_source_id == 3 && current_user.liberal
-    - next if problem_source_id == 4 && !current_user.liberal
+    - if [1,2].index(current_user.id).nil?
+      - next if problem_source_id == 3 && current_user.liberal
+      - next if problem_source_id == 4 && !current_user.liberal
     - collections = problem_collections.select{|c| c.problem_source_id == problem_source_id}
     tr.top.aligned
       td.one.wide.middle.aligned.center.aligned == problem_source_name
