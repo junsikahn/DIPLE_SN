@@ -1,10 +1,10 @@
 div#test_screen.ui.modal.fullscreen
 
 div.clearfix
-  h1.ui.left.floated.header
-    = "#{current_user.name} "
-    small
-      | 일일테스트
+  h1.ui.left.floated.grey.header
+    i.desktop.icon
+    span.content
+      | 온라인 일일테스트
       span.ui.horizontal.basic.label = "#{current_user.liberal ? '문과' : '이과'}"
   div class="ui right floated header" style="margin-top: 15px;"
     div class="ui red right ribbon large label"

@@ -6,14 +6,15 @@ $(function(){
     transition: 'fade',
     onVisible: function(){
       keyboardJS.setContext('test_screen');
+      $(window).off('resize', testFormInit).on('resize', testFormInit);
     },
     onHidden: function(){
       $(this).empty();
       keyboardJS.setContext('global');
+      $(window).off('resize', testFormInit);
     }
   }).modal('show');
   testFormInit();
-  $(window).off('resize', testFormInit).on('resize', testFormInit);
 
   $('#problem_collection_<%= @problem_collection_history.problem_collection_id %>').html("<%= escape_javascript(render 'calendar_item', problem_collection: @problem_collection_history.problem_collection, score: @problem_collection_history.score, start_date: params[:start_date], end_date: params[:end_date]) %>");
 });

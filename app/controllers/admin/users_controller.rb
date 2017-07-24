@@ -76,6 +76,6 @@ class Admin::UsersController < AdminController
     def admin_user_params
       params
         .fetch(:admin_user, {})
-        .permit(:uid, :name, :gender, :birthday)
+        .permit(:uid, :name, :gender, :liberal, :birthday)
     end
 end

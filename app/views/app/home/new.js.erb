@@ -16,6 +16,7 @@ $(function(){
       $(this).empty();
       keyboardJS.setContext('global');
       if (player) player.destroy();
+      $(window).off('resize', testFormInit);
     }
   }).modal('show');
 });

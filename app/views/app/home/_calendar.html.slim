@@ -10,9 +10,24 @@ tbody id="daily_test_calendar_#{week}"
       - [1,2,3,4,5,6,0].each do |index|
         - if !week_days.first.nil? && week_days.first.wday == index
           - date = week_days.shift
-          td.two.wide.middle.aligned.center.aligned.clearfix class="#{'positive' if date == Date.today}"
-            - date_collections = collections.select{|c| c.test_day == date}
-            - date_collections.each do |problem_collection|
-              == render 'calendar_item', problem_collection: problem_collection, score: problem_collection.score, start_date: start_date, end_date: end_date
+          - if date == Date.parse('2017-07-21')
+            - if problem_source_id == 1
+              td.two.wide.middle.aligned.center.aligned.clearfix rowspan="4"
+                i.huge.send.blue.icon
+                br
+                br
+                span.ui.green.label 썸머캠프 시작!
+          - elsif date == Date.parse('2017-08-15')
+            - if problem_source_id == 1
+              td.two.wide.middle.aligned.center.aligned.clearfix rowspan="4"
+                i.huge.map.signs.brown.icon
+                br
+                br
+                span.ui.green.label 썸머캠프 종료!
+          - else
+            td.two.wide.middle.aligned.center.aligned.clearfix class="#{'positive' if date == Date.today}"
+              - date_collections = collections.select{|c| c.test_day == date}
+              - date_collections.each do |problem_collection|
+                == render 'calendar_item', problem_collection: problem_collection, score: problem_collection.score, start_date: start_date, end_date: end_date
         - else
           td.two.wide.disabled style="background-color: rgba(0, 0, 50, 0.02);"
