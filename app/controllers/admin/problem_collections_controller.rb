@@ -10,6 +10,12 @@ class Admin::ProblemCollectionsController < AdminController
   # GET /admin/problem_collections/1
   # GET /admin/problem_collections/1.json
   def show
+    @users =
+      User
+        .joins("LEFT JOIN problem_collection_histories ON problem_collection_histories.problem_collection_id = #{@admin_problem_collection.id} AND problem_collection_histories.user_id = users.id")
+        .select('users.uid, users.name, problem_collection_histories.score, problem_collection_histories.created_at')
+        .order('problem_collection_histories.score DESC')
+        .where.not(id: [1,2,67])
   end
 
   # GET /admin/problem_collections/new

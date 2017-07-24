@@ -107,6 +107,7 @@ ko:
       date_long: '%Y년 %m월 %d일 (%a)'
       date_short: '%m/%d'
       date_dash: '%Y-%m-%d'
+      date_time: '%m월 %d일(%a) %H시 %M분'
   datetime:
     distance_in_words:
       about_x_hours:

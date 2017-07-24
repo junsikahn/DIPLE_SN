@@ -35,6 +35,7 @@ table.ui.celled.striped.table
         - else
           = link_to "#{semantic_icon('plus')}발행".html_safe, publish_admin_problem_collection_path(@admin_problem_collection), method: :patch, class: 'ui positive labeled icon button'
 
+h3 포함 문제
 table.ui.celled.structured.table.multiline#problems_table
   thead
     tr
@@ -74,6 +75,26 @@ table.ui.celled.structured.table.multiline#problems_table
         - order += 1
         == render 'problem', problem: problem, order: order
 
+- solved_users = @users.select{|u| !u.score.nil? }
+- unsolved_users = @users.select{|u| u.score.nil? }
+h3 응시자 명단
+table.ui.celled.table
+  thead
+    tr
+      th.center.aligned colspan="2" = "#{solved_users.size}명 응시 / #{unsolved_users.size}명 미응시"
+      th.center.aligned colspan="2" = "평균 #{@users.average(:score).to_i}점 / 만점 #{@admin_problem_collection.total_score}점"
+    tr
+      th.center.aligned 학번
+      th.center.aligned 이름
+      th.center.aligned 점수
+      th.center.aligned 시험일자
+  tbody
+    - @users.each do |user|
+      tr
+        td.four.wide = user.uid
+        td.four.wide = user.name
+        td.four.wide = user.score ? "#{user.score}점" : '미응시'
+        td.four.wide = user.score ? l(user.created_at, format: :date_time) : '-'
 
 javascript:
   $(function(){
