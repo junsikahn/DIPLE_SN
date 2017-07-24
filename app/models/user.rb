@@ -10,8 +10,8 @@ class User < ApplicationRecord
 
   validates :uid,
             presence: true,
-            uniqueness: true,
-            numericality: { only_integer: true }
+            uniqueness: true
+            # numericality: { only_integer: true }
             # format: { with: /\A(010|011|016|018|019)[0-9]{7,8}\z/ },
             # length: { in: 10..11 },
   validates :name,
