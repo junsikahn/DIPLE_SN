@@ -7,6 +7,7 @@ class App::HomeController < ApplicationController
       Standard::ProblemCollection
         .joins("LEFT JOIN problem_collection_histories ON problem_collection_histories.problem_collection_id = problem_collections.id AND problem_collection_histories.user_id = #{current_user.id}")
         .select('problem_collections.*, problem_collection_histories.score')
+        .where(published: true)
 
     @problem_histories = ProblemHistory.where(user_id: current_user.id, correct: false)
   end
