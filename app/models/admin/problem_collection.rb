@@ -3,6 +3,22 @@ class Admin::ProblemCollection < Standard::ProblemCollection
 
   has_many :admin_problems, class_name: 'Admin::Problem', through: :problem_collection_to_problems, source: :problem
 
+  before_save :scoring
+
+  def scoring
+    problem_count = problems.size
+    total_score = problems.map(&:score).sum
+    problems.select{ |problem| problem.set == true }.each do |problem_set|
+      problem_count -= 1
+      problem_set.set_problems.each do |set_problem|
+        problem_count += 1
+        total_score += set_problem.score
+      end
+    end
+    self[:problem_count] = problem_count
+    self[:total_score] = total_score
+  end
+
   def create_word_test(file)
     # 엑셀파일 읽기
     wb = RubyXL::Parser.parse(file)
