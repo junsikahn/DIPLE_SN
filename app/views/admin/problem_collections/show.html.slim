@@ -27,7 +27,7 @@ table.ui.celled.striped.table
     tr.right.aligned
       th colspan="20"
         = link_to "#{semantic_icon('plus')}문제추가".html_safe, new_admin_problem_collection_problem_path(@admin_problem_collection.id), class: 'ui positive labeled icon button'
-        = link_to "#{semantic_icon('plus')}문제세트추가".html_safe, new_admin_problem_collection_problem_set_path(@admin_problem_collection.id), class: 'ui positive labeled icon button'
+        / = link_to "#{semantic_icon('plus')}문제세트추가".html_safe, new_admin_problem_collection_problem_set_path(@admin_problem_collection.id), class: 'ui positive labeled icon button'
     tr.right.aligned
       th colspan="20"
         - if @admin_problem_collection.published
@@ -39,20 +39,8 @@ h3 포함 문제
 table.ui.celled.structured.table.multiline#problems_table
   thead
     tr
-      th.center.aligned rowspan="3" 번호
-      th.center.aligned colspan="3" 문제
-      th.center.aligned colspan="3" 해설
-    tr
-      th.center.aligned 보기1
-      th.center.aligned 보기2
-      th.center.aligned 보기3
-      th.center.aligned 보기4
-      th.center.aligned 보기5
-      th.center.aligned 정답
-    tr
-      th.center.aligned 과목
-      th.center.aligned
-      th.center.aligned
+      th.center.aligned 번호
+      th.center.aligned 문제
       th.center.aligned 정답률
       th.center.aligned 수정
       th.center.aligned 삭제
@@ -61,10 +49,10 @@ table.ui.celled.structured.table.multiline#problems_table
     - if problem.set?
       tbody
         tr
-          td.two.wide.center.aligned rowspan="1" = "#{order + 1}~#{order + problem.set_problems.size}번"
-          td.seven.wide colspan="3"
+          td.center.aligned = "#{order + 1}~#{order + problem.set_problems.size}번"
+          td.collapsing style="width: 540px; padding: 20px;"
             div.problem_container.problem_seg style="max-width: 500px;" == problem.content
-          td.two.wide
+          td.three.wide.center.aligned
           td.two.wide = link_to "#{semantic_icon('edit')}수정".html_safe, edit_admin_problem_collection_problem_set_path(@admin_problem_collection, problem), class: 'ui icon positive basic fluid button'
           td.two.wide = link_to "#{semantic_icon('trash')}삭제".html_safe, admin_problem_collection_problem_set_path(@admin_problem_collection, problem), class: 'ui icon negative basic fluid button', data: { confirm: 'Are you sure?' }, method: :delete
         - problem.set_problems.each do |set_problem|

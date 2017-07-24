@@ -1,27 +1,43 @@
 tr
-  td.two.wide.center.aligned rowspan="3"
+  td.center.aligned
     = "#{order}번"
     br
     = "(#{problem.score}점)"
-  td.seven.wide colspan="3"
-    div.problem_container.problem_seg style="max-width: 500px;" == problem.content
-  td.seven.wide colspan="3"
-    div.problem_container.problem_seg style="max-width: 500px;" == problem.explanation
-tr
-  - if problem.objective?
-    td.two.wide == problem.exm_1
-    td.two.wide == problem.exm_2
-    td.two.wide == problem.exm_3
-    td.two.wide == problem.exm_4
-    td.two.wide == problem.exm_5
-    td.two.wide == "정답 #{problem.answer}번"
-  - else
-    td.two.wide colspan="6" = "주관식 정답 #{problem.answer}"
-tr
-  td.two.wide == problem.subject.name
-  td.two.wide
-  td.two.wide
-  td.two.wide
+  td.collapsing style="width: 540px; padding: 20px;"
+    div.problem_container.clearfix style="max-width: 500px;"
+      span.ui.horizontal.black.label = "#{order}번"
+      span.ui.horizontal.basic.label = "#{problem.score}점"
+      span.ui.horizontal.label == problem.subject.path
+      div.ui.top.attached.segment.black.clearfix.problem_seg
+        == problem.content
+      - if problem.objective?
+        div.ui.attached.segment.exm_seg
+          div.ui.very.relaxed.selection.list
+            - (1..5).each do |index|
+              - next if problem['exm_' + index.to_s].blank?
+              div.item class="#{'active' if index == problem.answer.to_i}" data-problem-order="#{order}"
+                span.ui.circular.mini.horizontal.label class="#{index == problem.answer.to_i ? 'green' : 'basic'}" = index
+                div.exm_container == problem['exm_' + index.to_s]
+      - else
+        div.ui.attached.segment.exm_seg
+          div.ui.form
+            div.field
+              input.ui.input type="text" value="#{problem.answer}" readonly="true"
+      - if problem.audio?
+        div.ui.attached.secondary.segment.exm_answer_seg
+          == audio_tag problem.audio.url(:original), controls: true, style: 'width: 100%;'
+      - if problem.explanation?
+        div.ui.attached.secondary.segment.exm_answer_seg
+          == problem.explanation
+      - if problem.objective?
+        div.ui.bottom.attached.right.aligned.secondary.segment.exm_answer_seg
+          | 정답은&nbsp;
+          span.ui.circular.mini.horizontal.label.basic = problem.answer
+          | 번입니다.
+      - else
+        div.ui.bottom.attached.right.aligned.secondary.segment.exm_answer_seg
+          = "정답은 #{problem.answer} 입니다."
+  td.three.wide.center.aligned
     == "총 #{problem.total_count}회 중 정답 #{problem.correct_count}회"
     br
     == "(#{problem.total_count.zero? ? '-'  : "정답률 #{problem.correct_count * 100 / problem.total_count}%"})"

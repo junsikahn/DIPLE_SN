@@ -8,6 +8,25 @@
     tbody
       tr
         td = f.input :name
+      - if @admin_problem_collection.problem_source_id == 2 && @admin_problem_collection.problems.blank?
+        tr
+          td = f.input :excel, as: :file
+      - if @admin_problem_collection.problem_source_id == 2 && !@admin_problem_collection.problems.blank?
+        = f.simple_fields_for :problems, wrapper: false do |problem|
+          tr
+            td
+              div.five.fields
+                = problem.input :content, as: :string
+                = problem.input :exm_1, as: :string
+                = problem.input :exm_2, as: :string
+                = problem.input :exm_3, as: :string
+                = problem.input :exm_4, as: :string
+                = problem.input :answer
+                = problem.input :score
+                = problem.hidden_field :id
+                = problem.hidden_field :subject_id
+        tr
+          td = f.link_to_add '추가', :problems, class: 'ui button basic fluid'
   table.ui.table
     thead
       tr
@@ -21,4 +40,8 @@
 javascript:
   $(function(){
     $('select').dropdown();
+    window.NestedFormEvents.prototype.insertFields = function(content, assoc, link) {
+      var $tr = $(link).closest('tr');
+      return $(content).insertBefore($tr);
+    };
   });

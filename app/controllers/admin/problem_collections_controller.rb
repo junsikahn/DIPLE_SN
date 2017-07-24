@@ -31,7 +31,10 @@ class Admin::ProblemCollectionsController < AdminController
   # POST /admin/problem_collections.json
   def create
     @admin_problem_collection = Admin::ProblemCollection.new(admin_problem_collection_params)
-    if @admin_problem_collection.save
+    if @admin_problem_collection.problem_source_id == 2 && @admin_problem_collection.problems.blank?
+      @admin_problem_collection.create_word_test(admin_problem_collection_params[:excel].to_io)
+      render :new
+    elsif @admin_problem_collection.save
       redirect_to @admin_problem_collection
     else
       render :new
@@ -70,6 +73,8 @@ class Admin::ProblemCollectionsController < AdminController
     def admin_problem_collection_params
       params
         .require(:admin_problem_collection)
-        .permit(:name, :test_day, :subject_id, :problem_source_id, :audio)
+        .permit(:name, :test_day, :subject_id, :problem_source_id, :audio,
+                :excel,
+                problems_attributes: [:id, :subject_id, :content, :exm_1, :exm_2, :exm_3, :exm_4, :exm_5, :answer, :score])
     end
 end

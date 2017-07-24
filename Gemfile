@@ -120,3 +120,6 @@ end
 
 # Rails engine with helpers and JavaScript for displaying times and dates to users in their local time
 gem 'local_time'
+
+# Ruby lib for reading/writing/modifying .xlsx and .xlsm files https://github.com/weshatheleopard/rubyXL
+gem 'rubyXL'

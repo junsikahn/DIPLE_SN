@@ -1,7 +1,7 @@
 - if problem_history.nil?
   div.problem_container.clearfix
     span.ui.horizontal.black.label = "#{order}번"
-    span.ui.horizontal.basic.label.disabled = "#{problem.score}점"
+    span.ui.horizontal.basic.label = "#{problem.score}점"
     div.ui.top.attached.segment.black.clearfix.problem_seg
       == problem.content
     - if problem.objective?
