@@ -4,7 +4,7 @@ class Admin::ProblemCollectionsController < AdminController
   # GET /admin/problem_collections
   # GET /admin/problem_collections.json
   def index
-    @admin_problem_collections = Admin::ProblemCollection.includes(:subject, :problem_source).page(params[:page]).per(params[:per])
+    @admin_problem_collections = Admin::ProblemCollection.includes(:subject, :problem_source)
   end
 
   # GET /admin/problem_collections/1

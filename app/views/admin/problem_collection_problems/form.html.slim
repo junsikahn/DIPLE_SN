@@ -22,14 +22,15 @@
             div.item
               span.ui.circular.basic.mini.horizontal.label 4
               div.preview_exm_4 contenteditable="true" data-target="admin_problem_exm_4"
-            div.item
-              span.ui.circular.basic.mini.horizontal.label 5
-              div.preview_exm_5 contenteditable="true" data-target="admin_problem_exm_5"
+            - unless @admin_problem_collection.problem_source_id == 2
+              div.item
+                span.ui.circular.basic.mini.horizontal.label 5
+                div.preview_exm_5 contenteditable="true" data-target="admin_problem_exm_5"
         div.ui.attached.secondary.segment.problem_seg
           div.preview_explanation contenteditable="true" data-target="admin_problem_explanation"
         div.ui.bottom.attached.right.aligned.secondary.segment.problem_seg
           | 정답은&nbsp;
-          span.ui.circular.mini.horizontal.label.basic.preview_answer contenteditable="true" data-target="admin_problem_answer"
+          span.ui.circular.mini.horizontal.label.basic.preview_answer
           | 입니다
     div.ui.column.eight.wide
       = f.error_notification
@@ -38,19 +39,13 @@
           tr
             th 입력해주세요
         tbody
-          tr
-            td
-              = f.association :subject,
-                              include_blank: '단원을 선택해주세요',
-                              collection: f.object.subject_id.nil? ? @admin_problem_collection.subject.details.collect{ |subject| [subject.path, subject.id] } : [[f.object.subject.path, f.object.subject.id], ['처음부터 다시 선택하려면 누르세요', @admin_problem_collection.subject.id]],
-                              input_html: { class: 'subject select', data: { url: "#{list_admin_problem_collection_problems_path(@admin_problem_collection)}", remote: true, type: :json } }
-          tr
-            td
-              = f.input :audio, input_html: { data: { preview: 'audio' } }
-              - if @admin_problem.audio?
-                div.file_preview.center.aligned
-                  == @admin_problem.audio_file_name
-                  == audio_tag @admin_problem.audio.url(:original), controls: true, style: 'width: 100%;'
+          - if @admin_problem_collection.problem_source_id != 2
+            tr
+              td
+                = f.association :subject,
+                                include_blank: '단원을 선택해주세요',
+                                collection: f.object.subject_id.nil? ? @admin_problem_collection.subject.details.collect{ |subject| [subject.path, subject.id] } : [[f.object.subject.path, f.object.subject.id], ['처음부터 다시 선택하려면 누르세요', @admin_problem_collection.subject.id]],
+                                input_html: { class: 'subject select', data: { url: "#{list_admin_problem_collection_problems_path(@admin_problem_collection)}", remote: true, type: :json } }
           tr
             td
               = f.input :content, input_html: { class: 'problem_content' }
@@ -58,18 +53,27 @@
               = f.input :exm_2, input_html: { rows: 1, class: 'problem_exm_2' }
               = f.input :exm_3, input_html: { rows: 1, class: 'problem_exm_3' }
               = f.input :exm_4, input_html: { rows: 1, class: 'problem_exm_4' }
-              = f.input :exm_5, input_html: { rows: 1, class: 'problem_exm_5' }
+              = f.input :exm_5, input_html: { rows: 1, class: 'problem_exm_5' } unless @admin_problem_collection.problem_source_id == 2
           tr
             td
               div.two.fields
                 = f.input :answer, as: :numeric, input_html: { class: 'problem_answer' }
                 = f.input :score, input_html: { class: 'problem_score' }
               = f.input :explanation, input_html: { class: 'problem_explanation' }
+          - if @admin_problem_collection.problem_source_id == 1
+            tr
+              td
+                = f.input :audio, input_html: { data: { preview: 'audio' } }
+                - if @admin_problem.audio?
+                  div.file_preview.center.aligned
+                    == @admin_problem.audio_file_name
+                    == audio_tag @admin_problem.audio.url(:original), controls: true, style: 'width: 100%;'
       table.ui.table
         thead
           tr
             th.sixteen.wide 저장하시겠습니까?
             th.collapsing
+              = f.hidden_field :subject_id, value: 22 if @admin_problem_collection.problem_source_id == 2
               = f.button :button, '저장'
 
 div.ui.tiny.modal#formula_screen
@@ -141,7 +145,7 @@ css:
   .context-menu-icon-image::before { content: '\f03e'; font-family: 'Icons'; }
   .context-menu-icon-wpforms::before { content: '\f298'; font-family: 'Icons'; }
   .context-menu-icon-calculator::before { content: '\f1ec'; font-family: 'Icons'; }
-  
+
   @media only screen and (max-width:767px)  { .ui.tiny.modal { width:95%;   margin:0 0 0 -47.5% } }
   @media only screen and (min-width:768px)  { .ui.tiny.modal { width:52.8%; margin:0 0 0 -26.4% } }
   @media only screen and (min-width:992px)  { .ui.tiny.modal { width:510px; margin:0 0 0 -255px } }
@@ -239,6 +243,14 @@ javascript:
         }
       );
     });
+
+    $('#admin_problem_answer').on('input', function(){
+      $.each($('.preview_answer'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_answer').val()); });
+    });
+    $('#admin_problem_score').on('input', function(){
+      $.each($('.preview_score'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_score').val()); });
+    });
+
 
     var current_editor;
     var target_input;

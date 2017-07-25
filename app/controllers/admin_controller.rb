@@ -4,8 +4,6 @@ class AdminController < ActionController::Base
   before_action :authenticate_admin!
   before_action :default_paginate!, only: :index
 
-  semantic_breadcrumb 'Home', :admin_root_path
-
   private
 
   def authenticate_admin!

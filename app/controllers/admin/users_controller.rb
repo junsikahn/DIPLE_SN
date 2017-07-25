@@ -10,6 +10,7 @@ class Admin::UsersController < AdminController
   # GET /admin/users/1
   # GET /admin/users/1.json
   def show
+    @problem_collection_histories = ProblemCollectionHistory.includes(problem_collection: :problem_source).where(user_id: @admin_user.id)
   end
 
   # GET /admin/users/new

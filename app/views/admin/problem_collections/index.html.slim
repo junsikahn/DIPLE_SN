@@ -42,7 +42,3 @@ table.ui.celled.striped.selectable.table
         td = admin_problem_collection.test_day
         td = admin_problem_collection.solved_count
         td == "#{admin_problem_collection.published ? semantic_icon('check green') : semantic_icon('remove red')}"
-  tfoot
-    tr.right.aligned
-      th colspan="20"
-        = paginate @admin_problem_collections, views_prefix: 'admin'

@@ -40,7 +40,7 @@ class Admin::ProblemCollection < Standard::ProblemCollection
       word_list = data.pluck(:kor) - [pair[:kor]]
       word_list = word_list.shuffle
       exms = []
-      3.times do |index|
+      3.times do
         exms << word_list.shift
       end
       exms << pair[:kor]

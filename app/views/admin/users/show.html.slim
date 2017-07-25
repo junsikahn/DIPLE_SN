@@ -20,3 +20,24 @@ table.ui.celled.striped.table
       th colspan="20"
         = link_to "#{semantic_icon('edit')}편집".html_safe, edit_admin_user_path(@admin_user), class: 'ui positive labeled icon large button'
         = link_to "#{semantic_icon('trash')}삭제".html_safe, @admin_user, data: { confirm: 'Are you sure?' }, method: :delete, class: 'ui negative labeled icon large button'
+
+h3 참여한 시험 목록
+- if @problem_collection_histories.blank?
+  div 참여한 시험 이력이 없습니다
+- else
+  table.ui.celled.striped.table
+    thead
+      tr
+        th.center.aligned 시험일자
+        th.center.aligned 과목명
+        th.center.aligned 시험명
+        th.center.aligned 점수
+        th.center.aligned 참여일자
+    tbody
+      - @problem_collection_histories.each do |problem_collection_history|
+        tr
+          td = problem_collection_history.problem_collection.test_day
+          td = problem_collection_history.problem_collection.problem_source.name
+          td = problem_collection_history.problem_collection.name
+          td = "#{problem_collection_history.score}점 / #{problem_collection_history.problem_collection.total_score}점"
+          td = l(problem_collection_history.created_at, format: :date_time)
