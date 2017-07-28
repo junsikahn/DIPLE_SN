@@ -2,7 +2,7 @@ div.problems_row
   div.problems_column
     - order = 0
     - problems.each do |problem|
-      - problem_history = my_problem_histories.select{|history| problem_id = problem.id}.first unless my_problem_histories.nil?
+      - problem_history = my_problem_histories.select{|history| history.problem_id == problem.id}.first unless my_problem_histories.nil?
       - if problem.set?
         div.problem_container.clearfix
           span.ui.horizontal.label = "#{order + 1}~#{order + problem.set_problems.size}번"

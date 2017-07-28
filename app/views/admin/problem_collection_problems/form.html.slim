@@ -2,8 +2,8 @@
   div.ui.grid
     div.ui.column.eight.wide
       div.problem_container.clearfix style="max-width: 500px; margin: 0 auto;"
-        span.ui.horizontal.black.label 문제번호
-        span.ui.horizontal.basic.label
+        span.ui.horizontal.black.label = "#{@admin_problem.new_record? ? Standard::ProblemCollectionToProblem.where(problem_collection_id: @admin_problem_collection.id).count + 1 : Standard::ProblemCollectionToProblem.find_by(problem_collection_id: @admin_problem_collection.id, problem_id: @admin_problem.id).order + 1}번"
+        span.ui.horizontal.basic.label style="cursor: pointer;" onclick="$('#admin_problem_score').focus();"
           span.preview_score 0
           | 점
         div.ui.top.attached.black.segment.clearfix.problem_seg
@@ -28,7 +28,7 @@
                 div.preview_exm_5 contenteditable="true" data-target="admin_problem_exm_5"
         div.ui.attached.secondary.segment.problem_seg
           div.preview_explanation contenteditable="true" data-target="admin_problem_explanation"
-        div.ui.bottom.attached.right.aligned.secondary.segment.problem_seg
+        div.ui.bottom.attached.right.aligned.secondary.segment.problem_seg style="cursor: pointer;" onclick="$('#admin_problem_answer').focus();"
           | 정답은&nbsp;
           span.ui.circular.mini.horizontal.label.basic.preview_answer
           | 입니다
@@ -48,7 +48,7 @@
                                 input_html: { class: 'subject select', data: { url: "#{list_admin_problem_collection_problems_path(@admin_problem_collection)}", remote: true, type: :json } }
           tr
             td
-              = f.input :content, input_html: { class: 'problem_content' }
+              = f.input :content, input_html: { rows: 1, class: 'problem_content' }
               = f.input :exm_1, input_html: { rows: 1, class: 'problem_exm_1' }
               = f.input :exm_2, input_html: { rows: 1, class: 'problem_exm_2' }
               = f.input :exm_3, input_html: { rows: 1, class: 'problem_exm_3' }
@@ -59,7 +59,7 @@
               div.two.fields
                 = f.input :answer, as: :numeric, input_html: { class: 'problem_answer' }
                 = f.input :score, input_html: { class: 'problem_score' }
-              = f.input :explanation, input_html: { class: 'problem_explanation' }
+              = f.input :explanation, input_html: { rows: 1, class: 'problem_explanation' }
           - if @admin_problem_collection.problem_source_id == 1
             tr
               td
@@ -229,8 +229,16 @@ javascript:
           ]
         }
       );
+      $.each($('span.katex'), function(){
+        $(this).parent().attr('contenteditable', false).css({'cursor': 'pointer'});
+      });
+      $.each($('form').find('textarea'), function(){
+        $(this).on('input', function(){
+          $(this).css('height', 'auto');
+          $(this).height(this.scrollHeight - 22);
+        });
+      });
     };
-    render_preview();
 
     $('#formula_input').on('input', function(e){
       $('#formula_preview').html('$' + $(this).val() + '$');
@@ -252,34 +260,130 @@ javascript:
     });
 
 
-    var current_editor;
+    // var current_editor;
     var target_input;
     var editors = [];
 
     function sync(current_editor, target_input) {
       var html = document.createElement('div');
       html.innerHTML = current_editor.getHTML();
-      $.each($(html).find('span.katex'), function(index2, katex) {
-        var annotation = '<div>$' + $(katex).find('annotation').text() + '$</div>';
-        $(katex).replaceWith(annotation);
+      $.each($(html).find('span.katex'), function() {
+        var annotation = '$' + $(this).find('annotation').text() + '$';
+        $(this).parent().replaceWith(annotation);
       });
-      target_input.value = html.innerHTML.replace(/\<\/div\>\<div/g, '</div>\r<div');
+      target_input.value = html.innerHTML.replace(/\<\/div\>\<div/g, '</div>\r<div').replace(/\sclass=""/g, '');
+
+      $(target_input).css('height', 'auto');
+      $(target_input).height(target_input.scrollHeight - 22);
     }
 
-    $.each($('[contenteditable]'), function(index, editor){
-      editors[index] = wysiwyg({ element: editor, hijackContextmenu: true });
+    $(document).contextMenu({
+      selector: '[contenteditable=true]',
+      items: {
+          'addImg'     : { name: '그림 추가하기', icon: 'image' },
+          'addDiv'     : { name: '블럭 추가하기', icon: 'wpforms' },
+          'addFormula' : { name: '수식 추가하기', icon: 'calculator' },
+          'sep1'       : '---------',
+          'deleteAll'  : { name: '내용 모두 삭제',    icon: 'delete' }
+      },
+      callback: function(key, options) {
+        if (key == 'addImg') {
+          var input = document.createElement('input');
+          input.type = 'file';
+          input.addEventListener('change', function(e){
+            var file = FileAPI.getFiles(this)[0];
+            FileAPI.readAsDataURL(file, function(evt){
+              if (evt.type == 'load') {
+                document.execCommand('insertImage', false, evt.result);
+                document.execCommand('formatBlock', false, 'div');
+              } else if (evt.type == 'progress') {
+              } else {
+              }
+            });
+          }, false);
+          input.click();
+        } else if (key == 'addDiv') {
+          current_editor.insertHTML('<div class="ui segment"><br></div><div><br></div>');
+        } else if (key == 'addFormula') {
+          // current_editor.insertHTML('<span id="formula_target"></span>');
+          document.execCommand('insertHTML', false, '<span id="formula_target"><math></math></span>');
+          $('#formula_screen').modal({
+            observeChanges: true,
+            onHidden: function(){
+              $('#formula_input').val('');
+              $('#formula_preview').html('');
+              $('#formula_target').remove();
+            },
+            onApprove: function(){
+              var formula = $('#formula_preview>span');
+              if (formula.length === 0) {
+                alert('수식 오류가 있습니다');
+                return false;
+              } else {
+                // if ($('#formula_target').next().prop('tagName') == 'BR') $('#formula_target').next().remove();
+                // $('#formula_target').replaceWith(formula.parent().html());
+                $('#formula_target').html(formula.html()).removeAttr('id').addClass('formula').attr('draggable', true).attr('contenteditable', false);
+                // $('#formula_target').replaceWith('$' + $('#formula_input').val() + '$');
+                sync(current_editor, target_input);
+              }
+            }
+          }).modal('show');
+        } else if (key == 'deleteAll') {
+          $(this).html('');
+          target_input.value = '';
+        }
+      }
+    });
+
+    $.each($('[contenteditable=true]'), function(index, editor){
+      editors[index] = wysiwyg({
+        element: editor,
+        onSelection: function(collapsed, rect, nodes, rightclick) {
+          // $(editor).find('span.katex').parent().css('background-color', '');
+          // if (collapsed && nodes.length > 0 && nodes[0].parentElement.nodeName == 'SPAN') {
+          //   console.log('스팬 선택하였슴');
+          //   n = nodes[0];
+          //   // $(n.parentElement).closest('span.katex').parent().css('background-color', 'yellow');
+          //   var $span = $(n.parentElement).parentsUntil($(editor), 'span.katex').parent();
+          //   $span.css({'background-color': 'yellow'});
+          // } else {
+          //   console.log('기타 선택');
+          // }
+          // console.log(window.getSelection());
+          // console.log(window.getSelection().getRangeAt(0));
+          var selection = window.getSelection();
+          if ($(selection.anchorNode).parentsUntil(selection.anchorNode.offsetParent, 'span.formula').length == 1) {
+            console.log('수식 선택');
+            var range = document.createRange();
+            range.selectNodeContents($(selection.anchorNode).parentsUntil(selection.anchorNode.offsetParent, 'span.formula')[0]);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          };
+        }
+      });
       $(editor).on('focus', function(e){
         keyboardJS.setContext('input');
         current_editor = editors[index];
         target_input = document.getElementById($(e.target).data('target'));
-        if (current_editor.getHTML() == '') current_editor.insertHTML('<div><br></div>');
+        if (current_editor.getHTML().length === 0) current_editor.insertHTML('<div><br></div>');
       }).on('blur', function(e){
         sync(current_editor, target_input);
         keyboardJS.setContext('global');
       }).on('input', function(e){
+        if (current_editor.getHTML().length < 9) current_editor.insertHTML('<div><br></div>');
         sync(current_editor, target_input);
+      }).on('paste', function(e){
+        console.log('붙여넣기');
+        e.preventDefault();
+        var text = (e.originalEvent || e).clipboardData.getData('text/plain').replace(/\r/g, '');
+        window.document.execCommand('insertText', false, text);
+      }).on('DOMNodeInserted', function(e){
+        console.log('디오엠이 삽입되었습니다');
+        console.log(e);
+        if (e.target.nodeName == 'SPAN' && e.target.children.length == 0) $(e.target).replaceWith($(e.target).html());
       }).on('contextmenu', function(e){
-        current_editor.collapseSelection();
+        keyboardJS.setContext('global');
+        // current_editor.collapseSelection();
       }).contextMenu({
         selector: 'img',
         items: {
@@ -291,49 +395,33 @@ javascript:
           }
         }
       }).contextMenu({
-        selector: 'div.formula',
+        selector: 'span.formula',
         items: {
-            'deleteFormula' : {name: '삭제', icon: 'delete'},
+            'editFormula' : {name: '수식 수정하기', icon: 'edit'},
+            'deleteFormula' : {name: '수식 삭제하기', icon: 'delete'},
         },
         callback: function(key, options) {
-          if (key == 'deleteFormula') {
-            $(this).parentsUntil('[contenteditable]', 'span.katex').remove();
-          }
-        }
-      }).contextMenu({
-        selector: '*',
-        items: {
-            'addImg'     : { name: '그림 추가하기', icon: 'image' },
-            'addDiv'     : { name: '블럭 추가하기', icon: 'wpforms' },
-            'addFormula' : { name: '수식 추가하기', icon: 'calculator' },
-            'sep1'       : '---------',
-            'deleteAll'  : { name: '내용 모두 삭제',    icon: 'delete' }
-        },
-        callback: function(key, options) {
-          if (key == 'addImg') {
-            var input = document.createElement('input');
-            input.type = 'file';
-            input.addEventListener('change', function(e){
-              var file = FileAPI.getFiles(this)[0];
-              FileAPI.readAsDataURL(file, function(evt){
-                if (evt.type == 'load') {
-                  current_editor.insertImage(evt.result);
-                } else if (evt.type == 'progress') {
-                } else {
-                }
-              });
-            }, false);
-            input.click();
-          } else if (key == 'addDiv') {
-            current_editor.insertHTML('<div class="ui segment"><br></div><div><br></div>');
-          } else if (key == 'addFormula') {
-            current_editor.insertHTML('<div id="formula_target">수식 입력 위치</div>');
+          if (key == 'editFormula') {
+            var annotation = $(this).find('annotation').text();
+            $(this).attr('id', 'formula_target');
             $('#formula_screen').modal({
               observeChanges: true,
+              onShow: function(){
+                $('#formula_input').val(annotation);
+                $('#formula_preview').html('$' + annotation + '$');
+                renderMathInElement(document.getElementById('formula_preview'),
+                  {
+                    delimiters: [
+                      {left: "$$", right: "$$", display: true},
+                      {left: "$",  right: "$",  display: false}
+                    ]
+                  }
+                );
+              },
               onHidden: function(){
                 $('#formula_input').val('');
                 $('#formula_preview').html('');
-                $('#formula_target').remove();
+                $('#formula_target').removeAttr('id');
               },
               onApprove: function(){
                 var formula = $('#formula_preview>span');
@@ -342,14 +430,16 @@ javascript:
                   return false;
                 } else {
                   if ($('#formula_target').next().prop('tagName') == 'BR') $('#formula_target').next().remove();
-                  // $('#formula_target').replaceWith(formula.html());
-                  $('#formula_target').parent().replaceWith('$' + $('#formula_input').val() + '$').addClass('formula');
+                  // $('#formula_target').replaceWith(formula.parent().html());
+                  $('#formula_target').html(formula.html()).removeAttr('id').addClass('formula');
+                  // $('#formula_target').replaceWith('$' + $('#formula_input').val() + '$');
+                  sync(current_editor, target_input);
                 }
               }
             }).modal('show');
-          } else if (key == 'deleteAll') {
-            $(editor).html('');
-            target_input.value = '';
+          } else if (key == 'deleteFormula') {
+            // $(this).parentsUntil('[contenteditable=true]', 'span.katex').remove();
+            $(this).remove();
           }
         }
       });
@@ -357,16 +447,35 @@ javascript:
 
     keyboardJS.withContext('input', function(){
       keyboardJS.on('enter', function(e){
-        document.execCommand('formatBlock', false, 'div');
-        console.log(current_editor.getSelectedHTML());
+        // document.execCommand('formatBlock', false, 'div');
+        e.preventDefault();
+        focuss = window.getSelection();
+        console.log(window.getSelection());
+        if (window.getSelection().focusNode.nodeType != 3 && window.getSelection().focusNode.children.length == 1 && window.getSelection().focusNode.firstChild.nodeName == 'BR') {
+          console.log('빈 줄에서 엔터');
+          $(window.getSelection().focusNode).before('<div><br></div>');
+        } else {
+          console.log('아님...');
+          document.execCommand('insertHTML', false, '<div><br></div>');
+        };
       });
       keyboardJS.on(['control + u', 'command + u'], function(e){
         e.preventDefault();
         current_editor.underline('shell');
+      });
+      keyboardJS.on(['control + f', 'command + f'], function(e){
+        e.preventDefault();
+        current_editor.removeFormat();
+      });
+      keyboardJS.on(['control + d', 'command + d'], function(e){
+        e.preventDefault();
+        $(current_editor.getElement()).contextMenu();
       });
       // keyboardJS.on('shift + t', function(e){
         // e.preventDefault();
         // current_editor.insertHTML('<div><br></div><div class="ui segment"><br></div><div><br></div>');
       // });
     });
+
+    render_preview();
   });
