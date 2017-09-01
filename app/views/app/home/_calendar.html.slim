@@ -24,10 +24,20 @@ tbody id="daily_test_calendar_#{week}"
                 br
                 br
                 span.ui.green.label 썸머캠프 종료!
+          // - elsif date == Date.parse('2017-08-14')
+          //   - if problem_source_id == 1
+          //     td.two.wide.middle.aligned.center.aligned.clearfix style="background-color: rgba(0, 0, 50, 0.02);" rowspan="4"
+          //       span.ui.label 종강 전날이니깐 skip 😎
+          - elsif index == 6
+            - if problem_source_id == 1
+              td.two.wide.middle.aligned.center.aligned.clearfix style="background-color: rgba(0, 0, 50, 0.02);" rowspan="4" colspan="2"
+                span.ui.label 주말이니깐<br>쉬엄쉬엄 하세요 😎
+          - elsif index == 0
           - else
             td.two.wide.middle.aligned.center.aligned.clearfix class="#{'positive' if date == Date.today}"
               - date_collections = collections.select{|c| c.test_day == date}
               - date_collections.each do |problem_collection|
                 == render 'calendar_item', problem_collection: problem_collection, score: problem_collection.score, start_date: start_date, end_date: end_date
         - else
-          td.two.wide.disabled style="background-color: rgba(0, 0, 50, 0.02);"
+          - if problem_source_id == 1
+            td.two.wide.disabled style="background-color: rgba(0, 0, 50, 0.02);" rowspan="4"

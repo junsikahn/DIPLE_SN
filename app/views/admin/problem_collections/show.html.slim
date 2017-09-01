@@ -50,8 +50,8 @@ table.ui.celled.structured.table.multiline#problems_table
       tbody
         tr
           td.center.aligned = "#{order + 1}~#{order + problem.set_problems.size}번"
-          td.collapsing style="width: 540px; padding: 20px;"
-            div.problem_container.problem_seg style="max-width: 500px;" == problem.content
+          td.collapsing
+            div.problem_container.problem_seg  == problem.content
           td.three.wide.center.aligned
           td.two.wide = link_to "#{semantic_icon('edit')}수정".html_safe, edit_admin_problem_collection_problem_set_path(@admin_problem_collection, problem), class: 'ui icon positive basic fluid button'
           td.two.wide = link_to "#{semantic_icon('trash')}삭제".html_safe, admin_problem_collection_problem_set_path(@admin_problem_collection, problem), class: 'ui icon negative basic fluid button', data: { confirm: 'Are you sure?' }, method: :delete

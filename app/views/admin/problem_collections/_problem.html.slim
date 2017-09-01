@@ -3,19 +3,20 @@ tr
     = "#{order}번"
     br
     = "(#{problem.score}점)"
-  td.collapsing style="width: 540px; padding: 20px;"
-    div.problem_container.clearfix style="width: 500px; white-space: initial;"
-      span.ui.horizontal.black.label = "#{order}번"
-      span.ui.horizontal.basic.label = "#{problem.score}점"
-      span.ui.horizontal.label == problem.subject.path
+  td.collapsing style="white-space: initial;"
+    div.problem_container.clearfix
+      div
+        span.ui.horizontal.black.label = "#{order}번"
+        span.ui.horizontal.basic.label = "#{problem.score}점"
+        span.ui.horizontal.label == problem.subject.path
       div.ui.top.attached.segment.black.clearfix.problem_seg
         == problem.content
       - if problem.objective?
         div.ui.attached.segment.exm_seg
-          div.ui.very.relaxed.selection.list
+          div.ui.very.relaxed.selection.list.exm_list
             - (1..5).each do |index|
               - next if problem['exm_' + index.to_s].blank?
-              div.item class="#{'active' if index == problem.answer.to_i}" data-problem-order="#{order}"
+              div.item.exm_item class="#{'active' if index == problem.answer.to_i}" data-problem-order="#{order}"
                 span.ui.circular.mini.horizontal.label class="#{index == problem.answer.to_i ? 'green' : 'basic'}" = index
                 div.exm_container == problem['exm_' + index.to_s]
       - else

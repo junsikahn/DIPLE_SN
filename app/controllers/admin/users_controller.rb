@@ -4,7 +4,7 @@ class Admin::UsersController < AdminController
   # GET /admin/users
   # GET /admin/users.json
   def index
-    @admin_users = Admin::User.page(params[:page]).per(params[:per])
+    @admin_users = Admin::User.includes(:problem_collection_histories).page(params[:page]).per(params[:per])
   end
 
   # GET /admin/users/1
@@ -65,6 +65,26 @@ class Admin::UsersController < AdminController
       format.html { redirect_to admin_users_url, notice: 'User was successfully destroyed.' }
       format.json { head :no_content }
     end
+  end
+
+  def report
+    # @users = User.includes(:problem_collection_histories, :problem_histories).all
+    @problem_collections = Standard::ProblemCollection.where(published: true).where('test_day <= ?', Date.today)
+    @start_date = Time.zone.parse('2017-07-24').beginning_of_day
+    @end_date = Time.zone.parse('2017-08-15').beginning_of_day
+  end
+
+  def report_user
+    # @user = User.includes(:problem_collection_histories, :problem_histories).where(id: params[:id])
+    user = User.where(id: params[:id]).select(:id, :name, :liberal).first
+    problem_collection_histories = ProblemCollectionHistory.where(user_id: user.id).select(:problem_collection_id, :score)
+    problem_histories = ProblemHistory.includes(:problem).where(user_id: user.id).as_json(include: [:problem])
+
+    render json: {
+      user: user,
+      problem_collection_histories: problem_collection_histories,
+      problem_histories: problem_histories
+    }
   end
 
   private

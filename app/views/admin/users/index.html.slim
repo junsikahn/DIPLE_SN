@@ -1,4 +1,5 @@
 table.ui.celled.striped.selectable.table
+  - total_count = Standard::ProblemCollection.all.count
   thead
     tr
       th.center.aligned ID
@@ -7,9 +8,14 @@ table.ui.celled.striped.selectable.table
       th.center.aligned 전공
       th.center.aligned 성별
       th.center.aligned 생년월일
+      th.center.aligned = "시험참여횟수 (총 #{total_count}회)"
+      th.center.aligned 시험평균점수
 
   tbody
     - @admin_users.each do |admin_user|
+      - test_count = admin_user.problem_collection_histories.size
+      - test_scores = admin_user.problem_collection_histories.pluck(:score)
+      - test_avg = test_scores.sum / test_scores.size.to_f
       tr onclick='location.href="#{admin_user_path(admin_user)}"'
         td = admin_user.id
         td = admin_user.uid
@@ -17,6 +23,8 @@ table.ui.celled.striped.selectable.table
         td = admin_user.liberal ? '문과' : '이과'
         td = admin_user.gender ? '남' : '여'
         td = admin_user.birthday
+        td = "#{test_count}회 (#{100 * test_count / total_count}%)"
+        td = "#{test_avg.nan? ? '-' : "평균 #{test_avg}점"}"
   tfoot
     tr.right.aligned
       th colspan="20"

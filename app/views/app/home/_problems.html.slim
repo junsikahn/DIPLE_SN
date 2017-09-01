@@ -5,7 +5,8 @@ div.problems_row
       - problem_history = my_problem_histories.select{|history| history.problem_id == problem.id}.first unless my_problem_histories.nil?
       - if problem.set?
         div.problem_container.clearfix
-          span.ui.horizontal.label = "#{order + 1}~#{order + problem.set_problems.size}번"
+          div
+            span.ui.horizontal.label = "#{order + 1}~#{order + problem.set_problems.size}번"
           div.ui.tall.stacked.segment.clearfix.problem_seg class="#{'top attached' if problem.objective?}"
             == problem.content
         - problem.set_problems.each do |set_problem|
@@ -14,6 +15,7 @@ div.problems_row
       - else
         - order += 1
         == render 'problem', order: order, problem: problem, problem_history: problem_history
-    div.ui.basic.segment.center.aligned
-      div.ui.divider
-      | 준비된 문제는 여기까지입니다.<br>답안지의 해당란에 필요한 내용을 정확히 기입(표기)했는지 확인하세요.
+    - if my_problem_histories.nil?
+      div.ui.basic.segment.center.aligned style="margin: 0; padding: 40px;"
+        div.ui.divider
+        | 준비된 문제는 여기까지입니다.<br>답안지의 해당란에 필요한 내용을 정확히 기입(표기)했는지 확인하세요.

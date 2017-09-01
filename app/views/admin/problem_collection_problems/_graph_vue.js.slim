@@ -1,0 +1,1679 @@
+script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.0/vue.js"
+
+div.ui.fullscreen.modal#graph_screen
+  i.close.icon
+  div.header 그래프 입력
+  div.content.ui.form
+    div.ui.grid
+      div.row
+        div.two.wide.column
+          div.ui.segment
+            span.ui.top.attached.label 도형 입력도구
+            div.ui.form
+            div.field
+              div.ui.small.icon.basic.button @click="addDot" <b>점</b>
+              div.ui.small.icon.basic.button @click="addLine" <b>직선</b> <small>직선 위의 두 점</small>
+              div.ui.small.icon.basic.button @click="addClosedLine" <b>선분</b> <small>시작점과 끝점</small>
+              div.ui.small.icon.basic.button @click="addPolyLine" <b>꺾인선</b> <small>esc를 눌러 종료</small>
+              div.ui.small.icon.basic.button @click="addPolygon" <b>다각형</b> <small>esc를 눌러 종료</small>
+            div.field
+              div.ui.small.icon.basic.button @click="addQuadraBy2" <b>2차함수</b> <small>꼭지점과 곡선 위의 한 점</small>
+              div.ui.small.icon.basic.button @click="addQuadraBy3" <b>2차함수</b> <small>곡선 위의 세 점</small>
+            div.field
+              div.ui.small.icon.basic.button @click="addCubicBy2" <b>3차함수</b> <small>극대점과 극소점</small>
+              div.ui.small.icon.basic.button @click="addCubicByK" <b>3차함수</b> <small>변곡점, 변곡점의 기울기(지정)와 한 점</small>
+              div.ui.small.icon.basic.button @click="addCubicByDraggedK" <b>3차함수</b> <small>변곡점과 한 점, 변곡점의 기울기</small>
+              div.ui.small.icon.basic.button @click="addCubicBy3" <b>3차함수</b> <small>변곡점과 두 점</small>
+              div.ui.small.icon.basic.button @click="addCubicBy4" <b>3차함수</b> <small>곡선 위의 네 점</small>
+            div.field
+              div.ui.small.icon.basic.button @click="addQuarticBy5" <b>4차함수</b> <small>곡선 위의 다섯 점</small>
+              div.ui.small.icon.basic.button @click="addQuarticBy3" <b>4차함수</b> <small>세 극점, 단 세번째 극점의 지정한 y좌표는 무시됨</small>
+              div.ui.small.icon.basic.button @click="addQuarticByK" <b>4차함수</b> <small>꼭지점, 변곡점의 기울기(지정)와 변곡점</small>
+              div.ui.small.icon.basic.button @click="addQuarticByDraggedK" <b>4차함수</b> <small>꼭지점, 변곡점과 변곡점의 기울기</small>
+            div.field
+              div.ui.small.icon.basic.button @click="addCircleByR" <b>원</b> <small>반지름(지정)과 중점</small>
+              div.ui.small.icon.basic.button @click="addCircleBy2" <b>원</b> <small>중점과 한 점</small>
+              div.ui.small.icon.basic.button @click="addCircleBy3" <b>원</b> <small>원 위의 세 점</small>
+              div.ui.small.icon.basic.button @click="addEllipseBy3" <b>타원</b> <small>초점과 타원 위의 점</small>
+              div.ui.small.icon.basic.button @click="addEllipseByDis" <b>타원</b> <small>초점과 타원과의 거리(지정)</small>
+              div.ui.small.icon.basic.button @click="addHyperbolaByDis" <b>쌍곡선</b> <small>두초점과 쌍곡선과의 거리(지정)</small>
+              div.ui.small.icon.basic.button @click="addHyperbolaBy3" <b>쌍곡선</b> <small>두 초점과 쌍곡선 위의 한 점</small>
+            div.field
+              div.ui.small.icon.basic.button @click="addFormula" <b>함수</b> <small>함수 입력</small>
+              div.ui.small.icon.basic.button @click="addText" <b>글씨</b> <small>글씨 입력</small>
+              div.ui.small.icon.basic.button @click="addKatex" <b>수식</b> <small>수식 입력</small>
+        div.fourteen.wide.column
+          div.ui.segment
+            span.ui.top.attached.label 스타일 입력도구
+            div.ui.form
+              div.six.fields
+                div.field
+                  label style.stroke.color
+                  select.compact v-model="style.stroke.color"
+                    option v-for="option in style.colorOptions" :value="option.value" {{ option.text }}
+                div.field
+                  label style.stroke.width
+                  input type="number" min="0" max="10" step="0.1" v-model.number.lazy="style.stroke.width"
+                  input.ui.input type="range" min="0" max="10" step="0.1" v-model.number="style.stroke.width"
+                div.field
+                  label style.stroke.dash
+                  select.compact v-model="style.stroke.dash"
+                    option v-for="option in style.dashOptions" :value="option.value" {{ option.text }}
+                div.field
+                  label style.stroke.opacity
+                  input type="number" min="0" max="1" step="0.1" v-model.number.lazy="style.stroke.opacity"
+                  input.ui.input type="range" min="0" max="1" step="0.1" v-model.number="style.stroke.opacity"
+                div.field
+                  label style.fill.color
+                  select.compact v-model="style.fill.color"
+                    option v-for="option in style.colorOptions" :value="option.value" {{ option.text }}
+                div.field
+                  label style.fill.opacity
+                  input type="number" min="0" max="1" step="0.1" v-model.number.lazy="style.fill.opacity"
+                  input.ui.input type="range" min="0" max="1" step="0.1" v-model.number="style.fill.opacity"
+                div.one.wide.field
+                  label 초기화
+                  button.ui.icon.basic.button @click="resetStyle"
+                    i.refresh.icon
+          div.ui.segment
+            span.ui.top.attached.label 미리보기
+            div#graph_preview
+              div style="position: relative; margin: 0 auto;" :style="{ width: board.width + 'px', height: board.height + 'px' }"
+                graph-svg :board="board" :customs="customs"
+          div.ui.segment
+            span.ui.top.attached.label 기본 설정
+            div.ui.form
+              div.eight.fields
+                div.field.one.wide
+                  label &nbsp;
+                  div.ui.icon.basic.button.disabled
+                    i.icon.columns
+                div.field
+                  label 넓이
+                  input type="number" min="100" max="500" step="10" v-model.number.lazy="board.width"
+                  input.ui.input type="range" min="100" max="500" step="10" v-model.number="board.width"
+                div.field
+                  label 높이
+                  input type="number" min="0" max="500" step="10" v-model.number.lazy="board.height" :disabled="board.square == 1 ? true : false"
+                  input.ui.input type="range" min="100" max="500" step="10" v-model.number="board.height" :disabled="board.square == 1 ? true : false"
+                div.field
+                  label 여백
+                  input type="number" min="0" max="100" step="5" v-model.number.lazy="board.padding"
+                  input.ui.input type="range" min="0" max="100" step="5" v-model.number="board.padding"
+                div.field
+                  label 1:1 유지
+                  input type="number" min="0" max="1" v-model.number.lazy="board.square"
+                  input.ui.input type="range" min="0" max="1" v-model.number="board.square"
+                div.field.one.wide
+                  label &nbsp;
+                  div.ui.icon.basic.button.disabled
+                    i.icon.arrow.move
+                div.field
+                  label x축 최소값
+                  input type="number" v-model.number.lazy="board.xmin"
+                div.field
+                  label x축 최대값
+                  input type="number" v-model.number.lazy="board.xmax"
+                div.field
+                  label y축 최소값
+                  input type="number" v-model.number.lazy="board.ymin"
+                div.field
+                  label y축 최대값
+                  input type="number" v-model.number.lazy="board.ymax"
+              div.eight.fields
+                div.field.one.wide
+                  label &nbsp;
+                  div.ui.icon.basic.button.disabled
+                    i.icon.bar.chart
+                div.field
+                  label x축 표시
+                  input type="number" min="0" max="1" v-model.number.lazy="board.showXaxis"
+                  input.ui.input type="range" min="0" max="1" v-model.number="board.showXaxis"
+                div.field
+                  label x축 눈금 표시
+                  input type="number" min="0" max="1" v-model.number.lazy="board.showXmarks" :disabled="board.showXaxis == 0 ? true : false"
+                  input.ui.input type="range" min="0" max="1" v-model.number="board.showXmarks" :disabled="board.showXaxis == 0 ? true : false"
+                div.field
+                  label x축 숫자 표시
+                  input type="number" min="0" max="1" v-model.number.lazy="board.showXlabels" :disabled="board.showXaxis == 0 ? true : false"
+                  input.ui.input type="range" min="0" max="1" v-model.number="board.showXlabels" :disabled="board.showXaxis == 0 ? true : false"
+                div.field
+                  label x축 단위
+                  input type="number" min="0.1" step="0.1" v-model.number.lazy="board.dx" :disabled="board.showXaxis == 0 ? true : false"
+                div.field.one.wide
+                  label &nbsp;
+                  div.ui.icon.basic.button.disabled
+                    i.icon.bar.chart
+                div.field
+                  label y축 표시
+                  input type="number" min="0" max="1" v-model.number.lazy="board.showYaxis"
+                  input.ui.input type="range" min="0" max="1" v-model.number="board.showYaxis"
+                div.field
+                  label y축 눈금 표시
+                  input type="number" min="0" max="1" v-model.number.lazy="board.showYmarks" :disabled="board.showYaxis == 0 ? true : false"
+                  input.ui.input type="range" min="0" max="1" v-model.number="board.showYmarks" :disabled="board.showYaxis == 0 ? true : false"
+                div.field
+                  label y축 숫자 표시
+                  input type="number" min="0" max="1" v-model.number.lazy="board.showYlabels" :disabled="board.showYaxis == 0 ? true : false"
+                  input.ui.input type="range" min="0" max="1" v-model.number="board.showYlabels" :disabled="board.showYaxis == 0 ? true : false"
+                div.field
+                  label y축 단위
+                  input type="number" min="0.1" step="0.1" v-model.number.lazy="board.dy" :disabled="board.showYaxis == 0 ? true : false"
+              div.eight.fields
+                div.field.one.wide
+                  label &nbsp;
+                  div.ui.icon.basic.button.disabled
+                    i.icon.table
+                div.field
+                  label x축 격자
+                  input type="number" min="0" max="1" v-model.number.lazy="board.showXgrid"
+                  input.ui.input type="range" min="0" max="1" v-model.number="board.showXgrid"
+                div.field
+                  label x축 격자 단위
+                  input type="number" min="0.1" step="0.1" v-model.number.lazy="board.gdx" :disabled="board.showXgrid == 0 ? true : false"
+                div.field
+                  label y축 격자
+                  input type="number" min="0" max="1" v-model.number.lazy="board.showYgrid"
+                  input.ui.input type="range" min="0" max="1" v-model.number="board.showYgrid"
+                div.field
+                  label y축 격자 단위
+                  input type="number" min="0.1" step="0.1" v-model.number.lazy="board.gdy" :disabled="board.showYgrid == 0 ? true : false"
+  div.actions
+    div.ui.cancel.button 취소
+    div.ui.approve.positive.button 입력하기
+
+javascript:
+  var computed_value = {
+    xunitlength: function() { return ((this.board.width - 2 * this.board.padding) / (this.board.xmax - this.board.xmin)); },
+    yunitlength: function() { return this.board.square == 1 ? this.xunitlength : ((this.board.height - 2 * this.board.padding) / (this.board.ymax - this.board.ymin)); },
+    origin: function() { return [-this.board.xmin * this.xunitlength + this.board.padding, -this.board.ymin * this.yunitlength + this.board.padding]; },
+    fontsize: function() { return Math.max(14, Math.min(this.board.dx / 2, this.board.dy / 2, 16)); },
+    ticklength: function() { return this.fontsize / 4; },
+  };
+  var graphComponent = {
+    props: {
+      board: { type: Object, required: true },
+      customs: { type: Array, required: true }
+    },
+    computed: computed_value,
+    render: function(createElement) {
+      this.board.width = Math.min(500, Math.max(100, this.board.width));
+      this.board.padding = Math.max(0, this.board.padding);
+      if (this.board.square == 1) {
+        this.board.height = (this.board.ymax - this.board.ymin) * this.yunitlength + 2 * this.board.padding;
+      } else {
+        this.board.height = Math.min(500, Math.max(100, this.board.height));
+      }
+      this.board.gdx = Math.max(0.1, Math.abs(this.board.gdx));
+      this.board.gdy = Math.max(0.1, Math.abs(this.board.gdy));
+      this.board.dx = Math.max(0.1, Math.abs(this.board.dx));
+      this.board.dy = Math.max(0.1, Math.abs(this.board.dy));
+      this.board.xmax = Math.max(this.board.xmin + this.board.dx, this.board.xmax);
+      this.board.ymax = Math.max(this.board.ymin + this.board.dy, this.board.ymax);
+      this.board.doAxes = Math.min(1, Math.max(0, this.board.doAxes));
+      this.board.doGrids = Math.min(1, Math.max(0, this.board.doGrids));
+      this.board.showXgrid = Math.min(1, Math.max(0, this.board.showXgrid));
+      this.board.showYgrid = Math.min(1, Math.max(0, this.board.showYgrid));
+      this.board.showXaxis = Math.min(1, Math.max(0, this.board.showXaxis));
+      this.board.showYaxis = Math.min(1, Math.max(0, this.board.showYaxis));
+      this.board.showXmarks = Math.min(1, Math.max(0, this.board.showXmarks));
+      this.board.showYmarks = Math.min(1, Math.max(0, this.board.showYmarks));
+      this.board.showXlabels = Math.min(1, Math.max(0, this.board.showXlabels));
+      this.board.showYlabels = Math.min(1, Math.max(0, this.board.showYlabels));
+
+      var groups = [];
+
+      // 기본 배경 그룹 생성
+      var basicElems = [];
+      basicElems.push(createElement('rect', {
+        attrs: {
+          'x'           : 0,
+          'y'           : 0,
+          'width'       : this.board.width,
+          'height'      : this.board.height,
+          'stroke'      : 'none',
+          'fill'        : 'white'
+        }
+      }));
+      if (this.board.doGrids == 1) {
+        var st = '';
+        if (this.board.showXgrid == 1) {
+          var x, gdx = this.board.gdx * this.xunitlength;
+          for (x = this.origin[0]; x < this.board.width - .99 * this.board.padding; x += gdx)
+            st += ' M' + x.toFixed(2) + ',0 ' + x.toFixed(2) + ',' + this.board.height.toFixed(2);
+          for (x = this.origin[0] - gdx; x > .99 * this.board.padding; x -= gdx)
+            st += ' M' + x.toFixed(2) + ',0 ' + x.toFixed(2) + ',' + this.board.height.toFixed(2);
+        }
+        if (this.board.showYgrid == 1) {
+          var y, gdy = this.board.gdy * this.yunitlength;
+          for (y = this.board.height - this.origin[1]; y < this.board.height - .99 * this.board.padding; y += gdy)
+            st += ' M0,' + y.toFixed(2) + ' ' + this.board.width.toFixed(2) + ',' + y.toFixed(2);
+          for (y = this.board.height - this.origin[1] - gdy; y > .99 * this.board.padding; y -= gdy)
+            st += ' M0,' + y.toFixed(2) + ' ' + this.board.width.toFixed(2) + ',' + y.toFixed(2);
+        }
+        if (this.board.showXgrid == 1 || this.board.showYgrid == 1) {
+          basicElems.push(createElement('path', {
+            attrs: {
+              'd'               : st,
+              'stroke-width'    : 1,
+              'shape-rendering' : 'crispEdges',
+              'stroke'          : 'lightgrey',
+              'stroke-opacity'  : '0.5'
+            }
+          }))
+        }
+      }
+      groups.push(createElement('g', basicElems));
+
+      // 커스텀 엘리먼트 그룹 생성
+      var customElems = this.customs.map(function(custom){
+        var type = _.first(custom), args = _.rest(custom);
+        return this[type].apply(this, args);
+      }.bind(this));
+      groups.push(createElement('g', customElems));
+
+      // 미리보기 그룹 생성
+      if (this.board.isDrawing) {
+        var drawingElems = [];
+        if (this.board.current_c.length == 2) {
+          var x = this.board.current_c[0], y = this.board.current_c[1],
+              coords_x_color = ((x * 100) % (this.board.gdx * 100)) == 0 ? 'red' : 'lightgrey',
+              coords_y_color = ((y * 100) % (this.board.gdy * 100)) == 0 ? 'red' : 'lightgrey';
+          drawingElems.push(this.makeLine([[x, y], Infinity], false, { 'stroke': coords_x_color, 'stroke-dasharray': '1 2' }));
+          drawingElems.push(this.makeLine([[x, y], 0], false, { 'stroke': coords_y_color, 'stroke-dasharray': '1 2' }));
+          drawingElems.push(this.makeDot([x, y], { 'stroke': 'red', 'fill': 'white' }));
+          drawingElems.push(this.makeText([x, y], x.toFixed(2) + ', ' + y.toFixed(2), 'above', { 'font-size': 10, 'fill': 'lightgrey' }));
+        }
+
+        drawingElems.push(createElement('g', this.board.drawingData.map(function(preview) {
+          if (preview && typeof preview == 'object' && preview.length == 2) {
+            return this.makeDot(preview, { 'fill': 'none' });
+          }
+        }, this)));
+        drawingElems.push(createElement('g', this.board.previews.map(function(preview){
+          if (preview && typeof preview == 'object' && preview.length > 2) {
+            var type = _.first(preview), args = _.rest(preview);
+            return this[type].apply(this, args);
+          }
+        }.bind(this))));
+
+        drawingElems.push(createElement('rect', {
+          attrs: {
+            'x'           : 0,
+            'y'           : 0,
+            'width'       : this.board.width,
+            'height'      : this.board.height,
+            'stroke'      : 'red',
+            'fill'        : 'white',
+            'fill-opacity': 0
+          }
+        }));
+
+        groups.push(createElement('g', {
+          attrs: { 'cursor': 'none' },
+          on: this.board.drawingHandler
+        }, drawingElems));
+      }
+
+      // 축 그룹 생성
+      var axisElems = [];
+      if (this.board.doAxes == 1) {
+        if (this.board.showXaxis == 1) {
+          var x, st = '', dx =  this.board.dx * this.xunitlength;
+          st += 'M0.00,' + (this.board.height - this.origin[1]).toFixed(2) + ' ' + this.board.width.toFixed(2) + ',' + (this.board.height - this.origin[1]).toFixed(2);
+          if (this.board.showXmarks == 1) {
+            for (x = this.origin[0] + dx; x < this.board.width - .99 * this.board.padding; x += dx)
+              st += ' M' + x.toFixed(2) + ',' + (this.board.height - this.origin[1] + this.ticklength).toFixed(2) + ' ' + x.toFixed(2) + ',' + (this.board.height - this.origin[1] - this.ticklength).toFixed(2);
+            for (x = this.origin[0] - dx; x > .99 * this.board.padding; x -= dx)
+              st += ' M' + x.toFixed(2) + ',' + (this.board.height - this.origin[1] + this.ticklength).toFixed(2) + ' ' + x.toFixed(2) + ',' + (this.board.height - this.origin[1] - this.ticklength).toFixed(2);
+            if (this.board.showYaxis == 0)
+              st += ' M' + this.origin[0].toFixed(2) + ',' + (this.board.height - this.origin[1] + this.ticklength).toFixed(2) + ' ' + this.origin[0].toFixed(2) + ', ' + (this.board.height - this.origin[1] - this.ticklength).toFixed(2);
+          }
+          axisElems.push(createElement('path', {
+            attrs: {
+              'd'               : st,
+              'stroke-width'    : 1,
+              'shape-rendering' : 'crispEdges',
+              'stroke'          : 'grey'
+            }
+          }));
+          axisElems.push(createElement('path', {
+            attrs: {
+              'd'               : 'M' + this.board.width.toFixed(2) + ',' + (this.board.height - this.origin[1]).toFixed(2) + ' L' + (this.board.width - 7).toFixed(2) + ',' + ((this.board.height - this.origin[1]) - 3).toFixed(2) + ' L' + (this.board.width - 7).toFixed(2) + ',' + ((this.board.height - this.origin[1]) + 3).toFixed(2) + ' Z',
+              'stroke-width'    : 1,
+              'shape-rendering' : 'crispEdges',
+              'stroke'          : 'grey',
+              'fill'            : 'grey'
+            }
+          }));
+          axisElems.push(this.makeText([this.board.xmax + (this.board.padding - 5) / this.xunitlength, 0], 'x', 'above', {
+            'font-size' : 14,
+            'fill'     : 'grey'
+          }));
+          if (this.board.showXlabels == 1) {
+            var x,
+                ldx = this.board.dx,
+                lx = this.board.xmin > 0 || this.board.xmax < 0 ? this.board.xmin : 0,
+                ly = this.board.ymin > 0 || this.board.ymax < 0 ? this.board.ymin : 0,
+                lxp = ly == 0 ? 'below' : 'below',
+                ddx = Math.floor(1.1 - Math.log(ldx) / Math.log(10)) + 2;
+            if (this.board.showYaxis == 0)
+              axisElems.push(this.makeText([0, 0], 0, lxp, { 'font-size': 13, 'fill' : 'grey' }));
+            for (x = ldx; x <= this.board.xmax; x += ldx)
+              axisElems.push(this.makeText([x, ly], chopZ(x.toFixed(ddx)), lxp, { 'font-size': 13, 'fill' : 'grey' }));
+            for (x = -ldx; this.board.xmin <= x; x -= ldx)
+              axisElems.push(this.makeText([x, ly], chopZ(x.toFixed(ddx)), lxp, { 'font-size': 13, 'fill' : 'grey' }));
+          }
+        }
+        if (this.board.showYaxis == 1) {
+          var y, st = '', dy =  this.board.dy * this.yunitlength;
+          st += ' M' + this.origin[0].toFixed(2) + ',0.00 ' + this.origin[0].toFixed(2) + ',' + this.board.height.toFixed(2);
+          if (this.board.showYmarks == 1) {
+            for (y = this.board.height - this.origin[1] + dy; y < this.board.height - .99 * this.board.padding; y += dy)
+              st += ' M' + (this.origin[0] + this.ticklength).toFixed(2) + ',' + y.toFixed(2) + ' ' + (this.origin[0] - this.ticklength).toFixed(2) + ',' + y.toFixed(2);
+            for (y = this.board.height - this.origin[1] - dy; y > .99 * this.board.padding; y -= dy)
+              st += ' M' + (this.origin[0] + this.ticklength).toFixed(2) + ',' + y.toFixed(2) + ' ' + (this.origin[0] - this.ticklength).toFixed(2) + ',' + y.toFixed(2)
+            if (this.board.showXaxis == 0)
+              st += ' M' + (this.origin[0] + this.ticklength).toFixed(2) + ',' + (this.board.height - this.origin[1]).toFixed(2) + ' ' + (this.origin[0] - this.ticklength).toFixed(2) + ', ' + (this.board.height - this.origin[1]).toFixed(2);
+          }
+          axisElems.push(createElement('path', {
+            attrs: {
+              'd'               : st,
+              'stroke-width'    : 1,
+              'shape-rendering' : 'crispEdges',
+              'stroke'          : 'grey'
+            }
+          }));
+          axisElems.push(createElement('path', {
+            attrs: {
+              'd'               : 'M' + this.origin[0].toFixed(2) + ',0.00 L' + (this.origin[0] - 3).toFixed(2) + ',7.00 L' + (this.origin[0] + 3).toFixed(2) + ',7.00 Z',
+              'stroke-width'    : 1,
+              'shape-rendering' : 'crispEdges',
+              'stroke'          : 'grey',
+              'fill'            : 'grey'
+            }
+          }));
+          axisElems.push(this.makeText([0, this.board.ymax + (this.board.padding - 5) / this.yunitlength], 'y', 'right', {
+            'font-size' : 14,
+            'fill'     : 'grey'
+          }));
+          if (this.board.showYlabels == 1) {
+            var y,
+                ldy = this.board.dy,
+                lx = this.board.xmin > 0 || this.board.xmax < 0 ? this.board.xmin : 0,
+                ly = this.board.ymin > 0 || this.board.ymax < 0 ? this.board.ymin : 0,
+                lyp = lx == 0 ? 'left' : 'right',
+                ddy = Math.max(0, Math.floor(1.1 - Math.log(ldy) / Math.log(10)) + 2);
+            if (this.board.showXaxis == 0)
+              axisElems.push(this.makeText([0, 0], 0, lyp, { 'font-size': 13, 'fill' : 'grey' }));
+            for (y = ldy; y <= this.board.ymax; y += ldy)
+              axisElems.push(this.makeText([lx, y], chopZ(y.toFixed(ddy)), lyp, { 'font-size': 13, 'fill' : 'grey' }));
+            for (y = -ldy; this.board.ymin <= y; y -= ldy)
+              axisElems.push(this.makeText([lx, y], chopZ(y.toFixed(ddy)), lyp, { 'font-size': 13, 'fill' : 'grey' }));
+          }
+        }
+        function chopZ(a) {
+          var b = a.indexOf('.'), c = a.length - 1;
+          if (b < 0) return a;
+          for (c; c > b && a.charAt(c) == '0'; c--);
+          c == b && c--;
+          return a.slice(0, c + 1);
+        }
+      }
+      groups.push(createElement('g', axisElems));
+
+      // 최종 렌더링
+      return createElement('svg', {
+        attrs: { 'width': this.board.width, 'height': this.board.height }
+      }, groups);
+    },
+    methods: {
+      makeElem: function(type = 'svg', attrs = {}, contents) {
+        return this.$createElement(type, {
+          attrs: attrs,
+          on: {
+            click: function(e) {
+              if (confirm('삭제?')) e.target.remove()
+            },
+            mouseover: function(e) {
+              e.target.style.cursor = 'pointer';
+              e.target.style.stroke = 'red';
+              e.target.style.strokeWidth = 2;
+            },
+            mouseout: function(e) {
+              e.target.style.cursor = null;
+              e.target.style.stroke = null;
+              e.target.style.strokeWidth = null;
+            }
+          }
+        }, contents);
+      },
+      makeDot: function(coords = [0, 0], additional_options = {}) {
+        var cx = (coords[0] * this.xunitlength + this.origin[0]).toFixed(2),
+            cy = (this.board.height - coords[1] * this.yunitlength - this.origin[1]).toFixed(2),
+            options = {};
+
+        options = {
+          'cx'     : cx,
+          'cy'     : cy,
+          'r'      : 0.04 * Math.min(this.xunitlength, this.yunitlength),
+          'stroke' : 'grey',
+          'fill'   : 'grey'
+        }
+        for (let option in additional_options) options[option] = additional_options[option];
+        return this.makeElem('circle', options);
+      },
+      makeCircle: function(coords = [0, 0], radius = 0.04, additional_options = {}) {
+        if (radius <= 0) return false;
+        if (this.square == 1) {
+          var cx = (coords[0] * this.xunitlength + this.origin[0]).toFixed(2),
+              cy = (this.board.height - coords[1] * this.yunitlength - this.origin[1]).toFixed(2),
+              options = {};
+
+          options = {
+            'cx'     : cx,
+            'cy'     : cy,
+            'r'      : radius * Math.min(this.xunitlength, this.yunitlength),
+            'stroke' : 'grey',
+            'fill'   : 'none'
+          }
+          for (let option in additional_options) options[option] = additional_options[option];
+          return this.makeElem('circle', options);
+        } else {
+          var cx = (coords[0] * this.xunitlength + this.origin[0]).toFixed(2),
+              cy = (this.board.height - coords[1] * this.yunitlength - this.origin[1]).toFixed(2),
+              options = {};
+
+          options = {
+            'cx'        : cx,
+            'cy'        : cy,
+            'rx'        : radius * this.xunitlength,
+            'ry'        : radius * this.yunitlength,
+            'stroke'    : 'grey',
+            'fill'      : 'none'
+          }
+          for (let option in additional_options) options[option] = additional_options[option];
+          return this.makeElem('ellipse', options);
+        }
+      },
+      makeEllipse: function(coords = [0, 0], radius = [this.ticklength, this.ticklength], rotate = 0, additional_options = {}) {
+        var cx = (coords[0] * this.xunitlength + this.origin[0]).toFixed(2),
+            cy = (this.board.height - coords[1] * this.yunitlength - this.origin[1]).toFixed(2),
+            transform = 'rotate(' + rotate + ' ' + cx + ' ' + cy + ')',
+            options = {};
+
+        options = {
+          'cx'        : cx,
+          'cy'        : cy,
+          'rx'        : radius[0] * this.xunitlength,
+          'ry'        : radius[1] * this.yunitlength,
+          'transform' : transform,
+          'stroke'    : 'grey',
+          'fill'      : 'none'
+        }
+        for (let option in additional_options) options[option] = additional_options[option];
+        return this.makeElem('ellipse', options);
+      },
+      makeLine: function(data = [[0,0], 1], is_segment = false, additional_options = {}) {
+        var x1, y1, x2, y2, k, c,
+            xtick = this.board.padding / this.xunitlength,
+            ytick = this.board.padding / this.yunitlength,
+            options = {};
+        if (data.length == 2 && typeof data[1] == 'number') {
+          x1 = data[0][0], y1 = data[0][1],
+          k = data[1], c = y1 - k * x1;
+          if (_.contains([x1, y1, k, c], undefined)) return false;
+          if (Math.abs(k) == Infinity) {
+            x2 = x1,
+            y1 = this.board.ymin - ytick, y2 = this.board.ymax + ytick;
+          } else {
+            x1 = this.board.xmin - xtick, y1 = k * x1 + c,
+            x2 = this.board.xmax + xtick, y2 = k * x2 + c;
+          }
+        } else if (data.length == 2 && typeof data[1] == 'object') {
+          x1 = data[0][0], y1 = data[0][1],
+          x2 = data[1][0], y2 = data[1][1];
+          if (_.contains([x1, y1, x2, y2], undefined)) return false;
+          if (!is_segment) {
+            if (x1 == x2) {
+              y1 = this.board.ymin - ytick, y2 = this.board.ymax + ytick;
+            } else {
+              k = (y1 - y2) / (x1 - x2), c = y1 - k * x1;
+              x1 = this.board.xmin - xtick, y1 = k * x1 + c,
+              x2 = this.board.xmax + xtick, y2 = k * x2 + c;
+            }
+          }
+        }
+        options = {
+          'x1'              : (x1 * this.xunitlength + this.origin[0]).toFixed(2),
+          'y1'              : (this.board.height - y1 * this.yunitlength - this.origin[1]).toFixed(2),
+          'x2'              : (x2 * this.xunitlength + this.origin[0]).toFixed(2),
+          'y2'              : (this.board.height - y2 * this.yunitlength - this.origin[1]).toFixed(2),
+          'stroke-width'    : 1,
+          'stroke'          : 'grey',
+          'stroke-linecap'  : 'round',
+          'fill'            : 'none'
+        }
+        for (let option in additional_options) options[option] = additional_options[option];
+        return this.makeElem('line', options);
+      },
+      makePoly: function(pathArr = [], is_closed = false, additional_options = {}) {
+        if (pathArr.length == 0) return false;
+        var st = '', options = {}, polytype = is_closed ? 'polygon' : 'polyline';
+        for (let f = 0, l = pathArr.length; f < l; f++)
+          st += (pathArr[f][0] * this.xunitlength + this.origin[0]).toFixed(2) + ',' + (this.board.height - pathArr[f][1] * this.yunitlength - this.origin[1]).toFixed(2) + ' ';
+        options = {
+          'points'          : st,
+          'stroke-width'    : 1,
+          'stroke'          : 'grey',
+          'stroke-linecap'  : 'round',
+          'fill'            : 'none'
+        }
+        for (let option in additional_options) options[option] = additional_options[option];
+        return this.makeElem(polytype, options);
+      },
+      makePath: function(pathArr = [], is_closed = false, additional_options = {}) {
+        if (pathArr.length == 0) return false;
+        var st = 'M', options = {};
+        for (let f = 0, l = pathArr.length; f < l; f++)
+          st += (pathArr[f][0] * this.xunitlength + this.origin[0]).toFixed(2) + ',' + (this.board.height - pathArr[f][1] * this.yunitlength - this.origin[1]).toFixed(2) + ' ';
+        if (is_closed) st += ' Z';
+        options = {
+          'd'               : st,
+          'stroke-width'    : 1,
+          'stroke'          : 'grey',
+          'stroke-linecap'  : 'round',
+          'fill'            : 'none'
+        }
+        for (let option in additional_options) options[option] = additional_options[option];
+        return this.makeElem('path', options);
+      },
+      makeText: function(coords = [0, 0], contents = '', direction = '', additional_options = {}, target = this.id + '_custom') {
+        if (!contents) return false;
+        var textAnchor = 'middle',
+            xtick = 0,
+            ytick = this.fontsize / 3,
+            options = {};
+        if (direction !== undefined) {
+          if (direction.slice(0, 5) == 'above') ytick = -this.fontsize / 2;
+          if (direction.slice(0, 5) == 'below') ytick = this.fontsize + 2;
+          if (direction.slice(0, 5) == 'right' || direction.slice(5, 10) == 'right') textAnchor = 'start', xtick = this.fontsize / 2;
+          if (direction.slice(0, 4) == 'left'  || direction.slice(5, 9) == 'left'  ) textAnchor = 'end', xtick = -this.fontsize / 2;
+        }
+        options = {
+          'x'           : (coords[0] * this.xunitlength + this.origin[0] + xtick).toFixed(2),
+          'y'           : (this.board.height - coords[1] * this.yunitlength - this.origin[1] + ytick).toFixed(2),
+          'text-anchor' : textAnchor,
+          'font-family' : this.board.fontfamily,
+          'font-size'   : this.fontsize,
+          'font-weight' : 'normal',
+          'fill'        : 'grey',
+        };
+        for (let option in additional_options) options[option] = additional_options[option];
+        return this.makeElem('text', options, contents);
+      },
+      makeKatex: function(coords = [0, 0], contents = '', size = [0, 0], additional_options = {}) {
+        if (!contents) return false;
+        var options = {
+          'x'           : (coords[0] * this.xunitlength + this.origin[0] - size[0] / 2).toFixed(2),
+          'y'           : (this.board.height - coords[1] * this.yunitlength - this.origin[1] - size[1] / 2).toFixed(2),
+          'width'       : size[0],
+          'height'      : size[1],
+          'cursor'      : 'pointer'
+        };
+        for (let option in additional_options) options[option] = additional_options[option];
+        return this.$createElement('foreignObject', {
+          attrs: options,
+          domProps: {
+            innerHTML: contents
+          }
+        });
+      },
+      makePlot: function(equation = '', range, additional_options = {}) {
+        var pathArr = [], st = 'M', options = {};
+
+        if (typeof equation == 'string') {
+          pathArr = this.getEquationPath(equation, range);
+        } else if (typeof equation == 'object') {
+          _.map(equation, function(eq) {
+            pathArr.push('M');
+            pathArr.push(this.getEquationPath(eq, range));
+          }, this);
+          pathArr = _.flatten(pathArr, true);
+        }
+
+        if (pathArr.length == 0) return false;
+
+        if (_.last(pathArr) == 'M') pathArr.pop();
+        for (let f = 0, l = pathArr.length; f < l; f++)
+          if (typeof pathArr[f] == 'string') {
+            if (_.last(st) !== 'M') st += ' M';
+          } else {
+            st += ' ' + (pathArr[f][0] * this.xunitlength + this.origin[0]).toFixed(2) + "," + (this.board.height - pathArr[f][1] * this.yunitlength - this.origin[1]).toFixed(2);
+          }
+        if (st == 'M') return false;
+        options = {
+          'd'               : st,
+          'stroke-width'    : 1,
+          'stroke'          : 'grey',
+          'stroke-linecap'  : 'round',
+          'fill'            : 'none'
+        }
+        for (let option in additional_options) options[option] = additional_options[option];
+        return this.makeElem('path', options);
+      },
+      makeStandardNorm: function(equation = '', highlights = [], additional_options = {}) {
+        var g = [];
+        _.each(highlights, function(highlight) {
+          var pathArr = this.getEquationPath(equation, highlight),
+              a = [Math.min.apply(null, highlight), 0]
+              b = [Math.max.apply(null, highlight), 0];
+          pathArr.unshift(a);
+          pathArr.push(b);
+          g.push(this.makePoly(pathArr, true, {
+            'stroke-width'  : 0,
+            'stroke'        : 'none',
+            'fill'          : 'lightgrey',
+            'fill-opacity'  : 0.5
+          }));
+        }, this);
+        g.push(this.makePlot(equation, null, additional_options));
+        return this.makeElem('g', {}, g);
+      },
+      makeArrow: function(a, b, additional_options = {}) {
+        var st = '', rot = '',
+            rotateAngleRad,
+            triWidth = 6, triHeight = 10,
+            options = {};
+
+        st += 'M ' + Math.round(b[0] * this.xunitlength + this.origin[0]) + ' ' + Math.round(this.board.height - b[1] * this.yunitlength - this.origin[1]);
+        st += ' L ' + Math.round(b[0] * this.xunitlength + this.origin[0] - triWidth / 2) + ' ' + Math.round(this.board.height - b[1] * this.yunitlength - this.origin[1] + triHeight);
+        st += ' L ' + Math.round(b[0] * this.xunitlength + this.origin[0] + triWidth / 2) + ' ' + Math.round(this.board.height - b[1] * this.yunitlength - this.origin[1] + triHeight);
+        st += ' Z';
+
+        if (a[0] == b[0]) {
+          rotateAngleRad = b[1] > a[1] ? 0 : Math.PI;
+        } else {
+          rotateAngleRad = Math.PI / 2 - Math.atan((b[1] - a[1]) * this.yunitlength / ((b[0] - a[0]) * this.xunitlength));
+        }
+        if (a[0] > b[0]) rotateAngleRad += Math.PI;
+        rot += 'rotate(' + Math.round(180 / Math.PI * rotateAngleRad) + ' ' + Math.round(b[0] * this.xunitlength + this.origin[0]) + ' ' + Math.round(this.board.height - b[1] * this.yunitlength - this.origin[1]) + ')';
+
+        options = {
+          'd'         : st,
+          'transform' : rot,
+          'stroke'    : 'grey',
+          'fill'      : 'grey'
+        };
+        for (let option in additional_options) options[option] = additional_options[option];
+        return this.makeElem('path', options);
+      },
+      getEquationPath: function(equation = '', range) {
+        var pathArr = [],
+            f = function(x) { return x },
+            g = function(y) { return y },
+            xtick = this.board.padding / this.xunitlength, //+ (this.board.width / 2 * Math.sqrt(2)) / this.xunitlength,
+            ytick = this.board.padding / this.yunitlength, //+ (this.board.height / 2 * Math.sqrt(2)) / this.yunitlength,
+            xmin = this.board.xmin - xtick, xmax = this.board.xmax + xtick,
+            ymin = this.board.ymin - ytick, ymax = this.board.ymax + ytick,
+            er, inc;
+        if (equation.indexOf('x=') == 0) {
+          eval("g = function(y){ with(Math) return " + this.getEquation(equation) + "; }");
+          er = range ? range : [ymin, ymax],
+          inc = (1 - 1e-6) * (er[1] - er[0]) / this.board.height;
+          for (let y = er[0]; y <= er[1]; y += inc) {
+            let x = g(y), prev_x = g(y - inc), k = inc / (x - prev_x);
+            if (isNaN(y)) {
+              pathArr.push('M');
+            } else if (k < 0 && (prev_x > xmin && prev_x < xmax) && (x < xmin || x > xmax)) {
+              pathArr.push([x, y]);
+              pathArr.push('M');
+            } else if (k > 0 && (prev_x > xmin && prev_x < xmax) && (x < xmin || x > xmax)) {
+              pathArr.push([x, y]);
+              pathArr.push('M');
+            } else if (k > 0 && (prev_x < xmin || prev_x > xmax) && (x > xmin && x < xmax)) {
+              pathArr.push('M');
+              pathArr.push([prev_x, y - inc]);
+              pathArr.push([x, y]);
+            } else if (k < 0 && (prev_x < xmin || prev_x > xmax) && (x > xmin && x < xmax)) {
+              pathArr.push('M');
+              pathArr.push([prev_x, y - inc]);
+              pathArr.push([x, y]);
+            } else  if (x > xmin && x < xmax) {
+              pathArr.push([x, y]);
+            }
+          }
+        } else if (equation.indexOf('y=') == 0) {
+          eval("f = function(x){ with(Math) return " + this.getEquation(equation) + "; }");
+          er = range ? range : [xmin, xmax],
+          inc = (1 - 1e-6) * (er[1] - er[0]) / this.board.width;
+          for (let x = er[0]; x <= er[1]; x += inc) {
+            let y = f(x), prev_y = f(x - inc), k = (y - prev_y) / inc;
+            if (isNaN(y)) {
+              pathArr.push('M');
+            } else if (k < 0 && (prev_y > ymin && prev_y < ymax) && (y < ymin || y > ymax)) {
+              pathArr.push([x, y]);
+              pathArr.push('M');
+            } else if (k > 0 && (prev_y > ymin && prev_y < ymax) && (y < ymin || y > ymax)) {
+              pathArr.push([x, y]);
+              pathArr.push('M');
+            } else if (k > 0 && (prev_y < ymin || prev_y > ymax) && (y > ymin && y < ymax)) {
+              pathArr.push('M');
+              pathArr.push([x - inc, prev_y]);
+              pathArr.push([x, y]);
+            } else if (k < 0 && (prev_y < ymin || prev_y > ymax) && (y > ymin && y < ymax)) {
+              pathArr.push('M');
+              pathArr.push([x - inc, prev_y]);
+              pathArr.push([x, y]);
+            } else  if (y > ymin && y < ymax) {
+              pathArr.push([x, y]);
+            }
+          }
+        }
+
+        return pathArr;
+      },
+      getEquation: function(a) {
+        a = a.replace(/\s/g, '');
+        if (a.match(/=/g) && a.match(/=/g).length > 1) return console.warn('등호가 두 개 입니다');
+        if (a.indexOf('x=') == 0) {
+          a = a.replace('x=', '');
+          if (a.match(/x/g)) return console.warn('x를 한 변으로 몰아주세요');
+        }
+        if (a.indexOf('y=') == 0) {
+          a = a.replace('y=', '');
+          if (a.match(/y/g)) return console.warn('y를 한 변으로 몰아주세요');
+        }
+
+        if (a.indexOf('log') > -1) {
+          a = a.replace(/log\(([a-zA-Z0-9])\)/g, 'log($1)/log(10)');
+        }
+        if (a.indexOf('^-1') > -1) {
+          a = a.replace(/sin\^-1/g, 'arcsin');
+          a = a.replace(/cos\^-1/g, 'arccos');
+          a = a.replace(/tan\^-1/g, 'arctan');
+          a = a.replace(/sec\^-1/g, 'arcsec');
+          a = a.replace(/csc\^-1/g, 'arccsc');
+          a = a.replace(/cot\^-1/g, 'arccot');
+          a = a.replace(/sinh\^-1/g, 'arcsinh');
+          a = a.replace(/cosh\^-1/g, 'arccosh');
+          a = a.replace(/tanh\^-1/g, 'arctanh');
+          a = a.replace(/sech\^-1/g, 'arcsech');
+          a = a.replace(/csch\^-1/g, 'arccsch');
+          a = a.replace(/coth\^-1/g, 'arccoth');
+        }
+        a = a.replace(/(\d.\d+)e-(\d+)/g, '$1/(10**$2)');
+        a = a.replace(/^e$/g, '(E)');
+        a = a.replace(/^e([^a-zA-Z])/g, '(E)$1');
+        a = a.replace(/([^a-zA-Z])e([^a-zA-Z])/g, '$1(E)$2');
+        a = a.replace(/([0-9])([\(a-zA-Z])/g, '$1*$2');
+        a = a.replace(/\)([\(0-9a-zA-Z])/g, ')*$1');
+
+        for (var b, c, d, e, f; - 1 != (b = a.indexOf("^"));) {
+          if (0 == b) return "Error: missing argument";
+          if (c = b - 1, (e = a.charAt(c)) >= "0" && e <= "9") {
+            for (c--; c >= 0 && (e = a.charAt(c)) >= "0" && e <= "9";) c--;
+            if ("." == e)
+              for (c--; c >= 0 && (e = a.charAt(c)) >= "0" && e <= "9";) c--;
+          } else if (")" == e) {
+            for (f = 1, c--; c >= 0 && f > 0;) e = a.charAt(c), "(" == e ? f-- : ")" == e && f++, c--;
+            for (; c >= 0 && (e = a.charAt(c)) >= "a" && e <= "z" || e >= "A" && e <= "Z";) c--;
+          } else {
+            if (!(e >= "a" && e <= "z" || e >= "A" && e <= "Z")) return "Error: incorrect syntax in " + a + " at position " + c;
+            for (c--; c >= 0 && (e = a.charAt(c)) >= "a" && e <= "z" || e >= "A" && e <= "Z";) c--;
+          }
+          if (b == a.length - 1) return "Error: missing argument";
+          if (d = b + 1, (e = a.charAt(d)) >= "0" && e <= "9" || "-" == e) {
+            for (d++; d < a.length && (e = a.charAt(d)) >= "0" && e <= "9";) d++;
+            if ("." == e)
+              for (d++; d < a.length && (e = a.charAt(d)) >= "0" && e <= "9";) d++;
+          } else if ("(" == e)
+            for (f = 1, d++; d < a.length && f > 0;) e = a.charAt(d), "(" == e ? f++ : ")" == e && f--, d++;
+          else {
+            if (!(e >= "a" && e <= "z" || e >= "A" && e <= "Z")) return "Error: incorrect syntax in " + a + " at position " + d;
+            for (d++; d < a.length && (e = a.charAt(d)) >= "a" && e <= "z" || e >= "A" && e <= "Z";) d++;
+          }
+          a = a.slice(0, c + 1) + "pow(" + a.slice(c + 1, b) + "," + a.slice(b + 1, d) + ")" + a.slice(d);
+        }
+        for (; - 1 != (b = a.indexOf("!"));) {
+          if (0 == b) return "Error: missing argument";
+          if (c = b - 1, (e = a.charAt(c)) >= "0" && e <= "9") {
+            for (c--; c >= 0 && (e = a.charAt(c)) >= "0" && e <= "9";) c--;
+            if ("." == e)
+              for (c--; c >= 0 && (e = a.charAt(c)) >= "0" && e <= "9";) c--;
+          } else if (")" == e) {
+            for (f = 1, c--; c >= 0 && f > 0;) e = a.charAt(c), "(" == e ? f-- : ")" == e && f++, c--;
+            for (; c >= 0 && (e = a.charAt(c)) >= "a" && e <= "z" || e >= "A" && e <= "Z";) c--;
+          } else {
+            if (!(e >= "a" && e <= "z" || e >= "A" && e <= "Z")) return "Error: incorrect syntax in " + a + " at position " + c;
+            for (c--; c >= 0 && (e = a.charAt(c)) >= "a" && e <= "z" || e >= "A" && e <= "Z";) c--;
+          }
+          a = a.slice(0, c + 1) + "factorial(" + a.slice(c + 1, b) + ")" + a.slice(b + 1);
+        }
+        return a;
+      }
+    },
+  };
+
+  function openGraphInput() {
+    graph = new Vue({
+      el: '#graph_screen',
+      data: {
+        board: {
+          width: 400, height: 300, padding: 20, square: 1,
+          xmax: 5, xmin: -5, ymax: 4, ymin: -4,
+          doGrids: 1, showXgrid: 1, showYgrid: 1, gdx: 1, gdy: 1,
+          doAxes: 1, showXaxis: 1, showYaxis: 1, showXmarks: 1, showYmarks: 1, showXlabels: 1, showYlabels: 1, dx: 1, dy: 1,
+          isDrawing: false, current_c: [], previews: [], drawingHandler: null, drawingData: [],
+          fontfamily: 'KaTeX_Math, Times New Roman, Times, sans-serif',
+        },
+        style: {
+          stroke: { color: 'grey', width: 1, dash: 'none', opacity: 1 },
+          fill: { color: 'none', opacity: 1 },
+          colorOptions: [
+            { text: '없음',    value: 'none'      },
+            { text: '연회색',    value: 'lightgrey' },
+            { text: '회색',    value: 'grey'      },
+            { text: '검정색',    value: 'black'      },
+            { text: '빨강',    value: 'red'       },
+            { text: '파랑',    value: 'blue'      },
+          ],
+          dashOptions: [
+            { text: '실선',    value: 'none' },
+            { text: '점선1',   value: '1 2' },
+            { text: '점선2',   value: '5 5' },
+          ]
+        },
+        customs: []
+      },
+      computed: computed_value,
+      components: {
+        'graph-svg'  : graphComponent,
+      },
+      methods: {
+        initPreview: function(drawingContext) {
+          if (this.board.drawingData.length == 0 || (this.board.drawingData.length > 0 && confirm('드로잉을 초기화하시겠습니까?'))) {
+            console.log('드로잉을 초기화...');
+            this.board.drawingHandler = {
+              mousemove: this.drawPreviewGrid.bind(this, drawingContext),
+              click: this.drawPreviewObject.bind(this, drawingContext)
+            },
+            this.board.current_c = [], this.board.previews = [], this.board.drawingData = [],
+            this.board.isDrawing = true;
+            keyboardJS.off('esc');
+            keyboardJS.on('esc', this.removePreview.bind(this, false));
+          }
+        },
+        removePreview: function(result) {
+          if (result || this.board.drawingData.length == 0 || (this.board.drawingData.length > 0 && confirm('드로잉을 종료하시겠습니까?'))) {
+            console.log('드로잉을 종료합니다...');
+            keyboardJS.off('esc');
+            this.board.isDrawing = false,
+            this.board.current_c = [], this.board.previews = [], this.board.drawingHandler = null, this.board.drawingData = [];
+            if (result) this.customs.push(result);
+          }
+        },
+        drawPreviewGrid: function(drawingContext, e) {
+          var x, y, c;
+          if (e.altKey) {
+            x = (Math.round(((e.offsetX - this.origin[0]) / this.xunitlength) / this.board.gdx) * this.board.gdx).toFixed(2),
+            y = (Math.round((-(e.offsetY + this.origin[1] - this.board.height) / this.yunitlength) / this.board.gdy) * this.board.gdy).toFixed(2);
+          } else {
+            x = ((e.offsetX - this.origin[0]) / this.xunitlength).toFixed(2),
+            y = (-(e.offsetY + this.origin[1] - this.board.height) / this.yunitlength).toFixed(2);
+          }
+          // x = Math.max(this.board.xmin, Math.min(Number(x), this.board.xmax)),
+          // y = Math.max(this.board.ymin, Math.min(Number(y), this.board.ymax));
+          this.board.current_c = [Number(x), Number(y)];
+          this[drawingContext](e);
+        },
+        drawPreviewObject: function(drawingContext, e) {
+          this[drawingContext](e);
+        },
+        addDot: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addDot');
+          } else if (e.type == 'click') {
+            this.removePreview(this.drawDot(this.board.current_c));
+          }
+        },
+        addLine: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addLine');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawLine(this.board.drawingData, false));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 1) {
+              var c1 = this.board.drawingData[0], c = this.board.current_c;
+              this.board.previews.splice(0, 1, this.drawText(c1, c1[0].toFixed(2) + ',' + c1[1].toFixed(2), 'above', { 'font-size': 10, 'fill': 'lightgrey' }));
+              this.board.previews.splice(1, 1, this.drawText(c, '기울기:' + this.getSlope(c1, c).toFixed(2), 'below', { 'font-size': 10, 'fill': 'lightgrey' }));
+              this.board.previews.splice(2, 1, this.drawLine([c1, c], false));
+            }
+          }
+        },
+        addClosedLine: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addClosedLine');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawLine(this.board.drawingData, true));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 1) this.board.previews.splice(0, 1, this.drawLine([this.board.drawingData[0], this.board.current_c], true));
+          }
+        },
+        addPolyLine: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addPolyLine');
+          } else if (e.type == 'click') {
+            this.board.drawingData.push(this.board.current_c);
+            this.board.previews.splice(0, 1, this.drawPoly(this.board.drawingData, false));
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length > 0) {
+              var drawingData = _.clone(this.board.drawingData);
+              var lastPoint = drawingData.pop();
+              this.board.previews.splice(1, 1, this.drawPoly([lastPoint, this.board.current_c], false, { 'stroke-opacity': 0.5, 'stroke-dasharray': '1 2' }));
+            }
+          }
+          keyboardJS.off('esc');
+          keyboardJS.on('esc', function() {
+            this.removePreview(this.drawPoly(this.board.drawingData, false));
+          }.bind(this));
+        },
+        addPolygon: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addPolygon');
+          } else if (e.type == 'click') {
+            this.board.drawingData.push(this.board.current_c);
+            this.board.previews.splice(0, 1, this.drawPoly(this.board.drawingData, false));
+            var drawingData = _.clone(this.board.drawingData);
+            this.board.previews.splice(1, 1, this.drawPoly([_.first(drawingData), _.last(drawingData)], false, { 'stroke-dasharray': '5 5' }));
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length > 0) {
+              var drawingData = _.clone(this.board.drawingData);
+              drawingData.push(this.board.current_c);
+              this.board.previews.splice(2, 1, this.drawPoly(drawingData, true, { 'stroke-opacity': 0.5, 'stroke-dasharray': '1 2' }));
+            }
+          }
+          keyboardJS.off('esc');
+          keyboardJS.on('esc', function() {
+            this.removePreview(this.drawPoly(this.board.drawingData, true));
+          }.bind(this));
+        },
+        addQuadraBy2: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addQuadraBy2');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawQuadra(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 1) this.board.previews.splice(0, 1, this.drawQuadra([this.board.drawingData[0], this.board.current_c]));
+          }
+        },
+        addQuadraBy3: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addQuadraBy3');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 2) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawQuadra(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 2) this.board.previews.splice(0, 1, this.drawQuadra([this.board.drawingData[0], this.board.drawingData[1], this.board.current_c]));
+          }
+        },
+        addCubicBy2: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addCubicBy2');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawCubic(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 1) this.board.previews.splice(0, 1, this.drawCubic([this.board.drawingData[0], this.board.current_c]));
+          }
+        },
+        addCubicByK: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addCubicByK');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+              var k = Number(prompt('변곡점의 기울기를 입력해주세요'));
+              this.board.drawingData.push(null);
+              this.board.drawingData.push(k);
+              this.board.previews.splice(0, 1, this.drawLine([this.board.drawingData[0], this.board.drawingData[2]], false, { 'stroke-opacity': 0.5, 'stroke-dasharray': '1 2' }));
+            } else if (this.board.drawingData.length == 3) {
+              this.board.drawingData.splice(1, 1, this.board.current_c);
+              this.removePreview(this.drawCubic(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 3) this.board.previews.splice(1, 1, this.drawCubic([this.board.drawingData[0], this.board.current_c, this.board.drawingData[2]]));
+          }
+        },
+        addCubicByDraggedK: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addCubicByDraggedK');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 2) {
+              var c1 = this.board.drawingData[0];
+              var k = (this.board.current_c[1] - c1[1]) / (this.board.current_c[0] - c1[0]);
+              this.board.drawingData.push(k);
+              this.removePreview(this.drawCubic(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 2) {
+              var c1 = this.board.drawingData[0];
+              var k = (this.board.current_c[1] - c1[1]) / (this.board.current_c[0] - c1[0]);
+              this.board.previews.splice(0, 1, this.drawLine([this.board.drawingData[0], k], false, { 'stroke-opacity': 0.5, 'stroke-dasharray': '1 2' }));
+              this.board.previews.splice(1, 1, this.drawCubic([this.board.drawingData[0], this.board.drawingData[1], k]));
+            }
+          }
+        },
+        addCubicBy3: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addCubicBy3');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 2) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawCubic(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 2) this.board.previews.splice(0, 1, this.drawCubic([this.board.drawingData[0], this.board.drawingData[1], this.board.current_c]));
+          }
+        },
+        addCubicBy4: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addCubicBy4');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 2) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 3) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawCubic(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 3) this.board.previews.splice(0, 1, this.drawCubic([this.board.drawingData[0], this.board.drawingData[1], this.board.drawingData[2], this.board.current_c]));
+          }
+        },
+        addQuarticBy5: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addQuarticBy5');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 2) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 3) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 4) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawQuartic(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 4) this.board.previews.splice(0, 1, this.drawQuartic([this.board.drawingData[0], this.board.drawingData[1], this.board.drawingData[2], this.board.drawingData[3], this.board.current_c]));
+          }
+        },
+        addQuarticBy3: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addQuarticBy3');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 2) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawQuartic(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 2) this.board.previews.splice(0, 1, this.drawQuartic([this.board.drawingData[0], this.board.drawingData[1], this.board.current_c]));
+          }
+        },
+        addQuarticByK: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addQuarticByK');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+              var k = Number(prompt('변곡점의 기울기를 입력해주세요'));
+              this.board.drawingData.push(null);
+              this.board.drawingData.push(k);
+            } else if (this.board.drawingData.length == 3) {
+              this.board.drawingData.splice(1, 1, this.board.current_c);
+              this.removePreview(this.drawQuartic(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 3) {
+              this.board.previews.splice(0, 1, this.drawLine([this.board.current_c, this.board.drawingData[2]], false, { 'stroke-opacity': 0.5, 'stroke-dasharray': '1 2' }));
+              this.board.previews.splice(1, 1, this.drawQuartic([this.board.drawingData[0], this.board.current_c, this.board.drawingData[2]]));
+            }
+          }
+        },
+        addQuarticByDraggedK: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addQuarticByDraggedK');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 2) {
+              var c2 = this.board.drawingData[1];
+              var k = (this.board.current_c[1] - c2[1]) / (this.board.current_c[0] - c2[0]);
+              this.board.drawingData.push(k);
+              this.removePreview(this.drawQuartic(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 2) {
+              var c2 = this.board.drawingData[1];
+              var k = (this.board.current_c[1] - c2[1]) / (this.board.current_c[0] - c2[0]);
+              this.board.previews.splice(0, 1, this.drawLine([c2, k], false, { 'stroke-opacity': 0.5, 'stroke-dasharray': '1 2' }));
+              this.board.previews.splice(1, 1, this.drawQuartic([this.board.drawingData[0], this.board.drawingData[1], k]));
+            }
+          }
+        },
+        addCircleByR: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addCircleByR');
+            var r = Number(prompt('반지름을 입력해주세요'));
+            this.board.drawingData.push(null);
+            this.board.drawingData.push(r);
+          } else if (e.type == 'click') {
+            this.board.drawingData.splice(0, 1, this.board.current_c);
+            this.removePreview(this.drawCircle(this.board.drawingData));
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 2) {
+              var r = this.board.drawingData[1];
+              this.board.previews.splice(0, 1, this.drawText(this.board.current_c, '넓이:' + (r ** 2 * Math.PI).toFixed(2), 'below', { 'font-size': 10, 'fill': 'lightgrey' }));
+              this.board.previews.splice(1, 1, this.drawCircle([this.board.current_c, r]));
+            }
+          }
+        },
+        addCircleBy2: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addCircleBy2');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawCircle(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 1) {
+              var circle = this.drawCircle([this.board.drawingData[0], this.board.current_c]),
+                  c = circle[1], r = circle[2];
+              this.board.previews.splice(0, 1, this.drawLine([this.board.drawingData[0], this.board.current_c], true, { 'stroke-opacity': 0.5, 'stroke-dasharray': '1 2' }));
+              this.board.previews.splice(1, 1, this.drawText(c, '중점:' + c[0].toFixed(2) + ',' + c[1].toFixed(2), 'above', { 'font-size': 10, 'fill': 'lightgrey' }));
+              this.board.previews.splice(2, 1, this.drawText(c, '반지름:' + r.toFixed(2), 'below', { 'font-size': 10, 'fill': 'lightgrey' }));
+              this.board.previews.splice(3, 1, this.drawText([c[0], c[1] - 1], '넓이:' + (r ** 2 * Math.PI).toFixed(2), 'above', { 'font-size': 10, 'fill': 'lightgrey' }));
+              this.board.previews.splice(4, 1, circle);
+            }
+          }
+        },
+        addCircleBy3: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addCircleBy3');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 2) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawCircle(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 2) {
+              var circle = this.drawCircle([this.board.drawingData[0], this.board.drawingData[1], this.board.current_c]),
+                  c = circle[1], r = circle[2];
+              this.board.previews.splice(0, 1, this.drawDot(c));
+              this.board.previews.splice(1, 1, this.drawText(c, '중점:' + c[0].toFixed(2) + ',' + c[1].toFixed(2), 'above', { 'font-size': 10, 'fill': 'lightgrey' }));
+              this.board.previews.splice(2, 1, this.drawText(c, '반지름:' + r.toFixed(2), 'below', { 'font-size': 10, 'fill': 'lightgrey' }));
+              this.board.previews.splice(3, 1, this.drawText([c[0], c[1] - 1], '넓이:' + (r ** 2 * Math.PI).toFixed(2), 'above', { 'font-size': 10, 'fill': 'lightgrey' }));
+              this.board.previews.splice(4, 1, circle);
+            }
+          }
+        },
+        addEllipseBy3: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addEllipseBy3');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 2) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawEllipse(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 2) this.board.previews.splice(0, 1, this.drawEllipse([this.board.drawingData[0], this.board.drawingData[1], this.board.current_c]));
+          }
+        },
+        addEllipseByDis: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addEllipseByDis');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+              var a = Number(prompt('거리를 입력해주세요'));
+              this.board.drawingData.push(null);
+              this.board.drawingData.push(a);
+              this.board.previews.splice(0, 1, ['makeCircle', this.board.drawingData[0], a, { 'stroke': 'none', 'fill': 'lightgrey', 'fill-opacity': 0.25 }]);
+            } else if (this.board.drawingData.length == 3) {
+              this.board.drawingData.splice(1, 1, this.board.current_c);
+              this.removePreview(this.drawEllipse(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 3) this.board.previews.splice(1, 1, this.drawEllipse([this.board.drawingData[0], this.board.current_c, this.board.drawingData[2]]));
+          }
+        },
+        addHyperbolaByDis: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addHyperbolaByDis');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+              var a = Number(prompt('거리를 입력해주세요'));
+              this.board.drawingData.push(null);
+              this.board.drawingData.push(a);
+            } else if (this.board.drawingData.length == 3) {
+              this.board.drawingData.splice(1, 1, this.board.current_c);
+              this.removePreview(this.drawHyperbola(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 3) {
+              this.board.previews.splice(0, 1, this.drawHyperbola([this.board.drawingData[0], this.board.current_c, this.board.drawingData[2]]));
+            }
+          }
+        },
+        addHyperbolaBy3: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addHyperbolaBy3');
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 2) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawHyperbola(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 2) this.board.previews.splice(0, 1, this.drawHyperbola([this.board.drawingData[0], this.board.drawingData[1], this.board.current_c]));
+          }
+        },
+        addStandardNorm: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addStandardNorm');
+            // var avg = Number(prompt('평균 입력'));
+            // var sd = Number(prompt('표준편차 입력'));
+            // this.removePreview(this.drawStandardNorm([avg, sd]));
+            if (confirm('정규분포표 VIEW로 전환하시겠어요?')) { this.board.square = 0, this.board.ymin = 0, this.board.ymax = 0.5, this.board.xmin = -3, this.board.xmax = 3, this.board.dy = 0.1, this.board.dx = 1, this.board.gdy = 0.1; }
+          } else if (e.type == 'click') {
+            if (this.board.drawingData.length == 0) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 1) {
+              this.board.drawingData.push(this.board.current_c);
+            } else if (this.board.drawingData.length == 2) {
+              this.board.drawingData.push(this.board.current_c);
+              this.removePreview(this.drawStandardNorm(this.board.drawingData));
+            }
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 0) {
+              this.board.previews.splice(0, 1, this.drawLine([this.board.current_c, Infinity], false, { 'stroke-opacity': 0.5 }));
+            } else if (this.board.drawingData.length == 2) {
+              this.board.previews.splice(1, 1, this.drawStandardNorm([this.board.drawingData[0], this.board.drawingData[1], this.board.current_c]));
+            }
+          }
+        },
+        addFormula: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addFormula');
+            var equation = prompt('수식을 입력하세요');
+            if (!equation) return this.removePreview();
+            if (equation.indexOf('y=') < 0 && equation.indexOf('x=') < 0) equation = 'y=' + equation;
+            this.removePreview(['makePlot', equation]);
+          }
+        },
+        addText: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addText');
+            var content = prompt('내용을 입력하세요');
+            if (!content) return this.removePreview();
+            this.board.drawingData.push(null);
+            this.board.drawingData.push(content);
+          } else if (e.type == 'click') {
+            this.board.drawingData.splice(0, 1, this.board.current_c);
+            this.removePreview(this.drawText(this.board.drawingData[0], this.board.drawingData[1]));
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 2) this.board.previews.splice(0, 1, this.drawText(this.board.current_c, this.board.drawingData[1]));
+          }
+        },
+        addKatex: function(e) {
+          if (!this.board.isDrawing) {
+            this.initPreview('addKatex');
+            var content = prompt('수식을 입력하세요');
+            try {
+              content = katex.renderToString(content);
+            } catch (err) {
+              return this.removePreview();
+            }
+            var elem = document.createElement('span');
+            elem.style.display = 'inline-block';
+            elem.innerHTML = content;
+            document.body.append(elem);
+            var size = [elem.getBoundingClientRect().width, elem.getBoundingClientRect().height];
+            elem.remove();
+            this.board.drawingData.push(null);
+            this.board.drawingData.push(content);
+            this.board.drawingData.push(size);
+          } else if (e.type == 'click') {
+            this.board.drawingData.splice(0, 1, this.board.current_c);
+            this.removePreview(this.drawKatex(this.board.drawingData[0], this.board.drawingData[1], this.board.drawingData[2]));
+          } else if (e.type == 'mousemove') {
+            if (this.board.drawingData.length == 3) this.board.previews.splice(0, 1, this.drawKatex(this.board.current_c, this.board.drawingData[1], this.board.drawingData[2]));
+          }
+        },
+        drawDot: function(data = [], additional_options = {}) {
+          return ['makeDot', data, additional_options];
+        },
+        drawLine: function(data = [], is_segment, additional_options = {}) {
+          return ['makeLine', data, is_segment, additional_options];
+        },
+        drawPoly: function(data = [], is_closed, additional_options = {}) {
+          return ['makePoly', data, is_closed, additional_options];
+        },
+        drawText: function(data = [], content, direction, additional_options = {}) {
+          return ['makeText', data, content, direction, additional_options];
+        },
+        drawKatex: function(data = [], content, size, additional_options = {}) {
+          return ['makeKatex', data, content, size, additional_options];
+        },
+        drawQuadra: function(data = [], additional_options = {}) {
+          var e = 'y=';
+          if (data.length == 2) { // 2차 방정식, 꼭지점과 한 점
+            var xc = data[0][0], yc = data[0][1],
+                x1 = data[1][0], y1 = data[1][1];
+            if (_.contains([xc, yc, x1, y1], undefined)) return false;
+            e += '(' + (y1 - yc) + '*pow((' + this.subtract('x', xc) + '),2))/(pow(' + (x1 - xc) + ',2))+' + yc;
+          } else if (data.length == 3) { // 2차 방정식, 세 점
+            var x1 = data[0][0], y1 = data[0][1],
+                x2 = data[1][0], y2 = data[1][1],
+                x3 = data[2][0], y3 = data[2][1];
+            if (_.contains([x1, y1, x2, y2, x3, y3], undefined)) return false;
+            e += '((' + y3 + '*(' + this.subtract('x', x1) + ')*(' + this.subtract('x', x2) + '))/(' + ((x3 - x1) * (x3 - x2)) + '))+';
+            e += '((' + y2 + '*(' + this.subtract('x', x1) + ')*(' + this.subtract('x', x3) + '))/(' + ((x2 - x1) * (x2 - x3)) + '))+';
+            e += '((' + y1 + '*(' + this.subtract('x', x2) + ')*(' + this.subtract('x', x3) + '))/(' + ((x1 - x2) * (x1 - x3)) + '))';
+          } else {
+            return console.warn('데이터를 정확히 입력해주세요');
+          }
+          return ['makePlot', e, null, additional_options];
+        },
+        drawCubic: function(data = [], additional_options = {}) {
+          var e = 'y=';
+          if (data.length == 2) { // 3차 방정식, 극대점과 극소점
+            var xM = data[0][0], yM = data[0][1],
+                xm = data[1][0], ym = data[1][1],
+                xc = (xM + xm) / 2,
+                yc = (yM + ym) / 2,
+                a = (yc - yM) / (2 * Math.pow((xM - xc), 3)),
+                b = -3 * (yc - yM) / (2 * (xM - xc));
+            if (_.contains([a, b, xc, yc], undefined)) return false;
+            e += a + '*pow((' + this.subtract('x', xc) + '),3)+' + b + '*(' + this.subtract('x', xc) + ')+' + yc;
+          } else if (data.length == 3 && typeof data[2] == 'number') { // 3차 방정식, 변곡점, 변곡점의 기울기와 한 점
+            var xc = data[0][0], yc = data[0][1],
+                x1 = data[1][0], y1 = data[1][1],
+                k = data[2];
+            if (_.contains([k, xc, yc, x1, y1], undefined)) return false;
+            if (Math.abs(k) == Infinity || (xc == x1 && yc == y1)) return false;
+            e += (y1 - yc - (k * (x1 - xc)))/(Math.pow((x1 - xc),3)) + '*pow((' + this.subtract('x', xc) + '),3)+' + k + '*(' + this.subtract('x', xc) + ')+' + yc;
+          } else if (data.length == 3 && typeof data[2] == 'object') { // 3차 방정식, 변곡점과 두 점
+            var xc = data[0][0], yc = data[0][1],
+                x1 = data[1][0], y1 = data[1][1],
+                x2 = data[2][0], y2 = data[2][1],
+                a = (((y1 - yc) * (x2 - xc)) - ((y2 - yc) * (x1 - xc))) / ((x1 - x2) * (x1 - xc) * (x2 - xc) * (x1 + x2 - (2 * xc))),
+                b = (y1 - yc) / (x1 - xc) - a * Math.pow((x1 - xc), 2);
+            if (_.contains([a, b, xc, yc, x1, y1, x2, y2], undefined)) return false;
+            e += a + '*pow((' + this.subtract('x', xc) + '),3)+' + b + '*(' + this.subtract('x', xc) + ')+' + yc;
+          } else if (data.length == 4) { // 3차 방정식, 네 점
+            var x1 = data[0][0], y1 = data[0][1],
+                x2 = data[1][0], y2 = data[1][1],
+                x3 = data[2][0], y3 = data[2][1],
+                x4 = data[3][0], y4 = data[3][1];
+            if (_.contains([x1, y1, x2, y2, x3, y3, x4, y4], undefined)) return false;
+            e += '((' + y4 + '*('+ this.subtract('x', x1) +')*('+ this.subtract('x', x2) +')*('+ this.subtract('x', x3) +'))/(' + ((x4 - x1) * (x4 - x2) * (x4 - x3)) + '))+';
+            e += '((' + y3 + '*('+ this.subtract('x', x1) +')*('+ this.subtract('x', x2) +')*('+ this.subtract('x', x4) +'))/(' + ((x3 - x1) * (x3 - x2) * (x3 - x4)) + '))+';
+            e += '((' + y2 + '*('+ this.subtract('x', x1) +')*('+ this.subtract('x', x3) +')*('+ this.subtract('x', x4) +'))/(' + ((x2 - x1) * (x2 - x3) * (x2 - x4)) + '))+';
+            e += '((' + y1 + '*('+ this.subtract('x', x2) +')*('+ this.subtract('x', x3) +')*('+ this.subtract('x', x4) +'))/(' + ((x1 - x2) * (x1 - x3) * (x1 - x4)) + '))';
+          } else {
+            return console.warn('데이터를 정확히 입력해주세요');
+          }
+          return ['makePlot', e, null, additional_options];
+        },
+        drawQuartic: function(data = [], additional_options = {}) {
+          var e = 'y=';
+          if (data.length == 5) { // 4차 방정식, 다섯 점
+            var x1 = data[0][0], y1 = data[0][1],
+                x2 = data[1][0], y2 = data[1][1],
+                x3 = data[2][0], y3 = data[2][1],
+                x4 = data[3][0], y4 = data[3][1],
+                x5 = data[4][0], y5 = data[4][1];
+            if (_.contains([x1, y1, x2, y2, x3, y3, x4, y4, x5, y5], undefined)) return false;
+            e += '((' + y5 + '*('+ this.subtract('x', x1) +')*('+ this.subtract('x', x2) +')*('+ this.subtract('x', x3) +')*('+ this.subtract('x', x4) +'))/(' + ((x5 - x1) * (x5 - x2) * (x5 - x3) * (x5 - x4)) + '))+';
+            e += '((' + y4 + '*('+ this.subtract('x', x1) +')*('+ this.subtract('x', x2) +')*('+ this.subtract('x', x3) +')*('+ this.subtract('x', x5) +'))/(' + ((x4 - x1) * (x4 - x2) * (x4 - x3) * (x4 - x5)) + '))+';
+            e += '((' + y3 + '*('+ this.subtract('x', x1) +')*('+ this.subtract('x', x2) +')*('+ this.subtract('x', x4) +')*('+ this.subtract('x', x5) +'))/(' + ((x3 - x1) * (x3 - x2) * (x3 - x4) * (x3 - x5)) + '))+';
+            e += '((' + y2 + '*('+ this.subtract('x', x1) +')*('+ this.subtract('x', x3) +')*('+ this.subtract('x', x4) +')*('+ this.subtract('x', x5) +'))/(' + ((x2 - x1) * (x2 - x3) * (x2 - x4) * (x2 - x5)) + '))+';
+            e += '((' + y1 + '*('+ this.subtract('x', x2) +')*('+ this.subtract('x', x3) +')*('+ this.subtract('x', x4) +')*('+ this.subtract('x', x5) +'))/(' + ((x1 - x2) * (x1 - x3) * (x1 - x4) * (x1 - x5)) + '))';
+          } else if (data.length == 3 && typeof data[2] == 'object') { // 4차 방정식, 세 극점, 단 세번째 극점의 지정한 y좌표는 무시됨
+            var x1 = data[0][0], y1 = data[0][1],
+                x2 = data[1][0], y2 = data[1][1],
+                x3 = data[2][0], y3 = data[2][1],
+                a = (y1 - y2) / ((3 * ((x1 ** 4) - (x2 ** 4))) - (4 * (x1 + x2 + x3) * (x1 ** 3 - x2 ** 3)) + (6 * (x1 * x2 + x2 * x3 + x3 * x1) * (x1 **2 - x2 ** 2)) - (12 * x1 * x2 * x3 * (x1 - x2))),
+                b = y1 - a * (3 * (x1 ** 4) - (4 * (x1 ** 3) * (x1 + x2 + x3)) + (6 * (x1 ** 2) * (x1 * x2 + x2 * x3 + x3 * x1)) - (12 * (x1 ** 2) * x2 * x3));
+            if (_.contains([a ,b, x1, y1, x2, y2, x3, y3], undefined)) return false;
+            e += a + '*(3*(x**4)-(4*(' + (x1 + x2 + x3) + ')*(x**3))+(6*(' + (x1 * x2 + x2 * x3 + x3 * x1) + ')*(x**2))-(12*' + (x1 * x2 * x3) + '*x))+' + b;
+          } else if (data.length == 3 && typeof data[2] == 'number') { // 4차 방정식, 꼭지점, 변곡점과 기울기
+            var x1 = data[0][0], y1 = data[0][1],
+                x2 = data[1][0], y2 = data[1][1],
+                k = data[2], a, b, c, d;
+            if (_.contains([k, x1, y1, x2, y2], undefined)) return false;
+            if (Math.abs(k) == Infinity || x1 == x2 || y1 == y2) return false;
+            d = (2 * (y1 - y2) * (2 * x1 + x2) - k * (x1 - x2) * (3 * x1 + x2)) / (2 * (3 * (y1 - y2) - 2 * k * (x1 - x2))),
+            a = (-1) * (((3 * y1) - (3 * y2) - (2 * k * x1) + (2 * k * x2)) / ((x1 - x2) ** 4))
+            b = (6 * a * (x2 + d) * (x1 ** 2)) - (4 * a * (x1 ** 3)) - 12 * a * d * x1 * x2,
+            c = y1 - (a * (x1 ** 4)) + (2 * a * (x2 + d) * (x1 ** 3)) - (6 * a * (x1 ** 2) * x2 * d) - (b * x1);
+            if (d == 'Infinity') return false;
+            e += a + '*(x**4)+' + (-2 * a * (x2 + d)) + '*(x**3)+' + (6 * a * x2 * d) + '*(x**2)+' + b + '*x+' + c;
+          } else {
+            return console.warn('데이터를 정확히 입력해주세요');
+          }
+          return ['makePlot', e, null, additional_options];
+        },
+        drawCircle: function(data = [], additional_options = {}) {
+          var xc, yc, r;
+          if (data.length == 2 && typeof data[1] == 'number') { // 원, 중점과 반지름
+            xc = data[0][0], yc = data[0][1], r = data[1];
+            if (_.contains([xc, yc, r], undefined)) return false;
+          } else if (data.length == 2 && typeof data[1] == 'object') { // 원, 중점과 한 점
+            xc = data[0][0], yc = data[0][1];
+            var x1 = data[1][0], y1 = data[1][1];
+            if (_.contains([xc, yc, x1, y1], undefined)) return false;
+            r = Math.sqrt(((x1 - xc) ** 2) + ((y1 - yc) ** 2));
+          } else if (data.length == 3) { // 원, 세 점
+            var x1 = data[0][0], y1 = data[0][1],
+                x2 = data[1][0], y2 = data[1][1],
+                x3 = data[2][0], y3 = data[2][1];
+            if (_.contains([x1, y1, x2, y2, x3, y3], undefined)) return false;
+            if (y1 == y2 && y2 == y3 && y3 == y1) {
+              return false;
+            } else if (y1 == y2) {
+              x2 = data[2][0], y2 = data[2][1],
+              x3 = data[1][0], y3 = data[1][1];
+            }
+            var d = (x2 - x1) / (y2 - y1);
+            xc = ((y3 - y1) * (y2 - y1) * (y3 - y2) + (y2 - y1) * (x3 ** 2 - x2 ** 2) - (y3 - y2) * (x2 ** 2 - x1 ** 2)) / (2 * (y2 - y1) * (x3 - x2) - 2 * (y3 - y2) * (x2 - x1)),
+            yc = (y1 + y2) / 2 - d * (xc - (x1 + x2) / 2),
+            r = Math.sqrt(((x1 - xc) ** 2) + ((y1 - yc) ** 2));
+          } else {
+            return console.warn('데이터를 정확히 입력해주세요');
+          }
+          additional_options['stroke'] = this.style.stroke.color;
+          additional_options['stroke-width'] = this.style.stroke.width;
+          additional_options['stroke-dasharray'] = this.style.stroke.dash;
+          additional_options['stroke-opacity'] = this.style.stroke.opacity;
+          additional_options['fill'] = this.style.fill.color;
+          additional_options['fill-opacity'] = this.style.fill.opacity;
+          return ['makeCircle', [xc, yc], r, additional_options];
+        },
+        drawEllipse: function(data = [], additional_options = {}) {
+          var e = 'y=', xc, yc, rx, ry, dis, deg;
+          if (data.length == 3) {
+            var x1 = data[0][0], y1 = data[0][1], x2 = data[1][0], y2 = data[1][1];
+            if (_.contains([x1, y1, x2, y2], undefined)) return false;
+            xc = (x1 + x2) / 2,
+            yc = (y1 + y2) / 2,
+            dis = Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2) / 2;
+            if (typeof data[2] == 'number') { // 타원, 초점과 거리의 합 [[x1,y1], [x2,y2], 2rx]
+              rx = data[2] / 2;
+              if (_.contains([rx], undefined)) return false;
+            } else if (typeof data[2] == 'object') { // 타원, 초점과 한 점 [[x1,y1], [x2,y2], [x3,y3]]
+              var x3 = data[2][0], y3 = data[2][1];
+              if (_.contains([x3, y3], undefined)) return false;
+              rx = (Math.sqrt((x3 - x1) ** 2 + (y3 - y1) ** 2) + Math.sqrt((x3 - x2) ** 2 + (y3 - y2) ** 2)) / 2;
+            }
+            ry = Math.sqrt(rx ** 2 - dis ** 2);
+            deg = - Math.atan((y2 - y1) / (x2 - x1)) * 180 / Math.PI;
+          } else {
+            return console.warn('데이터를 정확히 입력해주세요');
+          }
+          if (rx <= dis) return false;
+          return ['makeEllipse', [xc, yc], [rx, ry], deg, additional_options];
+        },
+        drawHyperbola: function(data = [], additional_options = {}) {
+          var e1 = 'x=', e2 = 'x=-', p = '',
+              a, c, r, cp, cx, cy;
+          if (data.length == 3 && typeof data[2] == 'number') { // 쌍곡선, 초점과 거리의 합 2a
+            var x1 = data[0][0], y1 = data[0][1], x2 = data[1][0], y2 = data[1][1];
+            a = data[2] / 2,
+            c = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) / 2;
+          } else if (data.length == 3 && typeof data[2] == 'object') { // 쌍곡선, 초점과 쌍곡선 위의 한 점
+            var x1 = data[0][0], y1 = data[0][1], x2 = data[1][0], y2 = data[1][1], x3 = data[2][0], y3 = data[2][1];
+            a = Math.abs((this.getDistance(data[0], data[2]) - this.getDistance(data[1], data[2]))) / 2,
+            c = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) / 2;
+          } else {
+            return console.warn('데이터를 정확히 입력해주세요');
+          }
+          if (a >= c) return false;
+          p = 'sqrt(1+((' + this.subtract('y', ((y1 + y2) / 2)) + ')**2/(' + (this.getDistance(data[0], data[1]) ** 2 / 4 - (a ** 2))  + ')))*' + a + '+' + (x1 + x2) / 2;
+          r = - Math.atan((y2 - y1) / (x2 - x1)) * 180 / Math.PI,
+          cp = this.getPoint(this.getCenter(data[0], data[1])), cx = cp[0], cy = cp[1];
+          additional_options['transform'] = 'rotate(' + r + ' ' + cx + ' ' + cy + ')';
+          return ['makePlot', [e1 += p, e2 += p], null, additional_options];
+        },
+        drawStandardNorm: function(data = [0, 1], highlights = [], additional_options = {}) {
+          var e = 'y=', avg = data[0], sd = Math.abs(data[1]);
+          e += 'e**(-((' + this.subtract('x', avg) + ')**2)/' + (2 * (sd ** 2)) + ')/' + (sd * Math.sqrt(2 * Math.PI));
+          return ['makeStandardNorm', e, highlights, additional_options];
+        },
+        subtract: function(a,b) {
+          if (typeof a == 'number' && typeof b == 'number') {
+            return a - b;
+          } else if (typeof a == 'string' && typeof b == 'number') {
+            b = b < 0 ? '+' + -b : '-' + b;
+            return a + b;
+          } else {
+            return a.toString() + '-' + b.toString();
+          }
+        },
+        getPoint: function(c) {
+          var x = c[0], y = c[1];
+          return [(x * this.xunitlength + this.origin[0]).toFixed(2), (this.board.height - y * this.yunitlength - this.origin[1]).toFixed(2)];
+        },
+        getCenter: function(c1, c2) {
+          var x1 = c1[0], y1 = c1[1], x2 = c2[0], y2 = c2[1];
+          return [(x1 + x2) / 2, (y1 + y2) / 2];
+        },
+        getSlope: function(c1, c2) {
+          var x1 = c1[0], y1 = c1[1], x2 = c2[0], y2 = c2[1];
+          if (x1 == x2 && y1 == y2) {
+            return false;
+          } else if (x1 == x2) {
+            return Infinity;
+          } else if (y1 == y2) {
+            return 0;
+          } else {
+            return (y1 - y2) / (x1 - x2);
+          }
+        },
+        getDistance: function(c1, c2) {
+          var x1 = c1[0], y1 = c1[1], x2 = c2[0], y2 = c2[1];
+          if (x1 == x2 && y1 == y2) {
+            return 0;
+          } else if (x1 == x2) {
+            return Math.abs(y1 - y2);
+          } else if (y1 == y2) {
+            return Math.abs(x1 - x2);
+          } else {
+            return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+          }
+        },
+        resetStyle: function() {
+          this.style.stroke = { color: 'grey', width: 1, dash: 'none', opacity: 1 },
+          this.style.fill = { color: 'none', opacity: 1 }
+        }
+      },
+      mounted: function() {
+        // $('select').dropdown();
+      }
+    });
+    $('#graph_screen').modal({
+      autofocus: false,
+      observeChanges: true,
+      closable: false,
+      keyboardShortcuts: false,
+      onVisible: function(){
+      },
+      onHidden: function(){
+      },
+      onApprove: function(){
+        var result = $('#graph_preview').html();
+        $('#graph_target').html(result).removeAttr('id').attr('draggable', true).attr('contenteditable', false);
+      }
+    }).modal('show');
+  }

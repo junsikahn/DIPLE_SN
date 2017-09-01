@@ -14,6 +14,7 @@
 //= require jquery_ujs
 //= require jquery.remotipart
 //= require turbolinks
+//= require underscore
 //= require semantic-ui
 //= require jquery_nested_form
 //= require noty
@@ -28,3 +29,9 @@
 //= require wysiwyg
 //= require jQuery-contextMenu
 //= require_tree .
+
+// init underscore.js Template
+_.templateSettings = {
+  interpolate: /\{\{\=(.+?)\}\}/g,
+  evaluate: /\{\{(.+?)\}\}/g
+};

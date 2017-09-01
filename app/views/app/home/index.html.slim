@@ -288,38 +288,50 @@ javascript:
       }
     );
 
+    var col = test_screen.find('.problems_column');
+    var mh = col.outerHeight();
+    var problems = col.children();
+    problems.css({transform: ''});
     if ($(window).innerWidth() > 1480) {
-      var seg = test_screen.find('.problems_seg');
-      var row = test_screen.find('.problems_row');
-      var col = test_screen.find('.problems_column');
-      var ch = seg.outerHeight();
-      var mh = col.outerHeight();
-      var cp = Math.ceil((-parseInt(row.css('transform').split(',')[4]) || 0)/540);
-      var mp = Math.ceil(mh/ch);
-      seg.scrollTop(0);
-      row.css({width: (50 * mp) + '%'});
-      if (mp - cp < 2) row.css({transform: 'translateX(-' + (540 * (mp - 2)) + 'px)'});
-      col.not(':first').remove();
-      test_screen.find('.problems_row_divider').remove();
-      for (var i=1; i<mp; i++) {
-        col.first().after(col.first().clone());
-        col.first().after('<div class="problems_row_divider"></div>');
-      }
-
-      var cols = test_screen.find('.problems_column');
-      $.each(cols, function(index, value){
-        $(this).css({transform: 'translateY(-' + (ch * index) + 'px)'})
+      _.each(problems, function(problem){
+        var page = Math.floor($(problem).position().left / 540 / 2);
+        $(problem).css({transform: 'translate(-' + (540 * 2 * page) + 'px, ' + (mh * page) + 'px'});
       });
-
-      var left_icon = $('.problems_header').find('a.ui.icon.button').eq(0);
-      var right_icon = $('.problems_header').find('a.ui.icon.button').eq(1);
-      left_icon.css({cursor: 'w-resize'}).off('click', testFormPrev).on('click', testFormPrev);
-      right_icon.css({cursor: 'e-resize'}).off('click', testFormNext).on('click', testFormNext);
     } else {
-      test_screen.find('.problems_row').css({ transform: '', width: '' });
-      test_screen.find('.problems_column').not(':first').remove();
-      test_screen.find('.problems_row_divider').remove();
     }
+
+    // if ($(window).innerWidth() > 1480) {
+    //   var seg = test_screen.find('.problems_seg');
+    //   var row = test_screen.find('.problems_row');
+    //   var col = test_screen.find('.problems_column');
+    //   var ch = seg.outerHeight();
+    //   var mh = col.outerHeight();
+    //   var cp = Math.ceil((-parseInt(row.css('transform').split(',')[4]) || 0)/540);
+    //   var mp = Math.ceil(mh/ch);
+    //   seg.scrollTop(0);
+    //   row.css({width: (50 * mp) + '%'});
+    //   if (mp - cp < 2) row.css({transform: 'translateX(-' + (540 * (mp - 2)) + 'px)'});
+    //   col.not(':first').remove();
+    //   test_screen.find('.problems_row_divider').remove();
+    //   for (var i=1; i<mp; i++) {
+    //     col.first().after(col.first().clone());
+    //     col.first().after('<div class="problems_row_divider"></div>');
+    //   }
+
+    //   var cols = test_screen.find('.problems_column');
+    //   $.each(cols, function(index, value){
+    //     $(this).css({transform: 'translateY(-' + (ch * index) + 'px)'})
+    //   });
+
+    //   var left_icon = $('.problems_header').find('a.ui.icon.button').eq(0);
+    //   var right_icon = $('.problems_header').find('a.ui.icon.button').eq(1);
+    //   left_icon.css({cursor: 'w-resize'}).off('click', testFormPrev).on('click', testFormPrev);
+    //   right_icon.css({cursor: 'e-resize'}).off('click', testFormNext).on('click', testFormNext);
+    // } else {
+    //   test_screen.find('.problems_row').css({ transform: '', width: '' });
+    //   test_screen.find('.problems_column').not(':first').remove();
+    //   test_screen.find('.problems_row_divider').remove();
+    // }
 
     $.each($('.exm_seg'), function(p_index, seg){
       var problem_order = $(seg).data('problem-order');

@@ -176,16 +176,16 @@
 }
 #test_screen > .content {
   height: 100% !important; padding: 20px !important;
-  .test_wrapper { max-width: 1442px; margin: 0 auto; height: 100%; overflow: hidden; border: 1px solid lightgrey; border-radius: .3em;
+  .test_wrapper { margin: 0 auto; height: 100%; overflow: hidden; border: 1px solid lightgrey; border-radius: .3em;
     .problems_header { height: 50px; overflow: scroll; border-top: 0; }
     .problems_wrapper, .answers_wrapper { position: relative; display: inline-block; height: 100%; vertical-align: top; overflow: hidden; }
-    .problems_wrapper { width: 75%; box-shadow: 1px 0 lightgrey;
-      .problems_seg { width: 100%; height: calc(100% - 50px); background-color: #fff; overflow: hidden; }
-      .problems_row { min-width: 100%; height: 100%; transition: transform .25s; }
-      .problems_row_divider { display: inline-block; float: left; width: 1px; height: 100%; margin-left: -1px; background: lightgrey;}
-      .problems_column { position: relative; display: inline-block; float: left; width: 540px; padding: 20px; vertical-align: top; }
+    .problems_wrapper { box-shadow: 1px 0 lightgrey;
+      .problems_seg { width: 100%; height: calc(100% - 50px); background-color: #fff; }
+      .problems_row { position: relative; min-width: 100%; max-width: 100%; height: 100%; transition: transform .25s; }
+      .problems_row::after { content: ''; position: absolute; top: 0; left: 540px; display: inline-block; width: 1px; height: 100%; margin-left: -1px; background: lightgrey; }
+      .problems_column { position: relative; }
     }
-    .answers_wrapper { width: 25%; box-shadow: -1px 0 lightgrey;
+    .answers_wrapper { box-shadow: -1px 0 lightgrey;
       .answers_seg { height: calc(100% - 100px); background-color: #fff; overflow: scroll; -webkit-overflow-scrolling: touch;
         & > table { border-radius: 0; box-shadow: 0 1px 0 lightgrey; }
       }
@@ -220,39 +220,51 @@
   }
 }
 
-.problem_container { padding-bottom: 40px; }
-.problem_container:last-of-type { padding-bottom: 0; }
+.problem_container { width: 540px; max-width: 100%; padding: 20px; max-height: 100%; display: inline-flex; flex-direction: column; flex: 0 1 auto; }
 .problem_container img { max-width: 100%; }
-.problem_seg { overflow-x: scroll; overflow-y: hidden; }
-.exm_container { display: inline-block; width: calc(100% - 30px); padding: 3px 0; float: right; }
+.problem_seg { overflow-x: scroll; overflow-y: scroll; }
+.exm_list { display: flex; flex-wrap: wrap; }
+.exm_item { min-width: 50%; padding: 10px !important; }
+.exm_item > .ui.circular.label { margin-top: 1px; }
+.exm_container { display: inline-block; width: calc(100% - 25px); padding: 3px; float: right; }
+
+@media only screen and (min-width: 1481px) {
+  #test_screen {
+    .test_wrapper { max-width: 1442px;
+      .problems_wrapper { width: 75%;
+        .problems_seg { overflow: hidden; }
+        .problems_column { display: flex; width: 100%; height: 100%; flex-direction: column; flex-wrap: wrap; justify-content: space-between; overflow: hidden; }
+      }
+      .answers_wrapper { width: 25%; }
+    }
+  }
+}
 
 @media only screen and (min-width: 942px) and (max-width: 1480px) {
   #test_screen {
-    .test_wrapper { max-width: 902px !important;
-      .problems_wrapper { width: 60% !important;
-        .problems_seg { overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; }
-        .problems_row { min-width: 100%; max-width: 100%; }
+    .test_wrapper { max-width: 902px;
+      .problems_wrapper { width: 60%;
+        .problems_seg { overflow-y: scroll; -webkit-overflow-scrolling: touch; }
         .problems_header .ui.buttons { display: none; }
         .problems_row_divider { display: none; }
-        .problems_column { width: 100% !important; min-height: initial !important; }
+        .problems_column { display: block; width: 100%; min-height: 100%; }
       }
-      .answers_wrapper { width: 40% !important; }
+      .answers_wrapper { width: 40%; }
     }
   }
 }
 
 @media only screen and (max-width: 941px) {
   #test_screen {
-    .test_wrapper { max-width: 542px !important;
-      .problems_wrapper { width: 100% !important; height: calc(100% - 50px) !important; border-bottom: 1px solid lightgrey;
-        .problems_seg { overflow-y: scroll !important; -webkit-overflow-scrolling: touch !important; }
-        .problems_row { min-width: 100%; max-width: 100%; }
+    .test_wrapper { max-width: 542px;
+      .problems_wrapper { width: 100%; height: calc(100% - 50px) !important; border-bottom: 1px solid lightgrey;
+        .problems_seg { overflow-y: scroll; -webkit-overflow-scrolling: touch; }
         .problems_header .ui.labels { display: none; }
         .problems_header .ui.buttons { display: none; }
         .problems_row_divider { display: none; }
-        .problems_column { width: 100% !important; min-height: initial !important; }
+        .problems_column { display: block; width: 100%; min-height: 100%; }
       }
-      .answers_wrapper { width: 100% !important; height: 50px !important;
+      .answers_wrapper { width: 100%; height: 50px !important;
         form { overflow: scroll; -webkit-overflow-scrolling: touch; }
         .problems_header { display: none; }
         .answers_seg { display: none;

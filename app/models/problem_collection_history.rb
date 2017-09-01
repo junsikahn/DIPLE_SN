@@ -6,6 +6,7 @@ class ProblemCollectionHistory < ApplicationRecord
   accepts_nested_attributes_for :problem_histories
 
   before_create :scoring
+  after_create :averaging
 
   def build_problems
     problem_collection.problems.each do |problem|
@@ -28,5 +29,9 @@ class ProblemCollectionHistory < ApplicationRecord
       problem_history.problem.correct_count += 1
       problem_history.problem.save
     end
+  end
+
+  def averaging
+    problem_collection.update_columns(avg_score: ProblemCollectionHistory.where(problem_collection_id: problem_collection_id).average(:score))
   end
 end

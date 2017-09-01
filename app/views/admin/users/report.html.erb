@@ -1,0 +1,303 @@
+<script type="text/template" id="user_report_template">
+  <div id="user_{{= user.id }}" class="clearfix" style="page-break-before: always;">
+    <img style="position: absolute; right: 0;" src="http://snacademy.co.kr/images/logo.png">
+    <h1 style="margin-top: 0;"><i class="newspaper icon"></i>{{= user.name }}<small> 학생의 일일테스트 리포트</small></h1>
+    <p> 기간 : 2017년 7월 24일 ~ 8월 15일</p>
+    <div class="ui grid" style="margin: 0;">
+      <div class="three column row">
+        {{ var wrong_words = [] }}
+        {{ var wrong_maths = [] }}
+        {{ var subjects = user.liberal ? { 1: '영어듣기', 2: '영어단어', 4: '수학나형' } : { 1: '영어듣기', 2: '영어단어', 3: '수학가형' } }}
+        {{ _.each(subjects, function(problem_source_name, problem_source_id) { }}
+          {{ var my_collection_score = my_collection_scores[problem_source_id] }}
+          <div class="column">
+            <div class="ui segment top attached">
+              <span class="ui top attached label">{{= problem_source_name }}</span>
+              <div style="position: relative; width: 100%">
+                <canvas id="graph_{{= problem_source_id }}_{{= user.id }}"></canvas>
+              </div>
+            </div>
+            <table class="ui celled multiline table bottom attached center aligned middle aligned">
+              <tbody>
+                {{ for (let i = 0, l = dates.length; i < l; i++) { }}
+                  {{ let date = dates[i] }}
+                  {{ if (i % 5 == 0) { }}
+                    <tr>
+                  {{ } }}
+                  {{ if (i <= 15) { }}
+                    <td>{{= my_collection_score[i] }}</td>
+                  {{ } else if (i == 16) { }}
+                    <td colspan="4" style="  background: rgba(34, 36, 38, 0.1); color: grey;">{{=problem_source_id == 2 ? '60점 만점' : '100점 만점'}}</td>
+                  {{ } }}
+                  {{ if ((i + 1) % 5 == 0) { }}
+                    </tr>
+                  {{ } }}
+                {{ } }}
+              </tbody>
+            </table>
+            <div class="ui list">
+              {{ var collection_count = _.filter(my_collection_score, function(value) { if (value != '') return value }).length }}
+              {{ var particapated_count = _.filter(my_collection_score, function(value) { if (typeof value == 'number') return value }).length }}
+              <div class="item">
+                <span class="ui basic label right floated content">총 {{= collection_count }}회 중 <u>{{= particapated_count }}회</u> 참여</span>
+                <span class="ui black inverted label">참여율 {{= collection_count == 0 ? '-' : Math.floor(100 * particapated_count / collection_count) }}%</span>
+              </div>
+              {{ var this_problem_histories = _.flatten(my_problem_histories[problem_source_id]) }}
+              {{ var solved_count = this_problem_histories.length }}
+              {{ var correct_count = _.where(this_problem_histories, {correct: true}).length }}
+              <div class="item">
+                <span class="ui basic label right floated content">총 {{= solved_count }}개 중 <u>{{= correct_count }}개</u> 정답</span>
+                <span class="ui black inverted label">정답율 {{= solved_count == 0 ? '-' : Math.floor(100 * correct_count / solved_count) }}%</span>
+              </div>
+            </div>
+          </div>
+          {{ if (problem_source_id == 2) { }}
+            {{ wrong_words = _.where(this_problem_histories, {correct: false}) }}
+          {{ } else if (problem_source_id == 3 || problem_source_id == 4) { }}
+            {{ wrong_maths = solved_count >= 60 ? _.where(this_problem_histories, {correct: false}) : [] }}
+          {{ } }}
+        {{ }); }}
+      </div>
+    </div>
+
+    {{ if (wrong_words.length > 0 || wrong_maths.length > 0) { }}
+      <h1 style="margin-top: 0; {{= wrong_maths.length > 0 ? 'page-break-before: always;' : '' }}"><i class="book icon"></i>{{= user.name }}<small> 학생의 오답노트</small></h1>
+      {{ if (wrong_words.length > 0) { }}
+        <div class="ui segment">
+          <h3>영단어 오답노트</h3>
+          <div class="ui labels">
+            {{ _.each(wrong_words, function(value) { }}
+              <span class="ui basic label">
+                {{= value.problem.content.replace(/\<div\>/g, '').replace(/\<\/div\>/g, '').replace(/\<br\>/g, '') }}
+                <span class="detail">{{= value.problem['exm_' + value.problem.answer].replace(/\<div\>/g, '').replace(/\<\/div\>/g, '').replace(/\<br\>/g, '') }}</span>
+              </span>
+            {{ }); }}
+          </div>
+        </div>
+      {{ } }}
+      {{ if (wrong_maths.length > 0) { }}
+        <div class="ui divider"></div>
+        <div class="ui segment">
+          <h3>수학 오답노트</h3>
+          <div class="ui grid">
+            {{ _.each(wrong_maths, function(value, index) { }}
+              {{ if (index % 2 == 0) { }}
+                <div class="ui two columns row">
+              {{ } }}
+              <div class="column">
+                <div class="problem_container clearfix" style="max-width: 500px; margin: 0 auto;">
+                  <span class="ui horizontal black label">{{= index + 1 }}</span>
+                  <div class="ui top attached black segment clearfix problem_seg">
+                    {{= value.problem.content }}
+                  </div>
+                  <div class="ui attached segment">
+                    <div class="ui very relaxed list">
+                      <div class="item">
+                        <span class="ui circular basic mini horizontal label">1</span>
+                        <div class="preview_exm_1">{{= value.problem.exm_1 }}</div>
+                      </div>
+                      <div class="item">
+                        <span class="ui circular basic mini horizontal label">2</span>
+                        <div class="preview_exm_2">{{= value.problem.exm_2 }}</div>
+                      </div>
+                      <div class="item">
+                        <span class="ui circular basic mini horizontal label">3</span>
+                        <div class="preview_exm_3">{{= value.problem.exm_3 }}</div>
+                      </div>
+                      <div class="item">
+                        <span class="ui circular basic mini horizontal label">4</span>
+                        <div class="preview_exm_4">{{= value.problem.exm_4 }}</div>
+                      </div>
+                      <div class="item">
+                        <span class="ui circular basic mini horizontal label">5</span>
+                        <div class="preview_exm_5">{{= value.problem.exm_5 }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ui attached segment problem_seg">
+                    <div class="preview_explanation">{{= value.problem.explanation }}</div>
+                  </div>
+                  <div class="ui bottom attached right aligned secondary segment problem_seg">
+                    정답은 <span class="ui circular mini horizontal label basic preview_answer">{{= value.problem.answer }}</span>입니다
+                  </div>
+                </div>
+              </div>
+              {{ if (index % 2 == 1) { }}
+                </div>
+              {{ } }}
+            {{ }); }}
+          </div>
+        </div>
+      {{ } }}
+    {{ } }}
+  </div>
+</script>
+
+<script type="text/template" id="loader_template">
+  <div id="loader_screen" class="ui modal">
+    <div class="content">
+      <div class="ui progress" id="loader">
+        <div class="bar">
+          <div class="progress"></div>
+        </div>
+        <div class="label">0 of 66 done</div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<style>
+  .preview_content,
+  .preview_explanation {
+    padding: 3px 0;
+  }
+
+  .preview_exm_1,
+  .preview_exm_2,
+  .preview_exm_3,
+  .preview_exm_4,
+  .preview_exm_5 {
+    display: inline-block;
+    width: calc(100% - 30px);
+    padding: 3px 0;
+    float: right;
+  }
+</style>
+
+<script>
+  document.querySelector('.top-header').style.display = 'none';
+  document.querySelector('.center-main').style.padding = '0';
+  var user_report_template = _.template($('#user_report_template').html());
+  var loader_template = _.template($('#loader_template').html());
+  $('.center-main').after(loader_template());
+  $('#loader_screen').modal('show');
+  $('#loader').progress({
+    total: 66,
+    text     : {
+      active: '{value} of {total} done'
+    },
+    onSuccess: function(){
+      $('#loader_screen').modal('hide');
+    }
+  });
+
+  var problem_collections = [[], [], [], [], []];
+  <% @problem_collections.each do |problem_collection| %>
+    problem_collections[<%= problem_collection.problem_source_id %>].push({
+      id: <%= problem_collection.id %>,
+      name: '<%= problem_collection.name %>',
+      day: '<%= problem_collection.test_day %>',
+      total_score: <%= problem_collection.total_score %>,
+      avg_score: <%= problem_collection.avg_score.nil? ? 'null' : problem_collection.avg_score %>
+    });
+  <% end %>
+
+  var dates = [];
+  <% (@start_date.to_date.cweek..@end_date.to_date.cweek).each do |week| %>
+    <% week_days = (@start_date.to_date..@end_date.to_date).select{|date| date.cweek == week} %>
+    <% [0,1,2,3,4].each do |index| %>
+      dates.push('<%= week_days[index] %>');
+    <% end %>
+  <% end %>
+
+  var user_id = 3;
+  function add_user_report(user_id) {
+    $.ajax({
+      url: '/admin/users/' + user_id + '/report_user',
+      dataType: 'json',
+      type: 'GET',
+      success: function(data) {
+        var subjects = data.user.liberal ? { 1: '영어듣기', 2: '영어단어', 4: '수학나형' } : { 1: '영어듣기', 2: '영어단어', 3: '수학가형' };
+        var my_collection_scores = {};
+        var my_problem_histories = {};
+        _.each(subjects, function(problem_source_name, problem_source_id) {
+          var this_problem_collections = problem_collections[problem_source_id];
+          my_collection_scores[problem_source_id] = [];
+          for (let i = 0, l = dates.length; i < l; i++) {
+            let date = dates[i],
+                this_problem_collection = _.find(this_problem_collections, {day: date});
+            if (this_problem_collection) {
+              let my_history = _.find(data.problem_collection_histories, {problem_collection_id: this_problem_collection.id});
+              my_collection_scores[problem_source_id].push(my_history ? my_history.score : '-');
+            } else {
+              my_collection_scores[problem_source_id].push(null);
+            }
+          }
+
+          my_problem_histories[problem_source_id] = [];
+          var ids = _.pluck(this_problem_collections, 'id');
+          for (let i = 0, l = ids.length; i < l; i++) {
+            let id = ids[i],
+                this_problem_collection = _.find(this_problem_collections, {id: id});
+            if (this_problem_collection) {
+              let my_history = _.where(data.problem_histories, {problem_collection_id: this_problem_collection.id});
+              my_problem_histories[problem_source_id].push(my_history ? my_history : '-');
+            } else {
+              my_problem_histories[problem_source_id].push(null);
+            }
+          }
+        });
+
+        $('.center-main').append(user_report_template({
+          user: data.user,
+          problem_collection_histories: data.problem_collection_histories,
+          my_collection_scores: my_collection_scores,
+          my_problem_histories: my_problem_histories
+        }));
+
+        renderMathInElement(document.getElementById('user_' + data.user.id),
+          {
+            delimiters: [
+              {left: "$$", right: "$$", display: true},
+              {left: "$",  right: "$",  display: false}
+            ]
+          }
+        );
+
+        var subjects = data.user.liberal ? { 1: '영어듣기', 2: '영어단어', 4: '수학나형' } : { 1: '영어듣기', 2: '영어단어', 3: '수학가형' };
+        _.each(subjects, function(problem_source_name, problem_source_id) {
+          var ctx = document.getElementById('graph_' + problem_source_id + '_' + data.user.id).getContext('2d');
+          new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: _.initial(dates, 4),
+              datasets: [{
+                label: problem_source_name,
+                data: _.initial(my_collection_scores[problem_source_id], 4),
+                fill: false,
+                borderColor: 'grey',
+                pointBackgroundColor: 'grey',
+              }, {
+                label: '평균',
+                data: _.map(problem_collections[problem_source_id], function(value){ return value['avg_score'] }),
+                borderColor: 'transparent',
+                pointBackgroundColor: 'transparent',
+                backgroundColor: 'rgba(211, 211, 211, 0.25)',
+              }]
+            },
+            options: {
+              legend: { display: false },
+              scales: {
+                xAxes: [{
+                  display: false
+                }],
+                yAxes: [{
+                  ticks: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: problem_source_id == 2 ? 60 : 100
+                  }
+                }]
+              },
+            }
+          });
+        });
+
+        user_id ++;
+        $('#loader').progress('increment');
+        if (user_id < 69) add_user_report(user_id);
+      }
+    })
+  }
+  add_user_report(user_id);
+</script>

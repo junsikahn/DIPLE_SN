@@ -16,7 +16,10 @@ Rails.application.routes.draw do
         end
       end
       resources :problems
-      resources :users
+      resources :users do
+        get :report, on: :collection
+        get :report_user, on: :member
+      end
       resources :subjects
       # rails g scaffold Admin::User --skip-migration --no-resource-route --template-engine=slim --parent=User
       root 'home#index'
