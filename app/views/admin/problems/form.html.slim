@@ -1,57 +1,63 @@
-= simple_nested_form_for @admin_problem, url: @admin_problem.new_record? ? admin_problem_collection_problems_path(@admin_problem_collection, @admin_problem) : admin_problem_collection_problem_path(@admin_problem_collection, @admin_problem), html: { id: 'problem_form' } do |f|
+= simple_nested_form_for @admin_problem, url: @admin_problem.new_record? ? admin_problems_path(@admin_problem) : admin_problem_path(@admin_problem), html: { id: 'problem_form' } do |f|
   div.ui.grid
     div.ui.column.eight.wide
       div.problem_container.clearfix
         div
-          span.ui.horizontal.black.label = "#{@admin_problem.new_record? ? Standard::ProblemCollectionToProblem.where(problem_collection_id: @admin_problem_collection.id).count + 1 : Standard::ProblemCollectionToProblem.find_by(problem_collection_id: @admin_problem_collection.id, problem_id: @admin_problem.id).order + 1}번"
+          span.ui.horizontal.black.label = "#{@admin_problem.id}"
           span.ui.horizontal.basic.label style="cursor: pointer;" onclick="$('#admin_problem_score').focus();"
-            span.preview_score 0
-            | 점
+            span.preview_score == f.object.score.to_s + '점'
         div.ui.top.attached.black.segment.clearfix.problem_seg
-          div.preview_content contenteditable="true" data-target="admin_problem_content"
+          div.preview_content contenteditable="true" data-target="admin_problem_content" == f.object.content
         div.ui.attached.segment.exm_seg
           div.ui.very.relaxed.list.exm_list
             div.item.exm_item
               span.ui.circular.basic.mini.horizontal.label 1
-              div.preview_exm_1 contenteditable="true" data-target="admin_problem_exm_1"
+              div.preview_exm_1 contenteditable="true" data-target="admin_problem_exm_1" == f.object.exm_1
             div.item.exm_item
               span.ui.circular.basic.mini.horizontal.label 2
-              div.preview_exm_2 contenteditable="true" data-target="admin_problem_exm_2"
+              div.preview_exm_2 contenteditable="true" data-target="admin_problem_exm_2" == f.object.exm_2
             div.item.exm_item
               span.ui.circular.basic.mini.horizontal.label 3
-              div.preview_exm_3 contenteditable="true" data-target="admin_problem_exm_3"
+              div.preview_exm_3 contenteditable="true" data-target="admin_problem_exm_3" == f.object.exm_3
             div.item.exm_item
               span.ui.circular.basic.mini.horizontal.label 4
-              div.preview_exm_4 contenteditable="true" data-target="admin_problem_exm_4"
-            - unless @admin_problem_collection.problem_source_id == 2
-              div.item.exm_item
-                span.ui.circular.basic.mini.horizontal.label 5
-                div.preview_exm_5 contenteditable="true" data-target="admin_problem_exm_5"
+              div.preview_exm_4 contenteditable="true" data-target="admin_problem_exm_4" == f.object.exm_4
+            div.item.exm_item
+              span.ui.circular.basic.mini.horizontal.label 5
+              div.preview_exm_5 contenteditable="true" data-target="admin_problem_exm_5" == f.object.exm_5
         div.ui.attached.secondary.segment.problem_seg
-          div.preview_explanation contenteditable="true" data-target="admin_problem_explanation"
+          div.preview_explanation contenteditable="true" data-target="admin_problem_explanation" == f.object.explanation
         div.ui.bottom.attached.right.aligned.secondary.segment.problem_seg style="cursor: pointer;" onclick="$('#admin_problem_answer').focus();"
           | 정답은&nbsp;
-          span.ui.circular.mini.horizontal.label.basic.preview_answer
+          span.ui.circular.mini.horizontal.label.basic.preview_answer == f.object.answer
           | 입니다
-      div.ui.small.basic.buttons
-        div.ui.icon.button onclick="document.execCommand('bold');"
-          i class="bold icon"
-        div.ui.icon.button onclick="document.execCommand('italic');"
-          i class="italic icon"
-        div.ui.icon.button onclick="document.execCommand('underline');"
-          i class="underline icon"
-        div.ui.icon.button onclick="document.execCommand('strikeThrough');"
-          i class="strikethrough icon"
-        div.ui.icon.button onclick="document.execCommand('superscript');"
-          i class="superscript icon"
-        div.ui.icon.button onclick="document.execCommand('subscript');"
-          i class="subscript icon"
-        div.ui.icon.button onclick="document.execCommand('justifyLeft');"
-          i class="align left icon"
-        div.ui.icon.button onclick="document.execCommand('justifyCenter');"
-          i class="align center icon"
-        div.ui.icon.button onclick="document.execCommand('justifyRight');"
-          i class="align right icon"
+        div.ui.small.basic.buttons
+          div.ui.icon.button onclick="document.execCommand('bold');"
+            i.bold.icon
+          div.ui.icon.button onclick="document.execCommand('italic');"
+            i.italic.icon
+          div.ui.icon.button onclick="document.execCommand('underline');"
+            i.underline.icon
+          div.ui.icon.button onclick="document.execCommand('strikeThrough');"
+            i.strikethrough.icon
+          div.ui.icon.button onclick="document.execCommand('superscript');"
+            i.superscript.icon
+          div.ui.icon.button onclick="document.execCommand('subscript');"
+            i.subscript.icon
+          div.ui.icon.button onclick="document.execCommand('justifyLeft');"
+            i.align.left.icon
+          div.ui.icon.button onclick="document.execCommand('justifyCenter');"
+            i.align.center.icon
+          div.ui.icon.button onclick="document.execCommand('justifyRight');"
+            i.align.right.icon
+          div.ui.icon.button
+            i.calculator.icon
+            / svg viewBox="0 0 18 18"
+            /   path fill="rgba(0, 0, 0, 0.6)" d="M11.759,2.482a2.561,2.561,0,0,0-3.53.607A7.656,7.656,0,0,0,6.8,6.2C6.109,9.188,5.275,14.677,4.15,14.927a1.545,1.545,0,0,0-1.3-.933A0.922,0.922,0,0,0,2,15.036S1.954,16,4.119,16s3.091-2.691,3.7-5.553c0.177-.826.36-1.726,0.554-2.6L8.775,6.2c0.381-1.421.807-2.521,1.306-2.676a1.014,1.014,0,0,0,1.02.56A0.966,0.966,0,0,0,11.759,2.482Z"
+            /   rect fill="rgba(0, 0, 0, 0.6)" height="1.6" rx="0.8" ry="0.8" width="5" x="5.15" y="6.2"
+            /   path fill="rgba(0, 0, 0, 0.6)" d="M13.663,12.027a1.662,1.662,0,0,1,.266-0.276q0.193,0.069.456,0.138a2.1,2.1,0,0,0,.535.069,1.075,1.075,0,0,0,.767-0.3,1.044,1.044,0,0,0,.314-0.8,0.84,0.84,0,0,0-.238-0.619,0.8,0.8,0,0,0-.594-0.239,1.154,1.154,0,0,0-.781.3,4.607,4.607,0,0,0-.781,1q-0.091.15-.218,0.346l-0.246.38c-0.068-.288-0.137-0.582-0.212-0.885-0.459-1.847-2.494-.984-2.941-0.8-0.482.2-.353,0.647-0.094,0.529a0.869,0.869,0,0,1,1.281.585c0.217,0.751.377,1.436,0.527,2.038a5.688,5.688,0,0,1-.362.467,2.69,2.69,0,0,1-.264.271q-0.221-.08-0.471-0.147a2.029,2.029,0,0,0-.522-0.066,1.079,1.079,0,0,0-.768.3A1.058,1.058,0,0,0,9,15.131a0.82,0.82,0,0,0,.832.852,1.134,1.134,0,0,0,.787-0.3,5.11,5.11,0,0,0,.776-0.993q0.141-.219.215-0.34c0.046-.076.122-0.194,0.223-0.346a2.786,2.786,0,0,0,.918,1.726,2.582,2.582,0,0,0,2.376-.185c0.317-.181.212-0.565,0-0.494A0.807,0.807,0,0,1,14.176,15a5.159,5.159,0,0,1-.913-2.446l0,0Q13.487,12.24,13.663,12.027Z"
+          div.ui.icon.button
+            i.area.chart.icon
     div.ui.column.eight.wide
       = f.error_notification
       table.ui.table
@@ -59,13 +65,12 @@
           tr
             th 입력해주세요
         tbody
-          - if @admin_problem_collection.problem_source_id != 2
-            tr
-              td
-                = f.association :subject,
-                                include_blank: '단원을 선택해주세요',
-                                collection: f.object.subject_id.nil? ? @admin_problem_collection.subject.details.collect{ |subject| [subject.path, subject.id] } : [[f.object.subject.path, f.object.subject.id], ['처음부터 다시 선택하려면 누르세요', @admin_problem_collection.subject.id]],
-                                input_html: { class: 'subject select', data: { url: "#{list_admin_problem_collection_problems_path(@admin_problem_collection)}", remote: true, type: :json } }
+          tr
+            td
+              = f.association :subject,
+                              include_blank: '단원을 선택해주세요',
+                              collection: f.object.subject_id.nil? ? Standard::Subject.main_subjects.collect{ |subject| [subject.path, subject.id] } : [[f.object.subject.path, f.object.subject.id], ['처음부터 다시 선택하려면 누르세요', @admin_problem.subject.id]],
+                              input_html: { class: 'subject select', data: { url: "#{list_admin_problems_path(@admin_problem)}", remote: true, type: :json } }
           tr
             td
               = f.input :content, input_html: { rows: 1, class: 'problem_content' }
@@ -73,27 +78,18 @@
               = f.input :exm_2, input_html: { rows: 1, class: 'problem_exm_2' }
               = f.input :exm_3, input_html: { rows: 1, class: 'problem_exm_3' }
               = f.input :exm_4, input_html: { rows: 1, class: 'problem_exm_4' }
-              = f.input :exm_5, input_html: { rows: 1, class: 'problem_exm_5' } unless @admin_problem_collection.problem_source_id == 2
+              = f.input :exm_5, input_html: { rows: 1, class: 'problem_exm_5' }
           tr
             td
               div.two.fields
                 = f.input :answer, as: :numeric, input_html: { class: 'problem_answer' }
                 = f.input :score, input_html: { class: 'problem_score' }
               = f.input :explanation, input_html: { rows: 1, class: 'problem_explanation' }
-          - if @admin_problem_collection.problem_source_id == 1
-            tr
-              td
-                = f.input :audio, input_html: { data: { preview: 'audio' } }
-                - if @admin_problem.audio?
-                  div.file_preview.center.aligned
-                    == @admin_problem.audio_file_name
-                    == audio_tag @admin_problem.audio.url(:original), controls: true, style: 'width: 100%;'
       table.ui.table
         thead
           tr
             th.sixteen.wide 저장하시겠습니까?
             th.collapsing
-              = f.hidden_field :subject_id, value: 22 if @admin_problem_collection.problem_source_id == 2
               = f.button :button, '저장'
 
 div.ui.tiny.modal#formula_screen
@@ -126,6 +122,7 @@ css:
     padding: 3px 0;
   }
 
+  .preview_exm,
   .preview_exm_1,
   .preview_exm_2,
   .preview_exm_3,
@@ -188,7 +185,6 @@ css:
   .formula.block {
     display: block;
   }
-
   .formula:hover, .formula:active {
     background-color: rgba(0, 0, 0, 0.1);
     box-shadow: 0 1px 0 hotpink;
@@ -241,7 +237,7 @@ javascript:
         $.each(details, function(index, value){
           select.append('<option value="' + value.id + '">' + value.path + '</option>');
         });
-        select.append('<option value="#{@admin_problem_collection.subject.id}">처음부터 다시 선택하려면 누르세요</option>');
+        select.append('<option value="0">처음부터 다시 선택하려면 누르세요</option>');
         $(this).dropdown('show');
       }
     });
@@ -285,17 +281,17 @@ javascript:
     });
 
     var render_preview = function(){
-      $.each($('.preview_content'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_content').val()); });
-      $.each($('.preview_exm_1'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_1').val()); });
-      $.each($('.preview_exm_2'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_2').val()); });
-      $.each($('.preview_exm_3'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_3').val()); });
-      $.each($('.preview_exm_4'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_4').val()); });
-      $.each($('.preview_exm_5'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_5').val()); });
-      $.each($('.preview_answer'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_answer').val()); });
-      $.each($('.preview_score'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_score').val()); });
-      $.each($('.preview_explanation'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_explanation').val()); });
+      // $.each($('.preview_content'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_content').val()); });
+      // $.each($('.preview_exm_1'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_1').val()); });
+      // $.each($('.preview_exm_2'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_2').val()); });
+      // $.each($('.preview_exm_3'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_3').val()); });
+      // $.each($('.preview_exm_4'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_4').val()); });
+      // $.each($('.preview_exm_5'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_exm_5').val()); });
+      // $.each($('.preview_answer'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_answer').val()); });
+      // $.each($('.preview_score'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_score').val()); });
+      // $.each($('.preview_explanation'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_explanation').val()); });
 
-      $.each($('span.katex'), function(){
+      $.each($('span.katex'), function(index, span) {
         var wrapper = $(this).parent().hasClass('katex-display') ? $(this).parent().parent() : $(this).parent();
         var is_inline = $(this).parent().hasClass('katex-display') ? 'formula block' : 'formula inline';
         wrapper.attr('draggable', true).attr('contenteditable', false).addClass(is_inline);
@@ -333,12 +329,12 @@ javascript:
         }
       });
 
-      $('#admin_problem_answer').on('input', function(){
-        $.each($('.preview_answer'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_answer').val()); });
-      });
-      $('#admin_problem_score').on('input', function(){
-        $.each($('.preview_score'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_score').val()); });
-      });
+      // $('#admin_problem_answer').on('input', function(){
+      //   $.each($('.preview_answer'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_answer').val()); });
+      // });
+      // $('#admin_problem_score').on('input', function(){
+      //   $.each($('.preview_score'), function(){ $(this).html($(this).closest('div.ui.grid').find('.problem_score').val()); });
+      // });
     };
 
     var current_editor;

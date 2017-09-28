@@ -83,15 +83,3 @@ table.ui.celled.table
         td.four.wide = user.name
         td.four.wide = user.score ? "#{user.score}점" : '미응시'
         td.four.wide = user.score ? l(user.created_at, format: :date_time) : '-'
-
-javascript:
-  $(function(){
-    renderMathInElement(document.getElementById("problems_table"),
-      {
-          delimiters: [
-              {left: "$$", right: "$$", display: true},
-              {left: "$",  right: "$",  display: false}
-          ]
-      }
-    );
-  });

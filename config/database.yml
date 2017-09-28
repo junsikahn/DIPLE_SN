@@ -14,7 +14,7 @@ development:
   encoding: utf8mb4
   pool: 100
   timeout: 5000
-  database: diple_sn_dev
+  database: omr
   username: root
   password: 12341234
   reconnect: true

@@ -1,0 +1,93 @@
+div#ebs_upload
+  button.ui.button :class="isUploading ? 'loading' : ''" v-if="!isUploaded" :key="1" @click="ebsPreview" EBS 문제 업로드
+  button.ui.positive.button :class="isUploading ? 'loading' : ''" v-else="" :key="2" @click="ebsUpload" 업로드하기
+  table.ui.celled.striped.selectable.table
+    thead
+      tr
+        th.center.aligned 순서
+        th.center.aligned 문제
+    tbody
+      tr v-for="(tmp_problem, order) in tmp_problems"
+        td.collapsing v-text="order + 1"
+        td.collapsing style="white-space: initial;"
+          div.problem_container.clearfix
+            div
+              span.ui.horizontal.black.label v-text="tmp_problem.title"
+              span.ui.horizontal.black.label v-text="tmp_problem.year"
+              span.ui.horizontal.black.label v-text="tmp_problem.order + '번'"
+              span.ui.horizontal.basic.label v-text="tmp_problem.score + '점'"
+            div.ui.top.attached.segment.black.clearfix.problem_seg v-html="tmp_problem.content"
+            div.ui.attached.segment.exm_seg v-if="tmp_problem.exms"
+              div.ui.very.relaxed.selection.list.exm_list
+                div.item.exm_item v-for="(exm, index) in tmp_problem.exms" :class="index + 1 == tmp_problem.answer ? 'active' : ''"
+                  span.ui.circular.mini.horizontal.label :class="index + 1 == tmp_problem.answer ? 'green' : 'basic'" v-text="index + 1"
+                  div.exm_container v-html="exm"
+            div.ui.attached.segment.exm_seg v-else=""
+              div.ui.form
+                div.field
+                  input.ui.input type="text" :value="tmp_problem.answer" readonly="true"
+            div.ui.attached.secondary.segment.exm_answer_seg v-if="tmp_problem.explanation" v-html="tmp_problem.explanation"
+            div.ui.bottom.attached.right.aligned.secondary.segment.exm_answer_seg v-if="tmp_problem.exms"
+              | 정답은&nbsp;
+              span.ui.circular.mini.horizontal.label.basic v-text="tmp_problem.answer"
+              | 번입니다.
+            div.ui.bottom.attached.right.aligned.secondary.segment.exm_answer_seg v-else="" 정답은 {{ tmp_problem.answer }} 입니다.
+
+
+javascript:
+  var ebs = new Vue({
+    el: '#ebs_upload',
+    data: { file: null, tmp_problems: [], isUploading: false, isUploaded: false },
+    methods: {
+      ebsPreview: function() {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.addEventListener('change', function(e){
+          var file = FileAPI.getFiles(this)[0];
+          if (file.type !== 'text/xml') return alert('XML 파일만 업로드할 수 있습니다');
+          ebs.file = file;
+          var formData = new FormData();
+          formData.append('file', file);
+          FileAPI.readAsDataURL(file, function(evt){
+            if (evt.type == 'load') {
+              $.ajax({
+                url: '/admin/tmp_problems',
+                type: 'POST',
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function(data) {
+                  ebs.tmp_problems = data.results;
+                  ebs.isUploaded = true;
+                },
+                beforeSend: function() { ebs.isUploading = true },
+                complete: function() { ebs.isUploading = false }
+              });
+            }
+          });
+        }, false);
+        input.click();
+      },
+      ebsUpload: function() {
+        var formData = new FormData();
+        formData.append('file', ebs.file);
+        $.ajax({
+          url: '/admin/tmp_problems/upload',
+          type: 'POST',
+          processData: false,
+          contentType: false,
+          data: formData,
+          beforeSend: function() { ebs.isUploading = true },
+          complete: function() { ebs.isUploading = false }
+        });
+      }
+    },
+    updated: function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$",  right: "$",  display: false}
+        ]
+      });
+    }
+  });

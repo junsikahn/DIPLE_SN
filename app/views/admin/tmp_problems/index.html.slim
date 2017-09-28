@@ -1,0 +1,115 @@
+- if params[:title].nil?
+  - years = @tmp_problems.group_by{ |tmp| tmp.year }
+  - years.each do |year|
+    table.ui.celled.striped.selectable.table
+      thead
+        tr
+          th.center.aligned.one.wide = year.first
+          th.center.aligned 구분
+          th.center.aligned.three.wide 분류
+          th.center.aligned.three.wide 점수
+      tbody
+        - list = year.last.group_by{ |tmp| tmp.title }
+        - list.each_with_index do |item, index|
+          tr onclick='location.href="#{admin_tmp_problems_path(title: item.first)}"'
+            td.collapsing = index + 1
+            td == item.first
+            td.center.aligned = item.last.count{ |problem| problem.subject_id }.to_s + ' / ' + item.last.size.to_s
+            td.center.aligned = item.last.sum{ |problem| problem.score }
+- else
+  div#ebs_upload
+    table.ui.celled.striped.table
+      thead
+        tr
+          th.center.aligned 순서
+          th.center.aligned 문제
+          th.center.aligned 과목분류
+      tbody
+        - @tmp_problems.each do |tmp_problem|
+          tr
+            td.collapsing.center.aligned = tmp_problem.order
+            td.collapsing style="white-space: initial;"
+              div.problem_container.clearfix
+                div
+                  span.ui.horizontal.black.label = tmp_problem.order.to_s + '번'
+                  span.ui.horizontal.basic.label = tmp_problem.score.to_s + '점'
+                  - if tmp_problem.subject_id?
+                    span.ui.horizontal.label id="subject_#{tmp_problem.id}" = tmp_problem.subject.path
+                  - else
+                    span.ui.horizontal.red.label id="subject_#{tmp_problem.id}" 미분류
+                div.ui.top.attached.segment.black.clearfix.problem_seg == tmp_problem.content
+                - if tmp_problem.exm_1
+                  div.ui.attached.segment.exm_seg
+                    div.ui.very.relaxed.selection.list.exm_list
+                      - (1..5).each do |index|
+                        - next if tmp_problem['exm_' + index.to_s].blank?
+                        div.item.exm_item class="#{'active' if index == tmp_problem.answer.to_i}"
+                          span.ui.circular.mini.horizontal.label class="#{index == tmp_problem.answer.to_i ? 'green' : 'basic'}" = index
+                          div.exm_container == tmp_problem['exm_' + index.to_s]
+                - else
+                  div.ui.attached.segment.exm_seg
+                    div.ui.form
+                      div.field
+                        input.ui.input type="text" readonly="true" value="#{tmp_problem.answer}"
+                - if tmp_problem.explanation
+                  div.ui.attached.secondary.segment.exm_answer_seg == tmp_problem.explanation
+                - if tmp_problem.exm_1
+                  div.ui.bottom.attached.right.aligned.secondary.segment.exm_answer_seg
+                    | 정답은&nbsp;
+                    span.ui.circular.mini.horizontal.label.basic = tmp_problem.answer
+                    | 번입니다.
+                - else
+                  div.ui.bottom.attached.right.aligned.secondary.segment.exm_answer_seg = "정답은 #{tmp_problem.answer} 입니다."
+                div.right.aligned
+                  span.ui.horizontal.label = tmp_problem.title + ': ' + tmp_problem.order.to_s + '번'
+            td
+              div.ui.search.subject data-id="#{tmp_problem.id}"
+                div.ui.icon.input.fluid
+                  input.prompt type="text" placeholder="단원 검색" value="#{tmp_problem.subject.name if tmp_problem.subject_id?}"
+                  - if tmp_problem.subject_id?
+                    i.check.green.icon
+                  - else
+                    i.search.icon
+                div.results
+
+  javascript:
+    $(function(){
+      $('.subject.search').search({
+        maxResults: 20,
+        apiSettings: {
+          url: '/admin/subjects/list?q={query}'
+        },
+        fields: {
+          title       : 'name',
+          description : 'path'
+        },
+        onSelect: function(result, response) {
+          var self = $(this),
+              id = self.data('id'),
+              subject_id = result.id,
+              span = $('#subject_' + id);
+          $.ajax({
+            url: '/admin/tmp_problems/' + id,
+            type: 'PUT',
+            dataType: 'json',
+            data: { subject_id: subject_id },
+            success: function(data) {
+              if (data.status == 'success') {
+                self.find('i.icon').attr('class', 'icon check green');
+                span.removeClass('red').html(result.path);
+              } else {
+                self.find('i.icon').attr('class', 'icon red exclamation');
+                span.addClass('red').html('미분류');
+              }
+            },
+            beforeSend: function() {
+              self.find('i.icon').attr('class', 'icon search');
+              self.addClass('loading');
+            },
+            complete: function() {
+              self.removeClass('loading');
+            }
+          });
+        }
+      });
+    });

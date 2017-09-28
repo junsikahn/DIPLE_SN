@@ -7,6 +7,8 @@ class Standard::Problem < ApplicationRecord
   has_many   :set_problems, class_name: 'Standard::Problem', foreign_key: 'problem_id', dependent: :destroy
   accepts_nested_attributes_for :set_problems
 
+  has_many :problem_histories, dependent: :destroy
+
   has_attached_file :audio,
                     url: '/assets/problems/:id/:attachment.:extension'
   validates_attachment_content_type :audio, content_type: ['application/octet-stream', 'audio/mpeg', 'audio/x-mpeg', 'audio/mp3', 'audio/x-mp3', 'audio/mpeg3', 'audio/x-mpeg3', 'audio/mpg', 'audio/x-mpg', 'audio/x-mpegaudio']

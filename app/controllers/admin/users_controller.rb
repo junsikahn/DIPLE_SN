@@ -5,6 +5,7 @@ class Admin::UsersController < AdminController
   # GET /admin/users.json
   def index
     @admin_users = Admin::User.includes(:problem_collection_histories).page(params[:page]).per(params[:per])
+    @admin_users = @admin_users.where('name LIKE ?', "%#{params[:q]}%") unless params[:q].nil?
   end
 
   # GET /admin/users/1
@@ -88,15 +89,16 @@ class Admin::UsersController < AdminController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_admin_user
-      @admin_user = Admin::User.find(params[:id])
-    end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def admin_user_params
-      params
-        .fetch(:admin_user, {})
-        .permit(:uid, :name, :gender, :liberal, :birthday)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_admin_user
+    @admin_user = Admin::User.find(params[:id])
+  end
+
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def admin_user_params
+    params
+      .fetch(:admin_user, {})
+      .permit(:uid, :name, :gender, :liberal, :birthday)
+  end
 end

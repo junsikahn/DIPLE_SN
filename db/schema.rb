@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170814080625) do
+ActiveRecord::Schema.define(version: 20170913090110) do
 
   create_table "problem_collection_histories", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "user_id",               null: false
@@ -75,7 +75,7 @@ ActiveRecord::Schema.define(version: 20170814080625) do
   end
 
   create_table "problems", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer  "subject_id",                                      null: false
+    t.integer  "subject_id",                                         null: false
     t.integer  "level"
     t.integer  "score",                               default: 0
     t.text     "content",            limit: 16777215
@@ -94,8 +94,9 @@ ActiveRecord::Schema.define(version: 20170814080625) do
     t.string   "audio_content_type"
     t.integer  "audio_file_size"
     t.datetime "audio_updated_at"
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.integer  "year",                                default: 2017
     t.index ["problem_id"], name: "index_problems_on_problem_id", using: :btree
     t.index ["subject_id"], name: "index_problems_on_subject_id", using: :btree
   end
@@ -109,6 +110,23 @@ ActiveRecord::Schema.define(version: 20170814080625) do
     t.integer "main_subject_id"
     t.index ["main_subject_id"], name: "index_subjects_on_main_subject_id", using: :btree
     t.index ["subject_id"], name: "index_subjects_on_subject_id", using: :btree
+  end
+
+  create_table "tmp_problems", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.text    "title",       limit: 65535
+    t.integer "order"
+    t.text    "content",     limit: 16777215
+    t.text    "exm_1",       limit: 65535
+    t.text    "exm_2",       limit: 65535
+    t.text    "exm_3",       limit: 65535
+    t.text    "exm_4",       limit: 65535
+    t.text    "exm_5",       limit: 65535
+    t.string  "answer"
+    t.integer "score",                        default: 0
+    t.text    "explanation", limit: 16777215
+    t.integer "subject_id"
+    t.integer "year",                         default: 2017
+    t.index ["subject_id"], name: "index_tmp_problems_on_subject_id", using: :btree
   end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

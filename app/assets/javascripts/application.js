@@ -24,10 +24,11 @@
 //= require chartjs
 //= require bowser
 //= require FileAPI
-//= require KeyboardJS/dist/keyboard
+//= require KeyboardJS
 //= require howler
 //= require wysiwyg
 //= require jQuery-contextMenu
+//= require vue-quill-editor.min
 //= require_tree .
 
 // init underscore.js Template
