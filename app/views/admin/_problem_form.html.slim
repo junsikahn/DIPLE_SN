@@ -1,236 +1,715 @@
-div#graph_screen
+div.jumbotron.p-4.mb-3
+  h1.mb-0 == problem.id ? '문제 수정' : '문제 추가'
 
-script type="template/x-template" id="graph_screen_template"
-  div.ui.fullscreen.modal style="user-select: none;"
-    i.close.icon
-    div.header 그래프 입력
-    div.content.ui.form
-      div.ui.segment.accordion
-        span.ui.top.attached.label.title
-          span.content 기본 설정
-          i.expand.icon style="margin: 0; float: right;"
-        div.ui.form.content
-          div.eight.fields
-            div.field.one.wide
-              label &nbsp;
-              div.ui.icon.basic.button.disabled
-                i.icon.columns
-            div.field
-              label 넓이
-              input type="number" min="100" max="500" step="10" v-model.number.lazy="board.width"
-              input.ui.input type="range" min="100" max="500" step="10" v-model.number="board.width"
-            div.field
-              label 높이
-              input type="number" min="0" max="500" step="10" v-model.number.lazy="board.height" :disabled="board.square == 1 ? true : false"
-              input.ui.input type="range" min="100" max="500" step="10" v-model.number="board.height" :disabled="board.square == 1 ? true : false"
-            div.field
-              label 여백
-              input type="number" min="0" max="100" step="5" v-model.number.lazy="board.padding"
-              input.ui.input type="range" min="0" max="100" step="5" v-model.number="board.padding"
-            div.field
-              label 1:1 유지
-              input type="number" min="0" max="1" v-model.number.lazy="board.square"
-              input.ui.input type="range" min="0" max="1" v-model.number="board.square"
-            div.field.one.wide
-              label &nbsp;
-              div.ui.icon.basic.button.disabled
-                i.icon.arrow.move
-            div.field
-              label x축 최소값
-              input type="number" v-model.number.lazy="board.xmin"
-            div.field
-              label x축 최대값
-              input type="number" v-model.number.lazy="board.xmax"
-            div.field
-              label y축 최소값
-              input type="number" v-model.number.lazy="board.ymin"
-            div.field
-              label y축 최대값
-              input type="number" v-model.number.lazy="board.ymax"
-          div.eight.fields
-            div.field.one.wide
-              label &nbsp;
-              div.ui.icon.basic.button.disabled
-                i.icon.bar.chart
-            div.field
-              label x축 표시
-              input type="number" min="0" max="1" v-model.number.lazy="board.showXaxis"
-              input.ui.input type="range" min="0" max="1" v-model.number="board.showXaxis"
-            div.field
-              label x축 눈금 표시
-              input type="number" min="0" max="1" v-model.number.lazy="board.showXmarks" :disabled="board.showXaxis == 0 ? true : false"
-              input.ui.input type="range" min="0" max="1" v-model.number="board.showXmarks" :disabled="board.showXaxis == 0 ? true : false"
-            div.field
-              label x축 숫자 표시
-              input type="number" min="0" max="1" v-model.number.lazy="board.showXlabels" :disabled="board.showXaxis == 0 ? true : false"
-              input.ui.input type="range" min="0" max="1" v-model.number="board.showXlabels" :disabled="board.showXaxis == 0 ? true : false"
-            div.field
-              label x축 단위
-              input type="number" min="0.1" step="0.1" v-model.number.lazy="board.dx" :disabled="board.showXaxis == 0 ? true : false"
-            div.field.one.wide
-              label &nbsp;
-              div.ui.icon.basic.button.disabled
-                i.icon.bar.chart
-            div.field
-              label y축 표시
-              input type="number" min="0" max="1" v-model.number.lazy="board.showYaxis"
-              input.ui.input type="range" min="0" max="1" v-model.number="board.showYaxis"
-            div.field
-              label y축 눈금 표시
-              input type="number" min="0" max="1" v-model.number.lazy="board.showYmarks" :disabled="board.showYaxis == 0 ? true : false"
-              input.ui.input type="range" min="0" max="1" v-model.number="board.showYmarks" :disabled="board.showYaxis == 0 ? true : false"
-            div.field
-              label y축 숫자 표시
-              input type="number" min="0" max="1" v-model.number.lazy="board.showYlabels" :disabled="board.showYaxis == 0 ? true : false"
-              input.ui.input type="range" min="0" max="1" v-model.number="board.showYlabels" :disabled="board.showYaxis == 0 ? true : false"
-            div.field
-              label y축 단위
-              input type="number" min="0.1" step="0.1" v-model.number.lazy="board.dy" :disabled="board.showYaxis == 0 ? true : false"
-          div.eight.fields
-            div.field.one.wide
-              label &nbsp;
-              div.ui.icon.basic.button.disabled
-                i.icon.table
-            div.field
-              label x축 격자
-              input type="number" min="0" max="1" v-model.number.lazy="board.showXgrid"
-              input.ui.input type="range" min="0" max="1" v-model.number="board.showXgrid"
-            div.field
-              label x축 격자 단위
-              input type="number" min="0.1" step="0.1" v-model.number.lazy="board.gdx" :disabled="board.showXgrid == 0 ? true : false"
-            div.field.four.wide
-            div.field.one.wide
-              label &nbsp;
-              div.ui.icon.basic.button.disabled
-                i.icon.table
-            div.field
-              label y축 격자
-              input type="number" min="0" max="1" v-model.number.lazy="board.showYgrid"
-              input.ui.input type="range" min="0" max="1" v-model.number="board.showYgrid"
-            div.field
-              label y축 격자 단위
-              input type="number" min="0.1" step="0.1" v-model.number.lazy="board.gdy" :disabled="board.showYgrid == 0 ? true : false"
-            div.field.four.wide
-      div.ui.grid
+div#problem-edit
+  = simple_form_for problem, url: admin_problem_path(redirect_url: request.referer), html: { 'ref': 'problemForm' } do |f|
+    div.row
+      div.col style="width: calc(540px + 2rem); min-width: calc(540px + 2rem); max-width: calc(540px + 2rem)"
+        a.btn.btn-light href="#{request.referer}"
+          i.fa.fa-caret-left.mr-2
+          | 목록으로
+      div.col
+        = f.button :button, '저장', class: 'btn-block', ':class': '[ notReadySubmit ? "btn-secondary" : "btn-success" ]', '@click.prevent': 'saveProblem', data: { disable_with: "<i class='fa fa-spinner fa-spin'/>" }
+    hr
+    div.row.mb-5
+      div.col style="width: calc(540px + 2rem); min-width: calc(540px + 2rem); max-width: calc(540px + 2rem)" ref="problemPreview"
+        table.table.table-bordered
+          thead.thead-default
+            tr
+              th.d-flex.justify-content-between.align-items-center
+                span <i class="fa fa-caret-down p-1"></i> 미리보기
+                div
+                  label.m-1.mr-2 해설
+                  div.btn-group.btn-group-sm
+                    div.btn :class="[ show_explanation ? 'btn-secondary' : 'btn-outline-secondary' ]" @click="show_explanation = true" ON
+                    div.btn :class="[ !show_explanation ? 'btn-secondary' : 'btn-outline-secondary' ]" @click="show_explanation = false" OFF
+          tbody
+            tr
+              td.p-0
+                div.problem-container.problem-preview
+                  div.problem-info.d-flex.justify-content-between.align-items-end.flex-wrap
+                    div.d-inline-flex
+                      span.problem-order v-html="problem.order == undefined ? (problem.id ? 'ID ' + problem.id  : 'NEW') : problem.order + '번'"
+                      span.problem-score v-html="problem.score + '점'" @click="inputScore"
+                    div.d-inline-flex.justify-content-end.align-items-end.w-75
+                      span.problem-subject v-html="problem.subject_id ? problem.subject.path : '미분류'" @click="openSubjectModal" :class='{ "text-danger": !problem.subject_id }'
+                      span.problem-level.d-flex.bg-light.text-warning
+                        i.fa :class="[ problem.level >= 1 ? 'fa-star' : 'fa-star-o' ]" @mouseup="problem.level = 1"
+                        i.fa :class="[ problem.level >= 2 ? 'fa-star' : 'fa-star-o' ]" @mouseup="problem.level = 2"
+                        i.fa :class="[ problem.level == 3 ? 'fa-star' : 'fa-star-o' ]" @mouseup="problem.level = 3"
+                  div.problem-wrapper
+                    div.problem-content v-html="problem.content" @click="editTarget = 'content'" :class="{ 'is-editing': focusInput == 'content' }"
+                    div.problem-exm v-if="is_objective"
+                      div.problem-exm-wrapper v-for="(exm, index) in [problem.exm_1, problem.exm_2, problem.exm_3, problem.exm_4, problem.exm_5]" :key="index" @click="editTarget = 'exm_' + (index + 1)" :class="[ problem.answer == index + 1 ? 'active' : '', { 'is-editing': focusInput == 'exm_' + (index + 1) }]"
+                        span.problem-exm-index v-text="index + 1" :class="[ problem.answer == index + 1 ? 'active' : '' ]" @click.stop="inputAnswer(index + 1)"
+                        span.problem-exm-content v-html="exm"
+                    div.problem-answer-input v-else=""
+                      input.form-control type="text" readonly="true" :value="problem.answer" @click="inputAnswer()"
+                    div.problem-explanation v-html="problem.explanation" @click="editTarget = 'explanation'" :class="{ 'is-editing': focusInput == 'explanation' }" v-if="show_explanation"
+                    div.problem-answer :class="{ 'is-editing': focusInput == 'answer' }" @click="inputAnswer()" v-if="show_explanation"
+                      i.fa.fa-caret-right.mr-1
+                      span.problem-answer-wrapper
+                        span.problem-answer-seg.align-bottom :class="{ 'is-objective' : is_objective }" v-html="problem.answer"
+                  div.problem-source v-if="problem.problem_source"
+                    i.fa.fa-caret-right.mr-1
+                    span v-text="'출처 : ' + problem.problem_source.name + ' - ' + problem.problem_source_order + '번'"
+                  tag-input inline-template="true" :problem="problem" ref="tagInputComponent"
+                    div.problem-tags
+                      a.badge.badge-secondary.mt-1.mr-1 v-for="tag in problem.problem_tags" :key="tag.id" v-html="tag.name" href="#" @click.prevent="remove(tag)"
+                      div.text-right
+                        a.badge.badge-success.mt-1.mr-1 href="#" @click.prevent="open" v-show="!is_opened" <i class="fa fa-plus"></i> 추가
+                        a.badge.badge-light.mt-1.mr-1 href="#" @click.prevent="close" v-show="is_opened" 닫기 <i class="fa fa-remove"></i>
+                        div.dropdown.mt-1.d-none ref="tagSearchDropdown"
+                          div.input-group
+                            input.form-control ref="tagSearchInput" placeholder="태그 추가하기" :value="keyword" @input="typing" @keydown.esc.stop="reset" @keydown.enter.prevent="enter" @keydown.up.prevent="move(false)" @keydown.down.prevent="move(true)"
+                            span.input-group-addon.text-muted
+                              i.fa :class="[ is_loading ? 'fa-spinner fa-spin' : 'fa-plus' ]"
+                          div.dropdown-menu.w-100.p-0 ref="tagSearchResult"
+                            a.dropdown-item.pl-3.pr-3.text-info v-if="keyword.length == 0" href="#" @click.prevent="" 추가할 태그를 입력해주세요
+                            a.dropdown-item.pl-3.pr-3.text-muted v-else-if="is_loading" href="#" @click.prevent="" v-text="'[' + keyword + '] 를 DB에서 검색중...'"
+                            a.dropdown-item.pl-3.pr-3.text-danger v-else-if="search_results.length == 0" href="#" @click.prevent="" 이미 추가된 태그 키워드입니다
+                            a.dropdown-item.pl-3.pr-3 v-else="" v-for="(tag, index) in search_results" :key="tag.name" href="#" @click.prevent="save(tag)" :class="{ 'bg-hover font-weight-bold': index == selected }"
+                              div.d-flex.align-items-center.justify-content-between
+                                span v-html="tag.name"
+                                span.badge.badge-info.ml-2 style="font-size: 0.5em;" v-if="tag.id" v-text="tag.refer_count + '회'"
+                                span.badge.badge-danger.ml-2 style="font-size: 0.5em;" v-else="" NEW
+      div.col
+        table.table.table-bordered
+          thead.thead-default
+            tr
+              th.d-flex.justify-content-between.align-items-center
+                span <i class="fa fa-caret-down p-1"></i> 최종Data
+                div
+                  label.m-1.mr-2 타입
+                  div.btn-group.btn-group-sm
+                    div.btn :class="[ is_objective ? 'btn-secondary' : 'btn-outline-secondary' ]" @click="convertObjective(true)" 객관식
+                    div.btn :class="[ !is_objective ? 'btn-secondary' : 'btn-outline-secondary' ]" @click="convertObjective(false)" 주관식
+          tbody
+            tr
+              td
+                div.row
+                  div.col.mb-0.pr-0
+                    = f.input :subject_id, label: '과목', wrapper_html: { class: 'mb-0' }, input_html: { class: 'd-none', 'v-model': 'problem.subject_id' }
+                    div.input-group.cursor-pointer @click.stop="openSubjectModal"
+                      input.form-control.bg-white.cursor-pointer type="text" placeholder="과목 검색" :value="problem.subject.name" :class='{ "border-danger" : _.isNull(problem.subject_id) }' @focus.stop="openSubjectModal"
+                  div.col.mb-0.pl-1.pr-1
+                    = f.input :score, label: '점수', input_html: { 'ref': 'inputScore', 'v-model.number': 'problem.score', ':class': "{ 'border-danger' : _.isNull(problem.score) || problem.score == 0 }", min: 0 }
+                  div.col.mb-0.pl-0
+                    = f.input :level, label: '난이도', wrapper_html: { class: 'mb-0' }, input_html: { class: 'd-none', 'v-model': 'problem.level' }
+                    div.btn-group.w-100
+                      button.btn.w-100 :class="[ problem.level == 1 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.level = 1" 하
+                      button.btn.w-100 :class="[ problem.level == 2 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.level = 2" 중
+                      button.btn.w-100 :class="[ problem.level == 3 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.level = 3" 상
+            tr
+              td
+                = f.input :content, input_html: { rows: '1', 'v-model.trim': 'problem.content', ':class': "{ 'border-danger' : _.isEmpty(problem.content) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "content"', '@blur': 'focusInput = null'  }
+            tr v-if="is_objective"
+              td
+                = f.input :exm_1, wrapper_html: { class: 'd-inline-block w-50 pr-1' }, input_html: { rows: '1', 'v-model.trim': "problem.exm_1", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_1) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "exm_1"', '@blur': 'focusInput = null' }
+                = f.input :exm_2, wrapper_html: { class: 'd-inline-block w-50' }, input_html: { rows: '1', 'v-model.trim': "problem.exm_2", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_2) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "exm_2"', '@blur': 'focusInput = null' }
+                = f.input :exm_3, wrapper_html: { class: 'd-inline-block w-50 pr-1' }, input_html: { rows: '1', 'v-model.trim': "problem.exm_3", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_3) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "exm_3"', '@blur': 'focusInput = null' }
+                = f.input :exm_4, wrapper_html: { class: 'd-inline-block w-50' }, input_html: { rows: '1', 'v-model.trim': "problem.exm_4", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_4) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "exm_4"', '@blur': 'focusInput = null' }
+                = f.input :exm_5, wrapper_html: { class: 'd-inline-block w-50 pr-1' }, input_html: { rows: '1', 'v-model.trim': "problem.exm_5", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_5) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "exm_5"', '@blur': 'focusInput = null' }
+            tr
+              td = f.input :explanation, input_html: { rows: '1', 'v-model.trim': 'problem.explanation', ':class': "{ 'border-danger' : _.isEmpty(problem.explanation) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "explanation"', '@blur': 'focusInput = null' }
+            tr
+              td = f.input :answer, as: :integer, input_html: { 'ref': 'inputAnswer', 'v-model.number': 'problem.answer', ':class': "{ 'border-danger' : _.isNull(problem.answer) || problem.answer == 0 }", '@focus': 'focusInput = "answer"', '@blur': 'focusInput = null' }
+            tr
+              td
+                = f.hidden_field :problem_tag_ids, ':value': 'problem_tag_ids'
+                / = f.hidden_field :year
+                / = f.hidden_field :problem_source_id
+                / = f.hidden_field :problem_source_order
+                = f.button :button, '저장', class: 'btn-block', ':class': '[ notReadySubmit ? "btn-secondary" : "btn-success" ]', '@click.prevent': 'saveProblem', data: { disable_with: "<i class='fa fa-spinner fa-spin'/>" }
+  subject-modal inline-template="true" :problem="problem" ref="subjectModalComponent"
+    div.modal role="dialog" data-backdrop="static" ref="subjectModal"
+      div.modal-dialog.modal-lg role="document" style="min-width: 1050px; max-width: 90%;"
+        div.modal-content
+          div.modal-header
+            h5.modal-title 과목 입력하기
+            button.close type="button" data-dismiss="modal" aria-label="Close"
+              span aria-hidden="true" &times;
+          div.modal-body
+            div.border.border-info.rounded.pt-2.pb-2.pl-3.pr-3.mb-2
+              div.text-muted v-if="!problem.subject.id" 현재 설정된 과목이 없습니다
+              div v-else=""
+                span.badge.badge-dark.mr-1 v-text="problem.subject.depth"
+                span.badge.badge-info.mr-2 v-text="problem.subject.order"
+                span.font-weight-bold.text-info v-text="problem.subject.name"
+                br
+                small.text-muted v-text="problem.subject.path"
+            div.input-group.mt-2
+              span.input-group-addon.text-muted
+                i.fa.fa-search
+              input.form-control ref="subjectModalInput" placeholder="과목 검색하기" autofocus="true" :value="keyword" @input="typing" @keydown.esc.stop="reset" @keydown.enter.prevent="enter" @keydown.up.prevent="move(false)" @keydown.down.prevent="move(true)"
+              div style="position: absolute; top: 50%; margin-top: -7px; right: 7px; z-index: 100; font-size: 0.5em;" v-show="keyword.length > 0"
+                kbd.ml-1 :class="{ 'bg-light text-secondary' : filtered_subjects.length == 0 }" <i class="fa fa-caret-up"></i>
+                kbd.ml-1 :class="{ 'bg-light text-secondary' : filtered_subjects.length == 0 }" <i class="fa fa-caret-down"></i>
+                kbd.ml-1 :class="{ 'bg-light text-secondary' : filtered_subjects.length == 0 }" Enter:검색
+                kbd.ml-1 ESC:리셋
+            div.mt-2 style="max-height: calc(100vh - 280px); overflow-y: scroll;"
+              div.jumbotron.mb-0.text-center.text-muted v-show="filtered_subjects.length == 0" 검색결과가 없습니다
+              table.table.table-sm.table-hover.table-bordered.mb-0.cursor-pointer
+                tr v-for="(subject, index) in filtered_subjects" :key="subject.id" :class='{ "bg-hover font-weight-bold" : (keyword.length > 0 && index == selected) }'
+                  td @click="save(subject)" :class="[ subject.depth == 1 ? 'bg-secondary' : (subject.depth == 2 ? 'bg-light' : '') ]"
+                    div.d-flex.align-items-center.justify-content-between.pr-1 :class="[ subject.depth == 1 ? 'pl-1' : (subject.depth == 2) ? 'pl-4' : 'pl-5' ]"
+                      div
+                        span.badge.badge-dark.mr-1 v-text="subject.depth"
+                        span.badge.badge-secondary.mr-2 :class='{ "badge-info" : problem.subject.id == subject.id }' v-text="subject.order"
+                        span :class='{ "text-info" : problem.subject.id == subject.id }' v-text="subject.name"
+                      small.text-muted v-text="subject.path"
+  editor-modal inline-template="true" :target="editTarget" :key="editTarget" ref="editorModalComponent"
+    div.modal role="dialog" data-backdrop="static" ref="editorModal"
+      div.modal-dialog.modal-lg role="document" style="width: 1062px; max-width: 1062px;"
+        div.modal-content
+          div.modal-header
+            h5.modal-title v-html="editor.title"
+            button.close type="button" data-dismiss="modal" aria-label="Close"
+              span aria-hidden="true" &times;
+          div.modal-body
+            div.editor-grid.row
+              div.col-6
+                div.editor-wrapper v-html="editor.content"
+              div.col-6
+                div.preview-wrapper
+                  div.preview-header 미리보기
+                  div.preview-content v-html="renderedHTML"
+            p.mb-0.pl-2.pr-2.pt-2.text-muted style="font-size: 0.75em;"
+              | - 수식 입력 : $$ 사이에 수식을 입력 (<a href="https://khan.github.io/KaTeX/function-support">수식 참고 링크</a>) <br>
+              | - 가로줄 삽입 : ctrl + 엔터
+          div.modal-footer
+            button.btn.btn-secondary type="button" data-dismiss="modal" 취소
+            button.btn.btn-primary type="button" @click="saveEdit" 저장
+  graph-modal inline-template="true" ref="graphModalComponent"
+    div.modal role="dialog" data-backdrop="static" ref="graphModal"
+      div.modal-dialog.modal-lg role="document" style="min-width: 1062px; max-width: 90%;" v-if="graphData"
+        div.modal-content
+          div.modal-header
+            h5.modal-title 그래프 입력하기
+            button.close type="button" data-dismiss="modal" aria-label="Close"
+              span aria-hidden="true" &times;
+          div.modal-body
+            graph-editor v-bind="graphData" :key="graphData.id" ref="graphEditor"
+          div.modal-footer
+            button.btn.btn-secondary type="button" data-dismiss="modal" 취소
+            button.btn.btn-primary type="button" @click="saveGraph" 저장
+
+script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.14.1/vuedraggable.min.js"
+script type="template/x-template" id="graph-editor-template"
+  div
+    div.row
+      div.col-8
+        div.card
+          div.card-header.d-flex.justify-content-between.align-items-center
+            span 미리보기
+            small.text-info v-text="board.drawingTip"
+          div.card-body ref="graphPreview"
+            graph-svg :board="board" :customs="customs" ref="graphPreview"
+      div.col-4
+        div.card.h-100
+          div.card-header.d-flex.justify-content-between.align-items-center
+            span
+              | 입력내용
+              small.text-muted.ml-1 v-text='customs.length + "개"'
+            div.btn.btn-dark.btn-sm.btn-group @click="deleteAllElems" :class='{ disabled: customs.length == 0 }'
+              i.fa.fa-trash
+          div.card-body.p-2.d-flex.align-items-center.justify-content-center.text-muted v-if="customs.length == 0" @click="tab = 2" 입력해주세요
+          div.card-body.p-2 @click="deselectElem" @mouseover="dehoverElem" v-else=""
+            draggable.list-group v-model="customs" :style='{ maxHeight: board.height + 24 + "px", overflow: "scroll" }'
+              div.list-group-item.pt-2.pb-2.pl-3.pr-3 v-for="(custom, index) in customs" :key="index" :class='[ custom.isSelected ? "list-group-item-secondary" : "", custom.isHovered ? "list-group-item-dark" : "" ]' @click.stop="selectElem(custom, $event)" @mouseover.stop="hoverOnElem(custom)" @mouseout="hoverOffElem(custom)"
+                div.d-flex.justify-content-between.align-items-center
+                  div
+                    i.fa.fa-bars.mr-1.text-muted
+                    small.mr-1.text-muted v-text="index + 1"
+                    span v-text="custom.name"
+                  div
+                    span.badge.badge-danger
+                      i.fa.fa-trash @click.stop="deleteElem(index)"
+    hr
+    div.card
+      div.card-header
+        ul.nav.nav-tabs.nav-justified.card-header-tabs
+          li.nav-item
+            a.nav-link.text-muted @click.prevent="tab = 1" :class="{ active: tab == 1 }" 기본 정보
+          li.nav-item
+            a.nav-link.text-muted @click.prevent="tab = 2" :class="{ active: tab == 2 }" 도형 입력
+      div.card-body v-show="tab == 1"
         div.row
-          div.twelve.wide.column
-            div.ui.segment
-              span.ui.top.attached.label 도형 입력도구
-              div.ui.menu
-                div.ui.simple.dropdown.item
-                  | 점&선
-                  i.dropdown.icon
-                  div.menu
-                    div.item @click="addDot" <b>점</b> <small>한 점</small>
-                    div.item @click="addLine" <b>직선</b> <small>직선 위의 두 점</small>
-                    div.item @click="addClosedLine" <b>선분</b> <small>시작점과 끝점</small>
-                    div.item @click="addVector" <b>벡터</b> <small>시작점과 끝점</small>
-                    div.item @click="addDottedLine" <b>점선</b> <small>시작점과 끝점, 방향</small>
-                    div.item @click="addPolyLine" <b>꺾인선</b> <small>여러 점</small>
-                div.ui.simple.dropdown.item
-                  | 2차함수
-                  i.dropdown.icon
-                  div.menu
-                    div.item @click="addQuadraBy2" <b>2차함수</b> <small>꼭지점과 곡선 위의 한 점</small>
-                    div.item @click="addQuadraBy3" <b>2차함수</b> <small>곡선 위의 세 점</small>
-                div.ui.simple.dropdown.item
-                  | 3차함수
-                  i.dropdown.icon
-                  div.menu
-                    div.item @click="addCubicBy2" <b>3차함수</b> <small>극대점과 극소점</small>
-                    div.item @click="addCubicByK" <b>3차함수</b> <small>변곡점, 변곡점의 기울기(지정)와 곡선 위의 한 점</small>
-                    div.item @click="addCubicByDraggedK" <b>3차함수</b> <small>변곡점과 곡선 위의 한 점, 변곡점의 기울기(드래그)</small>
-                    div.item @click="addCubicBy3" <b>3차함수</b> <small>변곡점과 곡선 위의 두 점</small>
-                    div.item @click="addCubicBy4" <b>3차함수</b> <small>곡선 위의 네 점</small>
-                div.ui.simple.dropdown.item
-                  | 4차함수
-                  i.dropdown.icon
-                  div.menu
-                    div.item @click="addQuarticBy5" <b>4차함수</b> <small>곡선 위의 다섯 점</small>
-                    div.item @click="addQuarticBy3" <b>4차함수</b> <small>곡선의 세 극점</small>
-                    div.item @click="addQuarticByK" <b>4차함수</b> <small>꼭지점, 변곡점의 기울기(지정)와 변곡점</small>
-                    div.item @click="addQuarticByDraggedK" <b>4차함수</b> <small>꼭지점, 변곡점과 변곡점의 기울기(드래그)</small>
-                div.ui.simple.dropdown.item
-                  | 원&타원
-                  i.dropdown.icon
-                  div.menu
-                    div.item @click="addCircleByR" <b>원</b> <small>반지름(지정)과 중점</small>
-                    div.item @click="addCircleBy2" <b>원</b> <small>중점과 원 위의 한 점</small>
-                    div.item @click="addCircleBy3" <b>원</b> <small>원 위의 세 점</small>
-                    div.item @click="addEllipseBy3" <b>타원</b> <small>두 초점과 타원 위의 점</small>
-                    div.item @click="addEllipseByDis" <b>타원</b> <small>두 초점과 타원과의 거리(지정)</small>
-                div.ui.simple.dropdown.item
-                  | 사각형&다각형
-                  i.dropdown.icon
-                  div.menu
-                    div.item @click="addTrapezoidBy4" <b>사다리꼴</b> <small>네 모서리</small>
-                    div.item @click="addTrapezoidBy3" <b>등변사다리꼴</b> <small>세 모서리</small>
-                    div.item @click="addParallelogramBy3" <b>평행사변형</b> <small>세 모서리</small>
-                    div.item @click="addDiamondBy3" <b>마름모꼴</b> <small>세 모서리</small>
-                    div.item @click="addPolygon" <b>자유도형</b> <small>여러 점</small>
-                div.ui.simple.dropdown.item
-                  | 기타
-                  i.dropdown.icon
-                  div.menu
-                    div.item @click="addHyperbolaByDis" <b>쌍곡선</b> <small>두초점과 쌍곡선과의 거리(지정)</small>
-                    div.item @click="addHyperbolaBy3" <b>쌍곡선</b> <small>두 초점과 쌍곡선 위의 한 점</small>
-                    div.item @click="addFormula" <b>함수</b> <small>함수 입력</small>
-                    div.item @click="addText" <b>글씨</b> <small>글씨</small>
-                    div.item @click="addKatex" <b>수식</b> <small>KATEX 수식</small>
-                    div.item @click="addStandardNorm" <b>정규분포표</b> <small>평균(지정)과 표준분포(지정)</small>
-              div.ui.form
-                div.six.fields
-                  div.field
-                    label 선 색상
-                    select.compact v-model="drawstyle.stroke.color"
-                      option v-for="option in drawstyle.colorOptions" :value="option.value" v-text="option.text"
-                  div.field
-                    label 선 굵기
-                    input type="number" min="0" max="10" step="0.1" v-model.number.lazy="drawstyle.stroke.width"
-                    input.ui.input type="range" min="0" max="10" step="0.1" v-model.number="drawstyle.stroke.width"
-                  div.field
-                    label 선 스타일
-                    select.compact v-model="drawstyle.stroke.dash"
-                      option v-for="option in drawstyle.dashOptions" :value="option.value" v-text="option.text"
-                  div.field
-                    label 선 투명도
-                    input type="number" min="0" max="1" step="0.1" v-model.number.lazy="drawstyle.stroke.opacity"
-                    input.ui.input type="range" min="0" max="1" step="0.1" v-model.number="drawstyle.stroke.opacity"
-                  div.field
-                    label 채우기 색상
-                    select.compact v-model="drawstyle.fill.color"
-                      option v-for="option in drawstyle.colorOptions" :value="option.value" v-text="option.text"
-                  div.field
-                    label 채우기 투명도
-                    input type="number" min="0" max="1" step="0.1" v-model.number.lazy="drawstyle.fill.opacity"
-                    input.ui.input type="range" min="0" max="1" step="0.1" v-model.number="drawstyle.fill.opacity"
-                  div.one.wide.field
-                    label 초기화
-                    button.ui.icon.basic.button @click="resetDrawstyle"
-                      i.refresh.icon
-            div.ui.segment
-              span.ui.top.attached.label
-                span 미리보기
-                span style="float: right; color: crimson;" v-text="board.drawingTip"
-              div#graph_preview
-                graph-svg :board="board" :customs="customs"
-          div.four.wide.column
-            div.ui.segment
-              span.ui.top.attached.label 커스텀 엘리먼트
-              div.ui.secondary.segment @click="deselectElem" @mouseover="dehoverElem"
-                draggable.ui.selection.list v-model="customs" :style='{ height: board.height + 127 + "px", overflow: "scroll" }'
-                  div.item v-for="(custom, index) in customs" :class="{ active: custom.isSelected }" @click.stop="selectElem(custom, $event)" @mouseover.stop="hoverOnElem(custom)" @mouseout="hoverOffElem(custom)"
-                    div.left.floated.content style="margin-right: 0;"
-                      i.bars.icon
-                    div.right.floated.content
-                      i.trash.icon @click.stop="deleteElem(index)"
-                    div.content v-html="custom.name"
-              div.ui.basic.fluid.button @click="deleteAllElems" 모두 삭제
-    div.actions
-      div.ui.cancel.button 취소
-      div.ui.approve.positive.button 입력하기
+          div.col-6
+            div.row
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 넓이
+                input.form-control.text-right type="number" min="100" max="500" step="10" v-model.number.lazy="board.width"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 높이
+                input.form-control.text-right type="number" min="100" max="500" step="10" v-model.number.lazy="board.height" :disabled="board.square == 1 ? true : false"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 여백
+                input.form-control.text-right type="number" min="0" max="100" step="5" v-model.number.lazy="board.padding"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 1:1 유지
+                input.form-control.text-right type="number" min="0" max="1" v-model.number.lazy="board.square"
+        hr
+        div.row
+          div.col-6
+            div.row
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 x축 최소값
+                input.form-control.text-right type="number" v-model.number.lazy="board.xmin"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 x축 최대값
+                input.form-control.text-right type="number" v-model.number.lazy="board.xmax"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 x축 격자 표시
+                input.form-control.text-right type="number" min="0" max="1" v-model.number.lazy="board.showXgrid"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 x축 격자 단위
+                input.form-control.text-right type="number" min="0.1" step="0.1" v-model.number.lazy="board.gdx" :disabled="board.showXgrid == 0 ? true : false"
+          div.col-6
+            div.row
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 x축 표시
+                input.form-control.text-right type="number" min="0" max="1" v-model.number.lazy="board.showXaxis"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 x축 눈금 표시
+                input.form-control.text-right type="number" min="0" max="1" v-model.number.lazy="board.showXmarks" :disabled="board.showXaxis == 0 ? true : false"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 x축 숫자 표시
+                input.form-control.text-right type="number" min="0" max="1" v-model.number.lazy="board.showXlabels" :disabled="board.showXaxis == 0 ? true : false"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 x축 단위
+                input.form-control.text-right type="number" min="0.1" step="0.1" v-model.number.lazy="board.dx" :disabled="board.showXaxis == 0 ? true : false"
+        hr
+        div.row
+          div.col-6
+            div.row
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 y축 최소값
+                input.form-control.text-right type="number" v-model.number.lazy="board.ymin"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 y축 최대값
+                input.form-control.text-right type="number" v-model.number.lazy="board.ymax"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 y축 격자 표시
+                input.form-control.text-right type="number" min="0" max="1" v-model.number.lazy="board.showYgrid"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 y축 격자 단위
+                input.form-control.text-right type="number" min="0.1" step="0.1" v-model.number.lazy="board.gdy" :disabled="board.showYgrid == 0 ? true : false"
+          div.col-6
+            div.row
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 y축 표시
+                input.form-control.text-right type="number" min="0" max="1" v-model.number.lazy="board.showYaxis"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 y축 눈금 표시
+                input.form-control.text-right type="number" min="0" max="1" v-model.number.lazy="board.showYmarks" :disabled="board.showYaxis == 0 ? true : false"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 y축 숫자 표시
+                input.form-control.text-right type="number" min="0" max="1" v-model.number.lazy="board.showYlabels" :disabled="board.showYaxis == 0 ? true : false"
+              div.col-3.input-group-sm
+                span.badge.badge-dark.w-100 y축 단위
+                input.form-control.text-right type="number" min="0.1" step="0.1" v-model.number.lazy="board.dy" :disabled="board.showYaxis == 0 ? true : false"
+      div.card-body v-show="tab == 2"
+        div.row
+          div.col-7
+            div.row
+              div.col-3
+                label.text-muted <small>선 색상</small>
+                select.form-control v-model="drawstyle.stroke.color"
+                  option v-for="option in drawstyle.colorOptions" :key="option.value" :value="option.value" v-text="option.text"
+              div.col-3
+                label.text-muted <small>선 굵기</small>
+                input.form-control type="number" min="0" max="10" step="0.1" v-model.number.lazy="drawstyle.stroke.width"
+              div.col-3
+                label.text-muted <small>선 스타일</small>
+                select.form-control v-model="drawstyle.stroke.dash"
+                  option v-for="option in drawstyle.dashOptions" :key="option.value" :value="option.value" v-text="option.text"
+              div.col-3
+                label.text-muted <small>선 투명도</small>
+                input.form-control type="number" min="0" max="1" step="0.1" v-model.number.lazy="drawstyle.stroke.opacity"
+          div.col-4
+            div.row
+              div.col-6
+                label.text-muted <small>채우기 색상</small>
+                select.form-control v-model="drawstyle.fill.color"
+                  option v-for="option in drawstyle.colorOptions" :key="option.value" :value="option.value" v-text="option.text"
+              div.col-6
+                label.text-muted <small>채우기 투명도</small>
+                input.form-control type="number" min="0" max="1" step="0.1" v-model.number.lazy="drawstyle.fill.opacity"
+          div.col-1
+            label.text-muted <small>초기화</small>
+            div.btn.btn-block.btn-light @click="resetDrawstyle"
+              i.fa.fa-refresh
+        hr
+        div.row
+          div.col-3
+            label.text-muted <small>점/선</small>
+            div.btn-group-vertical.w-100
+              div.btn.btn-block.btn-light.text-left @click="addDot" <b>점</b> <small>한 점</small>
+              div.btn-group
+                div.btn.btn-block.btn-light.text-left.dropdown-toggle.d-flex.justify-content-between.align-items-center.font-weight-bold role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 선
+                div.dropdown-menu
+                  div.dropdown-item @click="addLine" <b>직선</b> <small>직선 위의 두 점</small>
+                  div.dropdown-item @click="addClosedLine" <b>선분</b> <small>시작점과 끝점</small>
+                  div.dropdown-item @click="addPolyLine" <b>꺾인선</b> <small>여러 점</small>
+              div.btn.btn-block.btn-light.text-left @click="addDottedLine" <b>호</b> <small>시작점과 끝점, 방향</small>
+              div.btn.btn-block.btn-light.text-left @click="addVector" <b>벡터</b> <small>시작점과 끝점</small>
+          div.col-3
+            label.text-muted <small>2차/3차/4차 함수</small>
+            div.btn-group-vertical.w-100
+              div.btn-group
+                div.btn.btn-block.btn-light.text-left.dropdown-toggle.d-flex.justify-content-between.align-items-center.font-weight-bold role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 2차함수
+                div.dropdown-menu
+                  div.dropdown-item @click="addQuadraBy2" <small>꼭지점과 곡선 위의 한 점</small>
+                  div.dropdown-item @click="addQuadraBy3" <small>곡선 위의 세 점</small>
+              div.btn-group
+                div.btn.btn-block.btn-light.text-left.dropdown-toggle.d-flex.justify-content-between.align-items-center.font-weight-bold role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 3차함수
+                div.dropdown-menu
+                  div.dropdown-item @click="addCubicBy2" <small>극대점과 극소점</small>
+                  div.dropdown-item @click="addCubicByK" <small>변곡점, 변곡점의 기울기(지정)와 곡선 위의 한 점</small>
+                  div.dropdown-item @click="addCubicByDraggedK" <small>변곡점과 곡선 위의 한 점, 변곡점의 기울기(드래그)</small>
+                  div.dropdown-item @click="addCubicBy3" <small>변곡점과 곡선 위의 두 점</small>
+                  div.dropdown-item @click="addCubicBy4" <small>곡선 위의 네 점</small>
+              div.btn-group
+                div.btn.btn-block.btn-light.text-left.dropdown-toggle.d-flex.justify-content-between.align-items-center.font-weight-bold role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 4차함수
+                div.dropdown-menu
+                  div.dropdown-item @click="addQuarticBy5" <small>곡선 위의 다섯 점</small>
+                  div.dropdown-item @click="addQuarticBy3" <small>곡선의 세 극점</small>
+                  div.dropdown-item @click="addQuarticByK" <small>꼭지점, 변곡점의 기울기(지정)와 변곡점</small>
+                  div.dropdown-item @click="addQuarticByDraggedK" <small>꼭지점, 변곡점과 변곡점의 기울기(드래그)</small>
+              div.btn-group
+                div.btn.btn-block.btn-light.text-left.dropdown-toggle.d-flex.justify-content-between.align-items-center.font-weight-bold role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 쌍곡선
+                div.dropdown-menu
+                  div.dropdown-item @click="addHyperbolaByDis" <small>두초점과 쌍곡선과의 거리(지정)</small>
+                  div.dropdown-item @click="addHyperbolaBy3" <small>두 초점과 쌍곡선 위의 한 점</small>
+          div.col-3
+            label.text-muted <small>원/타원/사각형/다각형</small>
+            div.btn-group-vertical.w-100
+              div.btn-group
+                div.btn.btn-block.btn-light.text-left.dropdown-toggle.d-flex.justify-content-between.align-items-center.font-weight-bold role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 원
+                div.dropdown-menu
+                  div.dropdown-item @click="addCircleByR" <small>반지름(지정)과 중점</small>
+                  div.dropdown-item @click="addCircleBy2" <small>중점과 원 위의 한 점</small>
+                  div.dropdown-item @click="addCircleBy3" <small>원 위의 세 점</small>
+              div.btn-group
+                div.btn.btn-block.btn-light.text-left.dropdown-toggle.d-flex.justify-content-between.align-items-center.font-weight-bold role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 타원
+                div.dropdown-menu
+                  div.dropdown-item @click="addEllipseBy3" <b>타원</b> <small>두 초점과 타원 위의 점</small>
+                  div.dropdown-item @click="addEllipseByDis" <b>타원</b> <small>두 초점과 타원과의 거리(지정)</small>
+              div.btn-group
+                div.btn.btn-block.btn-light.text-left.dropdown-toggle.d-flex.justify-content-between.align-items-center.font-weight-bold role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 사각형
+                div.dropdown-menu
+                  div.dropdown-item @click="addTrapezoidBy4" <b>사다리꼴</b> <small>네 모서리</small>
+                  div.dropdown-item @click="addTrapezoidBy3" <b>등변사다리꼴</b> <small>세 모서리</small>
+                  div.dropdown-item @click="addParallelogramBy3" <b>평행사변형</b> <small>세 모서리</small>
+                  div.dropdown-item @click="addDiamondBy3" <b>마름모꼴</b> <small>세 모서리</small>
+              div.btn.btn-block.btn-light.text-left @click="addPolygon" <b>자유도형</b> <small>여러 점</small>
+          div.col-3
+            label.text-muted <small>기타</small>
+            div.btn-group-vertical.w-100
+              div.btn.btn-block.btn-light.text-left @click="addFormula" <b>함수</b> <small>함수 입력</small>
+              div.btn.btn-block.btn-light.text-left @click="addText" <b>글씨</b> <small>글씨</small>
+              div.btn.btn-block.btn-light.text-left @click="addKatex" <b>수식</b> <small>KATEX 수식</small>
+              div.btn.btn-block.btn-light.text-left @click="addStandardNorm" <b>정규분포표</b> <small>평균(지정)과 표준분포(지정)</small>
 
 javascript:
+  var subjectModalComponent = {
+    props: ['problem'],
+    data: function() {
+      return {
+        subjects: #{{ Standard::Subject.where('subjects.order > 3000000 AND subjects.order < 4000000').to_json.html_safe }},
+        keyword: '',
+        selected: 0
+      }
+    },
+    watch: {
+      keyword: function(keyword) {
+        this.selected = 0;
+        this.filtered_subjects = _.filter(this.subjects, function(obj){ return obj['path'].match(new RegExp(keyword)); });
+      }
+    },
+    methods: {
+      typing: function(e) { return this.keyword = e.target.value; },
+      reset: function() { return this.keyword = ''; },
+      move: function(is_down) {
+        if (is_down) {
+          if (this.selected == this.filtered_subjects.length - 1) return this.selected = 0;
+          return this.selected += 1;
+        } else {
+          if (this.selected == 0) return this.selected = this.filtered_subjects.length - 1;
+          return this.selected -= 1;
+        }
+      },
+      enter: function() {
+        if (this.keyword.length == 0) {
+          return false;
+        } else if (this.filtered_subjects.length == 0) {
+          return this.reset();
+        } else {
+          return this.save(this.filtered_subjects[this.selected]);
+        }
+      },
+      save: function(subject) {
+        if (subject.depth != 3 && !confirm('소과목을 선택하지 않으셨습니다. 맞게 선택했나요?')) return false;
+        this.problem.subject = subject;
+        this.problem.subject_id = subject.id;
+        return $(this.$refs.subjectModal).modal('hide');
+      }
+    },
+    created: function() { this.filtered_subjects = this.subjects; }
+  }
+
+  var tagInputComponent = {
+    props: ['problem'],
+    data: function() {
+      return {
+        keyword: '',
+        search_results: [],
+        is_opened: false,
+        is_loading: false,
+        selected: 0
+      }
+    },
+    methods: {
+      open: function() {
+        this.is_opened = true;
+        $(this.$refs.tagSearchDropdown).removeClass('d-none');
+        $(this.$refs.tagSearchResult).addClass('show');
+        return $(this.$refs.tagSearchInput).focus();
+      },
+      close: function() {
+        this.reset();
+        this.is_opened = false;
+        $(this.$refs.tagSearchDropdown).addClass('d-none');
+      },
+      remove: function(tag) {
+        return this.problem.problem_tags = _.without(this.problem.problem_tags, tag);
+      },
+      typing: function(e) {
+        var keyword = e.target.value;
+        if (keyword.length == 0) {
+          this.reset();
+        } else if (keyword != this.keyword) {
+          this.keyword = keyword;
+          this.is_loading = true;
+          this.search();
+        }
+      },
+      reset: function() {
+        this.keyword = '';
+        this.search_results = [];
+        this.selected = 0;
+        this.is_loading = false;
+      },
+      search: _.debounce(function() {
+        $.ajax({
+          url: '#{{ admin_problem_tags_path }}',
+          data: { q: this.keyword.replace(/\s/g, '') },
+          dataType: 'json',
+          success: function(data) {
+            if (this.is_loading) {
+              this.search_results = data;
+              var ids = _.pluck(this.problem.problem_tags, 'id');
+              this.search_results = _.filter(this.search_results, function(result) {
+                return ids.indexOf(result.id) < 0;
+              }.bind(this));
+              var keywords = _.union(_.pluck(this.problem.problem_tags, 'keyword'), _.pluck(this.search_results, 'keyword'));
+              if (keywords.indexOf(this.keyword.replace(/\s/g, '')) < 0) this.search_results.unshift({ id: null, name: this.keyword, keyword: this.keyword.replace(/\s/g, ''), refer_count: 0 });
+            }
+          }.bind(this),
+          beforeSend: function() {
+            this.selected = 0;
+          }.bind(this),
+          complete: function() {
+            this.is_loading = false;
+          }.bind(this)
+        });
+      }, 500),
+      move: function(is_down) {
+        if (is_down) {
+          if (this.selected == this.search_results.length - 1) return this.selected = 0;
+          return this.selected += 1;
+        } else {
+          if (this.selected == 0) return this.selected = this.search_results.length - 1;
+          return this.selected -= 1;
+        }
+      },
+      enter: function() {
+        if (this.is_loading || this.keyword.length == 0) {
+          return false;
+        } else if (this.search_results.length == 0) {
+          return this.reset();
+        } else {
+          return this.save(this.search_results[this.selected]);
+        }
+      },
+      save: function(tag) {
+        if (tag.id) {
+          this.reset();
+          this.problem.problem_tags.push(tag);
+        } else {
+          $.ajax({
+            url: "#{{ admin_problem_tags_path }}",
+            type: 'POST',
+            data: { admin_problem_tag: { name: this.keyword } },
+            dataType: 'json',
+            success: function(data) {
+              this.problem.problem_tags.push(data);
+            }.bind(this),
+            beforeSend: function() {
+              this.reset();
+            }.bind(this)
+          });
+        }
+      }
+    }
+  }
+
+  var editorModalComponent = {
+    props: ['target'],
+    data: function() {
+      return {
+        editor: {
+          title: (this.target == 'content' ? '문제' : (this.target == 'explanation' ? '해설' : '보기')) + ' 입력하기',
+          content: this.$parent.$data['problem'][this.target]
+        }
+      }
+    },
+    computed: {
+      renderedHTML: function() {
+        var content = this.editor.content;
+        if (content && content.length > 0) {
+          var eqs = content.match(/\$[^\$]*\$/g);
+          _.each(eqs, function(eq) {
+            var nodes = $.parseHTML(eq),
+                annotation = _.map(nodes, function(node) {
+                  return node = $(node).text().replace(/\&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&nbsp;/g, ' ');
+                }).join('').replace(/\n/g, '').replace(/\$/g, '');
+            try {
+              content = content.replace(eq, katex.renderToString(annotation));
+            } catch(err) {
+              content = content.replace(eq, '<mark>' + eq + '</mark>');
+            }
+          });
+          return content;
+        }
+      }
+    },
+    methods: {
+      saveEdit: function() {
+        var content = this.editor.content;
+        var eqs = content.match(/\$[^\$]*\$/g);
+        _.each(eqs, function(eq) {
+          var nodes = $.parseHTML(eq),
+              annotation = _.map(nodes, function(node) {
+                return node = $(node).text().replace(/\&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&nbsp;/g, ' ');
+              }).join('').replace(/\n/g, '');
+          content = content.replace(eq, annotation);
+        });
+        this.$parent.$data['problem'][this.target] = content.replace(/></g, '>\n<');
+        return $(this.$refs.editorModal).modal('hide');
+      }
+    },
+    mounted: function() {
+      if (!this.target) return false;
+      $(this.$refs.editorModal)
+        .on('hide.bs.modal', function(e) {
+          this.$parent.editTarget = null;
+        }.bind(this)).modal({
+          keyboard: false
+        });
+      this.$refs.summernote = $(this.$refs.editorModal).find('.editor-wrapper').summernote({
+        width: 500,
+        // minHeight: 500,
+        focus: true,
+        placeholder: '내용을 입력해주세요',
+        tableClassName: 'table table-bordered',
+        dialogsInBody: true,
+        insertTableMaxSize: {
+          col: 20,
+          row: 20
+        },
+        toolbar: [
+          ['para', ['style', 'paragraph', 'height', 'ul', 'ol']],
+          ['font', ['fontsize', 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript']], //, 'color']],
+          ['styleclear', ['clear']],
+          ['insert', ['picture', 'graph', 'table', 'hr']],
+          ['misc', ['codeview', 'help']]
+        ],
+        popover: {
+          image: [
+            ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+            ['float', ['floatLeft', 'floatRight', 'floatNone']],
+            ['remove', ['removeMedia']]
+          ],
+          link: [
+            ['link', ['linkDialogShow', 'unlink']]
+          ],
+          table: [
+            ['add', ['addRowDown', 'addRowUp', 'addColLeft', 'addColRight']],
+            ['delete', ['deleteRow', 'deleteCol']],
+            ['style', ['toggleTDColor']],
+            ['deleteAll', ['deleteTable']]
+          ]
+        },
+        buttons: {
+          graph: function(context) {
+            return $.summernote.ui.button({
+              contents: '<i class="fa fa-area-chart"/>',
+              tooltip: '그래프를 추가합니다',
+              click: function () {
+                this.$parent.$refs.graphModalComponent.graphData = {
+                  id: Math.round(Math.random() * 1000000),
+                  board: {
+                    width: 400, height: 300, padding: 20, square: 1,
+                    xmax: 5, xmin: -5, ymax: 4, ymin: -4,
+                    doGrids: 1, showXgrid: 1, showYgrid: 1, gdx: 1, gdy: 1,
+                    doAxes: 1, showXaxis: 1, showYaxis: 1, showXmarks: 1, showYmarks: 1, showXlabels: 1, showYlabels: 1, dx: 1, dy: 1,
+                    isDrawing: false, current_c: [], previews: [], drawingHandler: null, drawingData: [], drawingTip: '',
+                    fontfamily: 'KaTeX_Math, Times New Roman, Times, sans-serif',
+                  },
+                  customs: []
+                }
+                $(this.$parent.$refs.graphModalComponent.$refs.graphModal).modal();
+                return false;
+              }.bind(this)
+            }).render();
+          }.bind(this),
+          toggleTDColor: function(context) {
+            return $.summernote.ui.button({
+              contents: '<i class="fa fa-paint-brush"/>',
+              tooltip: '테이블 스타일을 토글합니다',
+              click: function() {
+                var target = $(context.invoke('createRange').sc);
+                while ($(target).parent()[0].nodeName == 'TD') {
+                  target = $(target).parent();
+                }
+                target.toggleClass('table-secondary');
+                return context.triggerEvent('change', context.code());
+              }
+            }).render();
+          }
+        },
+        callbacks: {
+          onInit: function() {
+            $(this.$refs.editorModal).find('[contenteditable=true]').on('DOMNodeInserted', function(e) {
+              if (e.target.nodeName == 'SPAN') $(e.target).replaceWith($(e.target).html());
+            });
+          }.bind(this),
+          onChange: function(content) {
+            this.editor.content = content.replace(/\s(style=""|class="")/g, '')
+                                         .replace(/<div> <\/div>/g, '<div><br></div>')
+                                         .replace(/<div><br><\/div>/g, '<br>');
+          }.bind(this),
+          onPaste: function(e) {
+            e.preventDefault();
+            $(this.$refs.summernote).summernote('insertText', e.originalEvent.clipboardData.getData('text'));
+          }.bind(this)
+        }
+      });
+    }
+  };
+
   var computed_value = {
     xunitlength: function() { return ((this.board.width - 2 * this.board.padding) / (this.board.xmax - this.board.xmin)); },
     yunitlength: function() { return this.board.square == 1 ? this.xunitlength : ((this.board.height - 2 * this.board.padding) / (this.board.ymax - this.board.ymin)); },
@@ -239,7 +718,8 @@ javascript:
     ticklength: function() { return this.fontsize / 4; },
     selected: function() { return _.where(this.customs, { isSelected: true }); }
   };
-  var graphComponent = {
+
+  var graphPreviewComponent = {
     props: {
       board: { type: Object, required: true },
       customs: { type: Array, required: true },
@@ -324,7 +804,7 @@ javascript:
       groups.push(createElement('g', basicElems));
 
       // 커스텀 엘리먼트 그룹 생성
-      var customElems = this.customs.map(function(custom, index){
+      var customElems = this.customs.map(function(custom, index) {
         var type = custom.func, args = custom.data;
         var result = this[type].apply(this, args);
         result.data = result.data || {};
@@ -502,7 +982,7 @@ javascript:
 
       // 최종 렌더링
       return createElement('div', {
-        style: { position: 'relative', margin: '0 auto', width: this.board.width + 'px', height: this.board.height + 'px' }
+        style: { position: 'relative', margin: '10px auto', width: this.board.width + 'px', height: this.board.height + 'px' }
       }, [createElement('svg', {
         attrs: { 'width': this.board.width, 'height': this.board.height }
       }, groups)]);
@@ -991,11 +1471,12 @@ javascript:
     },
   };
 
-  var graphScreenComponent = {
-    template: '#graph_screen_template',
+  var graphEditorComponent = {
+    template: '#graph-editor-template',
     props: ['board', 'customs'],
     data: function() {
       return {
+        tab: 1,
         customList: function() { return this.customs },
         drawstyle: {
           stroke: { color: 'grey', width: 1, dash: 'none', opacity: 1 },
@@ -1018,7 +1499,7 @@ javascript:
     },
     computed: computed_value,
     components: {
-      'graph-svg'  : graphComponent,
+      'graph-svg'  : graphPreviewComponent,
     },
     methods: {
       initPreview: function(drawingContext) {
@@ -1690,7 +2171,7 @@ javascript:
           var equation = prompt('수식을 입력하세요');
           if (!equation) return this.removePreview();
           if (equation.indexOf('y=') < 0 && equation.indexOf('x=') < 0) equation = 'y=' + equation;
-          this.removePreview(this.drawFormula(equation));
+          this.removePreview(this.drawFormula(equation, null, {}));
         }
       },
       addText: function(e) {
@@ -1792,11 +2273,11 @@ javascript:
           isSelected: false, isHovered: false
         };
       },
-      drawFormula: function(equation = '', additional_options = {}) {
+      drawFormula: function(equation = '', range, additional_options = {}) {
         return {
           name: '함수',
           func: 'makePlot',
-          data: [equation, additional_options],
+          data: [equation, range, additional_options],
           isSelected: false, isHovered: false
         };
       },
@@ -2192,8 +2673,7 @@ javascript:
       },
       resetDrawstyle: function() {
         this.drawstyle.stroke = { color: 'grey', width: 1, dash: 'none', opacity: 1 },
-        this.drawstyle.fill = { color: 'none', opacity: 1 },
-        $('select').dropdown('restore defaults');
+        this.drawstyle.fill = { color: 'transparent', opacity: 1 };
       },
       selectElem: function(elem, e) {
         if (e.shiftKey || e.metaKey || e.ctrlKey) {
@@ -2218,57 +2698,142 @@ javascript:
     }
   };
 
-  function drawGraph(id, graph_data) {
-    var el = document.getElementById(id);
-    el.innerHTML = '<graph-template :board="board" :customs="customs"></graph-template>';
-    return new Vue({
-      el: el,
-      data: graph_data || {
-        board: {
-          width: 400, height: 300, padding: 20, square: 1,
-          xmax: 5, xmin: -5, ymax: 4, ymin: -4,
-          doGrids: 1, showXgrid: 1, showYgrid: 1, gdx: 1, gdy: 1,
-          doAxes: 1, showXaxis: 1, showYaxis: 1, showXmarks: 1, showYmarks: 1, showXlabels: 1, showYlabels: 1, dx: 1, dy: 1,
-          isDrawing: false, current_c: [], previews: [], drawingHandler: null, drawingData: [], drawingTip: '',
-          fontfamily: 'KaTeX_Math, Times New Roman, Times, sans-serif',
-        },
-        customs: []
+  var graphModalComponent = {
+    data: function() {
+      return {
+        graphData: null
+      }
+    },
+    components: {
+      'graph-editor': graphEditorComponent
+    },
+    methods: {
+      saveGraph: function() {
+        var result = this.$refs.graphEditor.$refs.graphPreview.firstElementChild;
+        $(result).attr('contenteditable', false);
+        $(this.$parent.$refs.editorModalComponent.$refs.summernote).summernote('insertNode', result);
+        return $(this.$refs.graphModal).modal('hide');
+      }
+    }
+  };
+
+  var vm = new Vue({
+    el: '#problem-edit',
+    data: {
+      problem: #{{ problem.as_json(include: [:subject, :problem_tags, :problem_source]).to_json.html_safe }},
+      is_objective: #{{ problem.id ? (problem.exm_1.blank? ? false : true) : true }},
+      show_explanation: true,
+      editTarget: null,
+      focusInput: null
+    },
+    components: {
+      'subject-modal' : subjectModalComponent,
+      'tag-input'     : tagInputComponent,
+      'editor-modal'  : editorModalComponent,
+      'graph-modal'   : graphModalComponent
+    },
+    computed: {
+      problem_tag_ids: function() {
+        return _.pluck(this.problem.problem_tags, 'id');
       },
-      computed: computed_value,
-      components: {
-        'graph-template': graphScreenComponent
+      notReadySubmit: function() {
+        if (_.isNull(this.problem.subject_id) || _.isEmpty(this.problem.content) || _.isEmpty(this.problem.explanation) || _.isNull(this.problem.answer) || this.problem.answer == 0 || _.isNull(this.problem.score) || this.problem.score == 0) return true;
+        if (this.is_objective & (_.isEmpty(this.problem.exm_1) || _.isEmpty(this.problem.exm_2) || _.isEmpty(this.problem.exm_3) || _.isEmpty(this.problem.exm_4) || _.isEmpty(this.problem.exm_5))) return true;
+        if (this.is_changed) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    },
+    methods: {
+      openSubjectModal: function() {
+        this.$refs.subjectModalComponent.keyword = '';
+        $(this.$refs.subjectModalComponent.$refs.subjectModal).modal();
+        $(this.$refs.subjectModalComponent.$refs.subjectModalInput).trigger('focus');
       },
-      methods: {
-        deleteSelectedElem: function() {
-          if (this.selected.length == 0) return false;
-          if (confirm('삭제하시겠어요?')) this.customs = _.difference(this.customs, this.selected);
-        },
+      convertObjective: function(is_objective) {
+        if (is_objective & (this.problem.answer == 0 || this.problem.answer > 5)) this.problem.answer = null;
+        return this.is_objective = is_objective;
       },
-      mounted: function() {
-        $('#' + id + ' select').dropdown();
-        $('#' + id + ' .accordion').accordion({
-          animateChildren: false,
-          duration: 250,
-          onChange: function() {
-            $('.modal.active').modal('refresh');
+      inputScore: function() {
+        return $(this.$refs.inputScore).focus();
+      },
+      inputAnswer: function(answer) {
+        if (answer) {
+          if (confirm('정답을 ' + answer + '번으로 수정하시겠어요?')) return this.problem.answer = answer;
+        } else {
+          return $(this.$refs.inputAnswer).focus();
+        }
+      },
+      resizeTextarea: function(e, textarea = e.target) {
+        let st = $(window).scrollTop();
+        $(textarea).css('height', 'auto').height(textarea.scrollHeight - 14);
+        $(window).scrollTop(st);
+      },
+      init: function() {
+        $.each($('textarea'), function(index, textarea) { this.resizeTextarea(null, textarea); }.bind(this));
+        renderMathInElement(this.$refs.problemPreview, {
+          delimiters: [ { left: "$",  right: "$",  display: false } ],
+          errorCallback: function(msg, err) {
           }
         });
-        keyboardJS.on('backspace', this.deleteSelectedElem);
-      }
-    });
-  }
+      },
+      equationCheck: function(content) {
+        var err_check = 0, eqs = content.match(/\$[^\$]*\$/g);
+        _.each(eqs, function(eq) {
+          var nodes = $.parseHTML(eq),
+        	  annotation = _.map(nodes, function(node) {
+                          return node = $(node).text().replace(/\&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&nbsp;/g, ' ');
+                        }).join('').replace(/\n/g, '').replace(/\$/g, '');
+      	  try {
+      		  katex.renderToString(annotation);
+      	  } catch(err) {
+      		  err_check += 1;
+      	  }
+        });
+        return err_check > 0;
+      },
+      saveProblem: function() {
+        if (!this.is_changed && !confirm('변경내용이 없습니다. 그래도 전송할까요?')) return false;
 
-  function openGraphInput(graph_data) {
-    graph = drawGraph('graph_screen');
-    $('#graph_screen .modal').modal({
-      autofocus: false,
-      observeChanges: true,
-      closable: false,
-      keyboardShortcuts: false,
-      onHidden: function(){ this.remove(); },
-      onApprove: function(){
-        var result = $('#graph_preview').html();
-        $('#graph_target').html(result).removeAttr('id').attr('draggable', true).attr('contenteditable', false);
+        this.problem.content = this.problem.content.trim();
+        this.problem.exm_1 = this.problem.exm_1.trim();
+        this.problem.exm_2 = this.problem.exm_2.trim();
+        this.problem.exm_3 = this.problem.exm_3.trim();
+        this.problem.exm_4 = this.problem.exm_4.trim();
+        this.problem.exm_5 = this.problem.exm_5.trim();
+        this.problem.explanation = this.problem.explanation.trim();
+
+        if (this.is_objective) {
+          if (this.problem.exm_1.indexOf('$') == -1 && String(Number(this.problem.exm_1)).length == this.problem.exm_1.length) this.problem.exm_1 = '$' + this.problem.exm_1 + '$';
+          if (this.problem.exm_2.indexOf('$') == -1 && String(Number(this.problem.exm_2)).length == this.problem.exm_2.length) this.problem.exm_2 = '$' + this.problem.exm_2 + '$';
+          if (this.problem.exm_3.indexOf('$') == -1 && String(Number(this.problem.exm_3)).length == this.problem.exm_3.length) this.problem.exm_3 = '$' + this.problem.exm_3 + '$';
+          if (this.problem.exm_4.indexOf('$') == -1 && String(Number(this.problem.exm_4)).length == this.problem.exm_4.length) this.problem.exm_4 = '$' + this.problem.exm_4 + '$';
+          if (this.problem.exm_5.indexOf('$') == -1 && String(Number(this.problem.exm_5)).length == this.problem.exm_5.length) this.problem.exm_5 = '$' + this.problem.exm_5 + '$';
+        } else {
+          this.problem.exm_1 = undefined;
+          this.problem.exm_2 = undefined;
+          this.problem.exm_3 = undefined;
+          this.problem.exm_4 = undefined;
+          this.problem.exm_5 = undefined;
+        }
+
+        if (this.equationCheck(this.problem.content)
+            || this.equationCheck(this.problem.exm_1)
+            || this.equationCheck(this.problem.exm_2)
+            || this.equationCheck(this.problem.exm_3)
+            || this.equationCheck(this.problem.exm_4)
+            || this.equationCheck(this.problem.exm_5)
+            || this.equationCheck(this.problem.explanation)) {
+          return alert('수식 오류가 있습니다. 확인해주세요!')
+        }
+
+        return $(this.$refs.problemForm).submit();
       }
-    }).modal('show');
-  }
+    },
+    created: function() { this.is_changed = false; },
+    mounted: function() { this.init(); },
+    beforeUpdate: function() { this.is_changed = true; },
+    updated: function() { this.init(); }
+  });

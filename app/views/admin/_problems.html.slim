@@ -1,0 +1,17 @@
+table.table.table-bordered
+  thead.thead-default
+    tr
+      th.text-center 문제
+      th.text-center 정답률
+      th.text-center 수정
+      th.text-center 삭제
+  - problems.each_with_index do |problem, index|
+    tr
+      td.p-0 style="width: 540px"
+        == render '/admin/problem', problem: problem, order: index + 1
+      td.text-center
+        == "총 #{problem.total_count}회 중 정답 #{problem.correct_count}회"
+        br
+        == "(#{problem.total_count.zero? ? '-'  : "정답률 #{problem.correct_count * 100 / problem.total_count}%"})"
+      td = link_to "수정".html_safe, edit_admin_problem_path(problem), class: 'btn btn-block btn-warning'
+      td = link_to "삭제".html_safe, admin_problem_path(problem), class: 'btn btn-block btn-danger', data: { confirm: 'Are you sure?' }, method: :delete

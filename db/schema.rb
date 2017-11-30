@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170913090110) do
+ActiveRecord::Schema.define(version: 20171130015332) do
 
   create_table "problem_collection_histories", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "user_id",               null: false
@@ -34,16 +34,17 @@ ActiveRecord::Schema.define(version: 20170913090110) do
 
   create_table "problem_collections", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "subject_id",                        null: false
-    t.integer  "problem_source_id",                 null: false
+    t.integer  "problem_source_id"
     t.string   "name",                              null: false
     t.integer  "problem_count",     default: 0
     t.integer  "total_score",       default: 0
     t.date     "test_day"
     t.boolean  "published",         default: false
     t.integer  "solved_count",      default: 0
+    t.integer  "avg_score",         default: 0
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
-    t.integer  "avg_score",         default: 0
+    t.integer  "curriculum"
     t.index ["problem_source_id"], name: "index_problem_collections_on_problem_source_id", using: :btree
     t.index ["subject_id"], name: "index_problem_collections_on_subject_id", using: :btree
   end
@@ -71,32 +72,47 @@ ActiveRecord::Schema.define(version: 20170913090110) do
   end
 
   create_table "problem_sources", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string "name", null: false
+    t.string  "name",     null: false
+    t.boolean "category"
+  end
+
+  create_table "problem_tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string  "name"
+    t.string  "keyword"
+    t.integer "refer_count", default: 0
+  end
+
+  create_table "problem_tags_problems", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "problem_tag_id", null: false
+    t.integer "problem_id",     null: false
+  end
+
+  create_table "problem_tags_tmp_problems", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "problem_tag_id", null: false
+    t.integer "tmp_problem_id", null: false
   end
 
   create_table "problems", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer  "subject_id",                                         null: false
+    t.integer  "subject_id"
     t.integer  "level"
-    t.integer  "score",                               default: 0
-    t.text     "content",            limit: 16777215
-    t.text     "exm_1",              limit: 65535
-    t.text     "exm_2",              limit: 65535
-    t.text     "exm_3",              limit: 65535
-    t.text     "exm_4",              limit: 65535
-    t.text     "exm_5",              limit: 65535
+    t.integer  "score",                                 default: 0
+    t.integer  "year",                                  default: 2017
+    t.text     "content",              limit: 16777215
+    t.text     "exm_1",                limit: 65535
+    t.text     "exm_2",                limit: 65535
+    t.text     "exm_3",                limit: 65535
+    t.text     "exm_4",                limit: 65535
+    t.text     "exm_5",                limit: 65535
     t.string   "answer"
-    t.text     "explanation",        limit: 16777215
-    t.integer  "total_count",                         default: 0
-    t.integer  "correct_count",                       default: 0
+    t.text     "explanation",          limit: 16777215
+    t.integer  "total_count",                           default: 0
+    t.integer  "correct_count",                         default: 0
     t.integer  "problem_id"
     t.boolean  "set"
-    t.string   "audio_file_name"
-    t.string   "audio_content_type"
-    t.integer  "audio_file_size"
-    t.datetime "audio_updated_at"
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
-    t.integer  "year",                                default: 2017
+    t.datetime "created_at",                                           null: false
+    t.datetime "updated_at",                                           null: false
+    t.integer  "problem_source_id"
+    t.integer  "problem_source_order"
     t.index ["problem_id"], name: "index_problems_on_problem_id", using: :btree
     t.index ["subject_id"], name: "index_problems_on_subject_id", using: :btree
   end
@@ -113,19 +129,24 @@ ActiveRecord::Schema.define(version: 20170913090110) do
   end
 
   create_table "tmp_problems", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.text    "title",       limit: 65535
-    t.integer "order"
-    t.text    "content",     limit: 16777215
-    t.text    "exm_1",       limit: 65535
-    t.text    "exm_2",       limit: 65535
-    t.text    "exm_3",       limit: 65535
-    t.text    "exm_4",       limit: 65535
-    t.text    "exm_5",       limit: 65535
-    t.string  "answer"
-    t.integer "score",                        default: 0
-    t.text    "explanation", limit: 16777215
-    t.integer "subject_id"
-    t.integer "year",                         default: 2017
+    t.text     "title",             limit: 65535
+    t.integer  "order"
+    t.text     "content",           limit: 16777215
+    t.text     "exm_1",             limit: 65535
+    t.text     "exm_2",             limit: 65535
+    t.text     "exm_3",             limit: 65535
+    t.text     "exm_4",             limit: 65535
+    t.text     "exm_5",             limit: 65535
+    t.string   "answer"
+    t.integer  "score",                              default: 0
+    t.text     "explanation",       limit: 16777215
+    t.integer  "subject_id"
+    t.integer  "year",                               default: 2017
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
+    t.integer  "level"
+    t.integer  "problem_id"
+    t.integer  "problem_source_id"
     t.index ["subject_id"], name: "index_tmp_problems_on_subject_id", using: :btree
   end
 

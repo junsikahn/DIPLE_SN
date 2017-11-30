@@ -4,7 +4,16 @@ class Admin::ProblemsController < AdminController
   # GET /admin/problems
   # GET /admin/problems.json
   def index
-    @admin_problems = Admin::Problem.includes(:subject).page(params[:page]).per(params[:per])
+    @admin_problems = Admin::Problem.includes(:subject, :problem_tags).page(params[:page]).per(params[:per])
+  end
+
+  def test
+    if params[:problem_source_id]
+      @problem_source = Standard::ProblemSource.find(params[:problem_source_id])
+      @admin_problems = Admin::Problem.includes(:subject, :problem_tags, :problem_source).where(problem_source_id: params[:problem_source_id])
+    else
+      @problem_sources = Standard::ProblemSource.includes(:problems).all.order(:name)
+    end
   end
 
   # GET /admin/problems/1
@@ -14,13 +23,14 @@ class Admin::ProblemsController < AdminController
 
   # GET /admin/problems/new
   def new
-    @admin_problem = Admin::Problem.new(subject_id: params[:subject_id])
+    @admin_problem = Admin::Problem.new(subject: Admin::Subject.new)
     render 'form'
   end
 
   # GET /admin/problems/1/edit
   def edit
-    render 'form2'
+    @admin_problem.subject = Admin::Subject.new if @admin_problem.subject_id.nil?
+    render 'form'
   end
 
   # POST /admin/problems
@@ -38,7 +48,13 @@ class Admin::ProblemsController < AdminController
   # PATCH/PUT /admin/problems/1.json
   def update
     if @admin_problem.update(admin_problem_params)
-      redirect_to @admin_problem
+      if params[:redirect_url] && Rails.application.routes.recognize_path(params[:redirect_url])[:action] == 'test'
+        redirect_to test_admin_problems_path(problem_source_id: @admin_problem.problem_source_id)
+      elsif params[:redirect_url]
+        redirect_to params[:redirect_url]
+      else
+        redirect_to @admin_problem
+      end
     else
       render :edit
     end
@@ -66,13 +82,28 @@ class Admin::ProblemsController < AdminController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_admin_problem
-    @admin_problem = Admin::Problem.includes(:subject).find(params[:id])
+    @admin_problem = Admin::Problem.includes(:subject, :problem_tags, :problem_source).find(params[:id])
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def admin_problem_params
+    params[:admin_problem][:problem_tag_ids] = params[:admin_problem][:problem_tag_ids].split(',') if params[:admin_problem][:problem_tag_ids]
     params
       .require(:admin_problem)
-      .permit(:subject_id, :content, :exm_1, :exm_2, :exm_3, :exm_4, :exm_5, :answer, :score, :explanation)
+      .permit(:subject_id,
+              :score,
+              :level,
+              :content,
+              :exm_1,
+              :exm_2,
+              :exm_3,
+              :exm_4,
+              :exm_5,
+              :explanation,
+              :answer,
+              :year,
+              :problem_source_id,
+              :problem_source_order,
+              problem_tag_ids: [])
   end
 end

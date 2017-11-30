@@ -25,31 +25,6 @@ ko:
         avatar: 프로필 이미지
         pin: 인증번호
         pin_sent_at: 유효시간
-      mentor:
-        self_introduction: 자기소개
-        bank_name: 은행명
-        account_number: 계좌번호
-        subjects: 과목명
-      univ_careers:
-        school: 학교
-        major_1: 전공
-        major_2: 복수전공1
-        major_3: 복수전공2
-        status: 학적상태
-        entrance_year: 입학년도
-        graduate_year: 졸업년도
-      high_careers:
-        school: 학교
-        status: 학적상태
-        entrance_year: 입학년도
-        graduate_year: 졸업년도
-      locations:
-        full_address: 주소
-        distance: 거리
-      schedules:
-        day_of_week: 요일
-        time_start: 시작시간
-        time_end: 종료시간
       admin_problem_collection:
         problem_source: 문제출처/유형
         subject: 과목명
@@ -65,30 +40,25 @@ ko:
         exm_5: 보기5
         answer: 정답
         score: 점수
+        level: 난이도
+        explanation: 해설
+      admin_tmp_problem:
+        subject: 단원
+        content: 문제
+        exm_1: 보기1
+        exm_2: 보기2
+        exm_3: 보기3
+        exm_4: 보기4
+        exm_5: 보기5
+        answer: 정답
+        score: 점수
+        level: 난이도
         explanation: 해설
     hints:
       defaults:
       user:
         pin_sent_at: 5분 내에 입력해주세요
-      univ_careers:
-        school: 학교명을 검색하여 입력하세요
-        major_1: 전공을 검색하여 입력하세요
-        major_2: 전공을 검색하여 입력하세요
-        major_3: 전공을 검색하여 입력하세요
-        status: 학적상태를 선택해주세요
-        entrance_year: 입학년도를 선택해주세요
-        graduate_year: 졸업년도를 선택해주세요
-      high_careers:
-        school: 학교명을 검색하여 입력하세요
-        status: 학적상태를 선택해주세요
-        entrance_year: 입학년도를 선택해주세요
-        graduate_year: 졸업년도를 선택해주세요
-      mentor:
-        self_introduction: 자기소개는 10자 이상 입력해주세요
-        bank_name: 은행을 선택하세요
-        account_number: "'-' 를 제외한 숫자만 입력해주세요"
       admin_problem:
-        answer: 숫자로 입력하세요
     include_blanks:
       defaults:
     prompts:
@@ -104,19 +74,6 @@ ko:
         name: 이름을 입력해주세요
         birthday: 생년월일을 선택해주세요
         address: 주소를 입력해주세요
-      mentor:
-        self_introduction: 자기소개를 입력해주세요
-        account_number: 계좌번호를 입력해주세요
-        subjects: 선호과목을 선택해주세요
-      univ_careers:
-        school: 학교명을 입력해주세요
-        major_1: 전공을 입력해주세요
-        major_2: 복수전공을 입력해주세요
-        major_3: 복수전공을 입력해주세요
-      high_careers:
-        school: 학교명을 입력해주세요
-      locations:
-        full_address: 주소를 입력해주세요
       admin_problem:
         content: 문제를 입력하세요
         exm_1: 보기1번을 입력하세요
@@ -126,4 +83,16 @@ ko:
         exm_5: 보기5번을 입력하세요
         answer: 정답을 입력하세요
         score: 점수를 입력하세요
+        level: 난이도를 입력하세요
+        explanation: 해설을 입력하세요
+      admin_tmp_problem:
+        content: 문제를 입력하세요
+        exm_1: 보기1번을 입력하세요
+        exm_2: 보기2번을 입력하세요
+        exm_3: 보기3번을 입력하세요
+        exm_4: 보기4번을 입력하세요
+        exm_5: 보기5번을 입력하세요
+        answer: 정답을 입력하세요
+        score: 점수를 입력하세요
+        level: 난이도를 입력하세요
         explanation: 해설을 입력하세요

@@ -1,43 +1,53 @@
 div#ebs_upload
-  button.ui.button :class="isUploading ? 'loading' : ''" v-if="!isUploaded" :key="1" @click="ebsPreview" EBS 문제 업로드
-  button.ui.positive.button :class="isUploading ? 'loading' : ''" v-else="" :key="2" @click="ebsUpload" 업로드하기
-  table.ui.celled.striped.selectable.table
-    thead
+  div.mb-3.text-right
+    button.btn.btn-secondary :class="isUploading ? 'loading' : ''" v-if="!isUploaded" :key="1" @click.prevent="ebsPreview" EBS 문제 업로드
+    button.btn.btn-success :class="isUploading ? 'loading' : ''" v-else="" :key="2" @click.prevent="ebsUpload" 업로드하기
+  table.table.table-bordered
+    thead.thead-default
       tr
-        th.center.aligned 순서
-        th.center.aligned 문제
+        th.text-center 순서
+        th.text-center 문제
     tbody
-      tr v-for="(tmp_problem, order) in tmp_problems"
-        td.collapsing v-text="order + 1"
-        td.collapsing style="white-space: initial;"
-          div.problem_container.clearfix
-            div
-              span.ui.horizontal.black.label v-text="tmp_problem.title"
-              span.ui.horizontal.black.label v-text="tmp_problem.year"
-              span.ui.horizontal.black.label v-text="tmp_problem.order + '번'"
-              span.ui.horizontal.basic.label v-text="tmp_problem.score + '점'"
-            div.ui.top.attached.segment.black.clearfix.problem_seg v-html="tmp_problem.content"
-            div.ui.attached.segment.exm_seg v-if="tmp_problem.exms"
-              div.ui.very.relaxed.selection.list.exm_list
-                div.item.exm_item v-for="(exm, index) in tmp_problem.exms" :class="index + 1 == tmp_problem.answer ? 'active' : ''"
-                  span.ui.circular.mini.horizontal.label :class="index + 1 == tmp_problem.answer ? 'green' : 'basic'" v-text="index + 1"
-                  div.exm_container v-html="exm"
-            div.ui.attached.segment.exm_seg v-else=""
-              div.ui.form
-                div.field
-                  input.ui.input type="text" :value="tmp_problem.answer" readonly="true"
-            div.ui.attached.secondary.segment.exm_answer_seg v-if="tmp_problem.explanation" v-html="tmp_problem.explanation"
-            div.ui.bottom.attached.right.aligned.secondary.segment.exm_answer_seg v-if="tmp_problem.exms"
-              | 정답은&nbsp;
-              span.ui.circular.mini.horizontal.label.basic v-text="tmp_problem.answer"
-              | 번입니다.
-            div.ui.bottom.attached.right.aligned.secondary.segment.exm_answer_seg v-else="" 정답은 {{ tmp_problem.answer }} 입니다.
+      tr v-for="(problem, order) in tmp_problems"
+        td v-text="order + 1"
+        td
+          div.problem-container
+            div.problem-info.d-flex.justify-content-between.align-items-end.flex-wrap
+              div.d-inline-flex
+                span.problem-order v-html="problem.order == undefined ? (problem.id ? 'ID ' + problem.id  : 'NEW') : problem.order + '번'"
+                span.problem-score v-html="problem.score + '점'"
+              div.d-inline-flex.justify-content-end.align-items-end.w-75
+                span.problem-subject v-html="problem.subject_id ? problem.subject.path : '미분류'" :class='{ "text-danger": !problem.subject_id }'
+                span.problem-level.d-flex.bg-light.text-warning
+                  i.fa :class="[ problem.level >= 1 ? 'fa-star' : 'fa-star-o' ]"
+                  i.fa :class="[ problem.level >= 2 ? 'fa-star' : 'fa-star-o' ]"
+                  i.fa :class="[ problem.level == 3 ? 'fa-star' : 'fa-star-o' ]"
+            div.problem-wrapper
+              div.problem-content v-html="problem.content"
+              div.problem-exm v-if="problem.exm_1"
+                div.problem-exm-wrapper v-for="(exm, index) in [problem.exm_1, problem.exm_2, problem.exm_3, problem.exm_4, problem.exm_5]" :key="index"
+                  span.problem-exm-index v-text="index + 1" :class="[ problem.answer == index + 1 ? 'active' : '' ]"
+                  span.problem-exm-content v-html="exm"
+              div.problem-answer-input v-else=""
+                input.form-control type="text" readonly="true" :value="problem.answer"
+              div.problem-explanation v-html="problem.explanation"
+              div.problem-answer
+                i.fa.fa-caret-right.mr-1
+                span.problem-answer-wrapper
+                  span.problem-answer-seg.align-bottom :class="{ 'is-objective' : problem.exm_1 }" v-html="problem.answer"
+              div.problem-tags
+                a.badge.badge-secondary.mt-1.mr-1 v-for="tag in problem.problem_tags" :key="tag.id" v-html="tag.name" href="#" @click.prevent=""
 
 
 javascript:
   var ebs = new Vue({
     el: '#ebs_upload',
-    data: { file: null, tmp_problems: [], isUploading: false, isUploaded: false },
+    data: {
+      file: null,
+      tmp_problems: [],
+      isUploading: false,
+      isUploaded: false
+    },
     methods: {
       ebsPreview: function() {
         var input = document.createElement('input');

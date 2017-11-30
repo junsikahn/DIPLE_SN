@@ -38,7 +38,7 @@ module DIPLE
                             deliver_with: :deliver_now,
                             email_prefix: '[Server ERROR] ',
                             sender_address: %("Server ERROR" <notice@vaskit.kr>),
-                            exception_recipients: ['junsikahn@vaskit.kr', 'sunghomoon@vaskit.kr']
+                            exception_recipients: ['junsikahn@vaskit.kr']
                           }
     #                       slack: {
     #                         webhook_url: "https://hooks.slack.com/services/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",

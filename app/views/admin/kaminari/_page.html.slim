@@ -1,4 +1,6 @@
 - if page.current?
-  a.item.active href="#{url}" title="#{page}" = page
+  li.page-item.active
+    = content_tag :a, page, remote: remote, rel: (page.next? ? 'next' : (page.prev? ? 'prev' : nil)), class: 'page-link'
 - else
-  a.item href="#{url}" title="#{page}" = page
+  li.page-item
+    = link_to page, url, remote: remote, rel: (page.next? ? 'next' : (page.prev? ? 'prev' : nil)), class: 'page-link'

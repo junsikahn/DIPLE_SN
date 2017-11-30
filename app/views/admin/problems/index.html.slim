@@ -1,60 +1,24 @@
-table.ui.celled.striped.selectable.table
-  thead
+div.jumbotron.p-4.mb-3.text-right
+  h1.text-left 문제 목록
+  = link_to "<i class='fa fa-plus-square'></i> 문제 추가".html_safe, new_admin_problem_path, class: 'btn btn-success'
+
+table.table.table-bordered
+  thead.thead-default
     tr
-      th.center.aligned 문제
-      th.center.aligned 정답률
-      th.center.aligned 수정
-      th.center.aligned 삭제
+      th.text-center 문제
+      th.text-center 정답률
+      th.text-center 수정
+      th.text-center 삭제
   tbody
     - @admin_problems.each do |admin_problem|
-      / tr onclick='location.href="#{admin_problem_path(admin_problem)}"'
       tr
-        td.collapsing style="white-space: initial;"
-          div.problem_container.clearfix
-            div
-              span.ui.horizontal.black.label = "ID: #{admin_problem.id}"
-              span.ui.horizontal.basic.label = "#{admin_problem.score}점"
-              span.ui.horizontal.basic.label = "#{admin_problem.level}"
-              span.ui.horizontal.label == admin_problem.subject.path
-            div.ui.top.attached.segment.black.clearfix.problem_seg
-              == admin_problem.content
-            - if admin_problem.objective?
-              div.ui.attached.segment.exm_seg
-                div.ui.very.relaxed.selection.list.exm_list
-                  - (1..5).each do |index|
-                    - next if admin_problem['exm_' + index.to_s].blank?
-                    div.item.exm_item class="#{'active' if index == admin_problem.answer.to_i}"
-                      span.ui.circular.mini.horizontal.label class="#{index == admin_problem.answer.to_i ? 'green' : 'basic'}" = index
-                      div.exm_container == admin_problem['exm_' + index.to_s]
-            - else
-              div.ui.attached.segment.exm_seg
-                div.ui.form
-                  div.field
-                    input.ui.input type="text" value="#{admin_problem.answer}" readonly="true"
-            - if admin_problem.audio?
-              div.ui.attached.secondary.segment.exm_answer_seg
-                == audio_tag admin_problem.audio.url(:original), controls: true, style: 'width: 100%;'
-            - if admin_problem.explanation?
-              div.ui.attached.secondary.segment.exm_answer_seg
-                == admin_problem.explanation
-            - if admin_problem.objective?
-              div.ui.bottom.attached.right.aligned.secondary.segment.exm_answer_seg
-                | 정답은&nbsp;
-                span.ui.circular.mini.horizontal.label.basic = admin_problem.answer
-                | 번입니다.
-            - else
-              div.ui.bottom.attached.right.aligned.secondary.segment.exm_answer_seg
-                = "정답은 #{admin_problem.answer} 입니다."
-        td.three.wide.center.aligned
+        td.p-0 style="width: 540px"
+          == render '/admin/problem', problem: admin_problem, order: nil
+        td.text-center
           == "총 #{admin_problem.total_count}회 중 정답 #{admin_problem.correct_count}회"
           br
           == "(#{admin_problem.total_count.zero? ? '-'  : "정답률 #{admin_problem.correct_count * 100 / admin_problem.total_count}%"})"
-        td.two.wide = link_to "#{semantic_icon('edit')}수정".html_safe, edit_admin_problem_path(admin_problem), class: 'ui icon positive basic fluid button'
-        td.two.wide = link_to "#{semantic_icon('trash')}삭제".html_safe, admin_problem_path(admin_problem), class: 'ui icon negative basic fluid button', data: { confirm: 'Are you sure?' }, method: :delete
-  tfoot
-    tr.right.aligned
-      th colspan="20"
-        = paginate @admin_problems, views_prefix: 'admin'
-    tr.right.aligned
-      th colspan="20"
-        = link_to "#{semantic_icon('plus')}추가".html_safe, new_admin_problem_path, class: 'ui positive labeled icon large button'
+        td.text-center = link_to "<i class='fa fa-edit'></i>".html_safe, edit_admin_problem_path(admin_problem), class: 'btn btn-warning text-white'
+        td.text-center = link_to "<i class='fa fa-trash'></i>".html_safe, admin_problem_path(admin_problem), class: 'btn btn-danger', data: { confirm: 'Are you sure?' }, method: :delete
+
+= paginate @admin_problems, views_prefix: 'admin'

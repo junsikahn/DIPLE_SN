@@ -1,0 +1,40 @@
+div.problem-container
+  div.problem-info.d-flex.justify-content-between.align-items-end.flex-wrap
+    div.d-inline-flex
+      span.problem-order == order ? "#{order}번" : "ID #{problem.id}"
+      span.problem-score == "#{problem.score}점"
+    div.d-inline-flex.justify-content-end.align-items-end.w-75
+      span.problem-subject class="#{'text-danger' if !problem.subject_id}" == problem.subject_id ? problem.subject.path : '미분류'
+      span.problem-level.d-flex.bg-light.text-warning
+        - if problem.level.nil?
+          == "<i class='fa fa-star-o'></i><i class='fa fa-star-o'></i><i class='fa fa-star-o'></i>".html_safe
+        - else
+          - problem.level.times do
+            == "<i class='fa fa-star'></i>".html_safe
+          - (3 - problem.level).times do
+            == "<i class='fa fa-star-o'></i>".html_safe
+  div.problem-wrapper
+    div.problem-content == problem.content
+    div.problem-exm
+      - if problem.exm_1
+        - (1..5).each do |index|
+          - next if problem['exm_' + index.to_s].blank?
+          - correct = index == problem.answer.to_i
+          div.problem-exm-wrapper class="#{'active' if correct}"
+            span.problem-exm-index class="#{'active' if correct}" == index
+            span.problem-exm-content == problem['exm_' + index.to_s]
+      - else
+        input.form-control type="text" readonly="true"
+    - if problem.explanation
+      div.problem-explanation == problem.explanation
+    div.problem-answer
+      i.fa.fa-caret-right.mr-1
+      span.problem-answer-wrapper
+        span.problem-answer-seg.align-bottom class="#{'is-objective' if problem.objective?}" == problem.answer
+  - if problem.problem_source_id
+    div.problem-source
+      i.fa.fa-caret-right.mr-1
+      span =="출처 : #{problem.problem_source.name} - #{problem.problem_source_order}번"
+  div.problem-tags
+    - problem.problem_tags.each do |tag|
+      a.badge.badge-secondary.mr-1 == tag.name

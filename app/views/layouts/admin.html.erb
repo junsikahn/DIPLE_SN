@@ -7,134 +7,76 @@
     <%= action_cable_meta_tag %>
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.0/vue.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.6.0/Sortable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.14.1/vuedraggable.min.js"></script>
-    <script src="//cdn.quilljs.com/1.3.2/quill.min.js"></script>
-    <link href="//cdn.quilljs.com/1.3.2/quill.snow.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
     <script>
-      $(document).ready(function(){
-        $('#nav-menu-icon').on('click', function(e) {
-          e.preventDefault();
-          $('.ui.sidebar').sidebar('toggle');
-        });
-
-        <% flash.each do |key, value| %>
-          new Noty({
-            type: '<%= flash_class key %>',
-            text: '<%= value %>',
-            timeout: 5000,
-            progressBar: true,
-            animation: {
-              open: 'noty_effects_open',
-              close: 'noty_effects_close'
-            }
-          }).show();
-        <% end %>
-
-        $('.file-upload.button').on('click', function() {
-          var field = $(this).parentsUntil('.field.file', this);
-          var file_input = field.find('input[type="file"]');
-          var img = field.find('img');
-          file_input.click().off('change').on('change', function() {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-              img[0].src = e.target.result;
-            };
-            reader.readAsDataURL(file_input[0].files[0]);
-          });
-        });
-
+      $(document).on('turbolinks:load', function() {
+        // $('.file-upload.button').on('click', function() {
+        //   var field = $(this).parentsUntil('.field.file', this);
+        //   var file_input = field.find('input[type="file"]');
+        //   var img = field.find('img');
+        //   file_input.click().off('change').on('change', function() {
+        //     var reader = new FileReader();
+        //     reader.onload = function(e) {
+        //       img[0].src = e.target.result;
+        //     };
+        //     reader.readAsDataURL(file_input[0].files[0]);
+        //   });
+        // });
         renderMathInElement(document.body, {
-          delimiters: [
-            { left: "$$", right: "$$", display: true },
-            { left: "$",  right: "$",  display: false }
-          ]
+          delimiters: [ { left: "$",  right: "$",  display: false } ],
+          errorCallback: function(msg, err) {
+            var err_msg = msg.split('`')[1];
+            $('body').highlight(err_msg, { element: 'mark', className: 'bg-danger text-light' });
+            new Noty({
+              type: 'error',
+              text: '<i class="fa fa-exclamation-triangle"/> 수식 에러가 있습니다',
+              layout: 'bottomRight',
+              timeout: 5000,
+              progressBar: true,
+              closeWith: ['click', 'button'],
+              animation: {
+                open: 'noty_effects_open',
+                close: 'noty_effects_close'
+              }
+            }).show();
+            console.error(err);
+          }
         });
       });
     </script>
   </head>
   <body>
-    <nav class="ui right vertical menu sidebar inverted">
-    </nav>
-    <div class="pusher">
-      <header class="ui top-header clearfix">
-        <div class="ui container">
-            <div class="ui secondary menu">
-              <%= link_to admin_root_path, style: 'position: relative' do %>
-                <img src="http://snacademy.co.kr/images/logo.png">
-                <span style="position: absolute; bottom: 0; right: 0; font-weight: bold; color: crimson;">썸머캠프 재학생 전용</span>
-                <span style="position: absolute; bottom: 20px; right: -90px; font-weight: bold; font-size: 25px; color: coral;">ADMIN</span>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
+      <div class="container">
+        <%= link_to 'OMRice', admin_root_path, style: 'position: relative', class: 'navbar-brand' %>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item <%== 'active' if controller_name == 'problems' && action_name == 'test' %>"><%= link_to '기출문제', test_admin_problems_path, class: 'nav-link' %></li>
+            <li class="nav-item <%== 'active' if controller_name == 'problems' && action_name != 'test' %>"><%= link_to '문제관리', admin_problems_path, class: 'nav-link' %></li>
+            <li class="nav-item <%== 'active' if controller_name == 'problem_collections' %>"><%= link_to '문제모음관리', admin_problem_collections_path, class: 'nav-link' %></li>
+            <li class="nav-item <%== 'active' if controller_name == 'subjects' %>"><%= link_to '과목관리', admin_subjects_path, class: 'nav-link' %></li>
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <% if current_user %>
+                <%= link_to '로그아웃', destroy_user_session_path, class: 'nav-link', method: :delete %>
+              <% else %>
+                <%= link_to '로그인', new_user_session_path, class: 'nav-link' %>
               <% end %>
-              <div class="right menu" id="admin_menu">
-                <%= link_to 'EBS 업로드', admin_tmp_problems_path, class: 'item' %>
-                <%= link_to '문제 관리', admin_problems_path, class: 'item' %>
-                <%= link_to '문제모음 관리', admin_problem_collections_path, class: 'item' %>
-                <%= link_to '회원 관리', admin_users_path, class: 'item' %>
-                <%= link_to '과목 관리', admin_subjects_path, class: 'item' %>
-                <% if current_user %>
-                  <%= link_to '로그아웃', destroy_user_session_path, class: 'item', method: :delete %>
-                <% else %>
-                  <%= link_to '로그인', new_user_session_path, class: 'item' %>
-                <% end %>
-                <div class="item mobile only">
-                  <%= link_to '#', class: 'ui button red inverted icon', id: 'nav-menu-icon' do %>
-                    <i class="icon content"></i>
-                  <% end %>
-                </div>
-              </div>
-            </div>
+            </li>
+          </ul>
         </div>
-      </header>
-
-      <main class="ui container center-main">
+      </div>
+    </nav>
+    <main class="container-fluid mt-3 mb-5">
+      <div class="container">
         <%= yield %>
-      </main>
-
-      <!-- <footer class="ui inverted vertical bottom-footer segment">
-        <div class="ui center aligned container">
-          <div class="ui stackable inverted divided grid">
-            <div class="seven wide column">
-              <h4 class="ui inverted header">Footer Header</h4>
-              <p>Extra space for a call to action inside the footer that could help re-engage users.</p>
-            </div>
-            <div class="three wide column">
-              <h4 class="ui inverted header">Group 1</h4>
-              <div class="ui inverted link list">
-                <a href="#" class="item">Link One</a>
-                <a href="#" class="item">Link Two</a>
-                <a href="#" class="item">Link Three</a>
-                <a href="#" class="item">Link Four</a>
-              </div>
-            </div>
-            <div class="three wide column">
-              <h4 class="ui inverted header">Group 2</h4>
-              <div class="ui inverted link list">
-                <a href="#" class="item">Link One</a>
-                <a href="#" class="item">Link Two</a>
-                <a href="#" class="item">Link Three</a>
-                <a href="#" class="item">Link Four</a>
-              </div>
-            </div>
-            <div class="three wide column">
-              <h4 class="ui inverted header">Group 3</h4>
-              <div class="ui inverted link list">
-                <a href="#" class="item">Link One</a>
-                <a href="#" class="item">Link Two</a>
-                <a href="#" class="item">Link Three</a>
-                <a href="#" class="item">Link Four</a>
-              </div>
-            </div>
-          </div>
-          <div class="ui inverted section divider"></div>
-          <div class="ui horizontal inverted small divided link list">
-            <a class="item" href="#">Site Map</a>
-            <a class="item" href="#">Contact Us</a>
-            <a class="item" href="#">Terms and Conditions</a>
-            <a class="item" href="#">Privacy Policy</a>
-          </div>
-        </div>
-      </footer> -->
-    </div>
+      </div>
+    </main>
   </body>
 </html>

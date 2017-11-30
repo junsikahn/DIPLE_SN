@@ -13,22 +13,21 @@
 //= require jquery
 //= require jquery_ujs
 //= require jquery.remotipart
-//= require turbolinks
-//= require underscore
-//= require semantic-ui
 //= require jquery_nested_form
-//= require noty
+//= require underscore
+//= require vue
+//= require vuex
+//= require turbolinks
+//= require bowser
+//= require summernote
 //= require katex
 //= require katex/contrib/auto-render.min
-//= require local_time_ko
 //= require chartjs
-//= require bowser
-//= require FileAPI
+//= require noty
 //= require KeyboardJS
-//= require howler
-//= require wysiwyg
-//= require jQuery-contextMenu
-//= require vue-quill-editor.min
+//= require FileAPI
+//= require sortablejs
+//= require local_time_ko
 //= require_tree .
 
 // init underscore.js Template

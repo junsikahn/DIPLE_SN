@@ -1,85 +1,56 @@
-table.ui.celled.striped.table
-  thead
+h3 문제집 정보
+table.table.table-hover.table-bordered
+  thead.thead-default
     tr
-      th.center.aligned 타입
-      th.center.aligned 과목
-      th.center.aligned 이름
-      th.center.aligned 문제갯수
-      th.center.aligned 총점
-      th.center.aligned 시험일자
-      th.center.aligned 완료횟수
-      th.center.aligned 발행여부
+      th.text-center 과목
+      th.text-center 타입
+      th.text-center 이름
+      th.text-center 문제갯수
+      th.text-center 총점
+      th.text-center 시험일자
+      th.text-center 완료횟수
+      th.text-center 편집
+      th.text-center 삭제
+      th.text-center 추가
+      th.text-center 발행
   tbody
     tr
-      td = @admin_problem_collection.problem_source.name
       td = @admin_problem_collection.subject.name
+      td = @admin_problem_collection.curriculum_name
       td = @admin_problem_collection.name
       td = "#{@admin_problem_collection.problem_count}개"
       td = "#{@admin_problem_collection.total_score}점"
       td = @admin_problem_collection.test_day
       td = @admin_problem_collection.solved_count
-      td == "#{@admin_problem_collection.published ? semantic_icon('check green') : semantic_icon('remove red')}"
-  tfoot
-    tr.right.aligned
-      th colspan="20"
-        = link_to "#{semantic_icon('edit')}편집".html_safe, edit_admin_problem_collection_path(@admin_problem_collection), class: 'ui positive labeled icon button'
-        = link_to "#{semantic_icon('trash')}삭제".html_safe, @admin_problem_collection, data: { confirm: 'Are you sure?' }, method: :delete, class: 'ui negative labeled icon button'
-    tr.right.aligned
-      th colspan="20"
-        = link_to "#{semantic_icon('plus')}문제추가".html_safe, new_admin_problem_collection_problem_path(@admin_problem_collection.id), class: 'ui positive labeled icon button'
-        / = link_to "#{semantic_icon('plus')}문제세트추가".html_safe, new_admin_problem_collection_problem_set_path(@admin_problem_collection.id), class: 'ui positive labeled icon button'
-    tr.right.aligned
-      th colspan="20"
+      td = link_to "수정".html_safe, edit_admin_problem_collection_path(@admin_problem_collection), class: 'btn btn-block btn-warning'
+      td = link_to "삭제".html_safe, @admin_problem_collection, class: 'btn btn-block btn-danger', data: { confirm: 'Are you sure?' }, method: :delete
+      td = link_to "추가".html_safe, new_admin_problem_collection_problem_path(@admin_problem_collection), class: 'btn btn-block btn-success'
+      td
         - if @admin_problem_collection.published
-          = link_to "#{semantic_icon('remove')}발행취소".html_safe, publish_admin_problem_collection_path(@admin_problem_collection), method: :patch, class: 'ui negative labeled icon button'
+          = link_to "취소".html_safe, publish_admin_problem_collection_path(@admin_problem_collection), class: 'btn btn-block btn-danger', method: :patch
         - else
-          = link_to "#{semantic_icon('plus')}발행".html_safe, publish_admin_problem_collection_path(@admin_problem_collection), method: :patch, class: 'ui positive labeled icon button'
+          = link_to "발행".html_safe, publish_admin_problem_collection_path(@admin_problem_collection), class: 'btn btn-block btn-success', method: :patch
 
 h3 포함 문제
-table.ui.celled.structured.table.multiline#problems_table
-  thead
-    tr
-      th.center.aligned 번호
-      th.center.aligned 문제
-      th.center.aligned 정답률
-      th.center.aligned 수정
-      th.center.aligned 삭제
-  - order = 0
-  - @admin_problem_collection.problems.each_with_index do |problem, index|
-    - if problem.set?
-      tbody
-        tr
-          td.center.aligned = "#{order + 1}~#{order + problem.set_problems.size}번"
-          td.collapsing
-            div.problem_container.problem_seg  == problem.content
-          td.three.wide.center.aligned
-          td.two.wide = link_to "#{semantic_icon('edit')}수정".html_safe, edit_admin_problem_collection_problem_set_path(@admin_problem_collection, problem), class: 'ui icon positive basic fluid button'
-          td.two.wide = link_to "#{semantic_icon('trash')}삭제".html_safe, admin_problem_collection_problem_set_path(@admin_problem_collection, problem), class: 'ui icon negative basic fluid button', data: { confirm: 'Are you sure?' }, method: :delete
-        - problem.set_problems.each do |set_problem|
-          - order += 1
-          == render 'problem', problem: set_problem, order: order
-    - else
-      tbody
-        - order += 1
-        == render 'problem', problem: problem, order: order
-
-- solved_users = @users.select{|u| !u.score.nil? }
-- unsolved_users = @users.select{|u| u.score.nil? }
-h3 응시자 명단
-table.ui.celled.table
-  thead
-    tr
-      th.center.aligned colspan="2" = "#{solved_users.size}명 응시 / #{unsolved_users.size}명 미응시"
-      th.center.aligned colspan="2" = "평균 #{@users.average(:score).to_i}점 / 만점 #{@admin_problem_collection.total_score}점"
-    tr
-      th.center.aligned 학번
-      th.center.aligned 이름
-      th.center.aligned 점수
-      th.center.aligned 시험일자
-  tbody
-    - @users.each do |user|
-      tr
-        td.four.wide = user.uid
-        td.four.wide = user.name
-        td.four.wide = user.score ? "#{user.score}점" : '미응시'
-        td.four.wide = user.score ? l(user.created_at, format: :date_time) : '-'
+== render '/admin/problems', problems: @admin_problem_collection.problems
+/
+/ - solved_users = @users.select{|u| !u.score.nil? }
+/ - unsolved_users = @users.select{|u| u.score.nil? }
+/ h3 응시자 명단
+/ table.table.table-bordered
+/   thead.thead-default
+/     tr
+/       th.text-center colspan="2" = "#{solved_users.size}명 응시 / #{unsolved_users.size}명 미응시"
+/       th.text-center colspan="2" = "평균 #{@users.average(:score).to_i}점 / 만점 #{@admin_problem_collection.total_score}점"
+/     tr
+/       th.text-center 학번
+/       th.text-center 이름
+/       th.text-center 점수
+/       th.text-center 시험일자
+/   tbody
+/     - @users.each do |user|
+/       tr
+/         td.four.wide = user.uid
+/         td.four.wide = user.name
+/         td.four.wide = user.score ? "#{user.score}점" : '미응시'
+/         td.four.wide = user.score ? l(user.created_at, format: :date_time) : '-'

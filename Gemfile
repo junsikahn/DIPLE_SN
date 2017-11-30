@@ -35,6 +35,10 @@ gem 'redis', '~> 3.0'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
+# Sprockets ES6 transformer
+gem 'sprockets'
+gem 'sprockets-es6'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
@@ -95,28 +99,38 @@ gem 'simple_form'
 gem 'nested_form'
 gem 'validates_timeliness'
 
-# Sass-powered version of Semantic UI and ready to drop into Rails & Compass.
-gem 'semantic-ui-sass', '~> 2.2.10.1'
-# Rails asset-pipeline gem to provide underscore.js
-gem 'underscore-rails'
+# A simple asset-pipeline wrapper for Vue.js by Evan You https://github.com/adambutler/vuejs-rails
+gem 'vuejs-rails'
+
+# the font-awesome font bundled as an asset for the rails asset pipeline https://github.com/bokmann/font-awesome-rails
+# gem 'font-awesome-rails'
+
+# http://fontawesome.io/get-started/
+gem 'font-awesome-sass'
 
 source 'https://rails-assets.org' do
-  # NOTY is a notification library that makes it easy to create alert - success - error - warning - information - confirmation messages as an alternative the standard alert dialog.
-  gem 'rails-assets-noty'
+  # Rails asset-pipeline gem to provide underscore.js
+  gem 'rails-assets-underscore'
+  # A browser detector https://github.com/lancedikson/bowser
+  gem 'rails-assets-bowser'
   # Fast math typesetting for the web. https://khan.github.io/KaTeX/
   gem 'rails-assets-katex'
   # Simple HTML5 Charts using the <canvas> tag http://www.chartjs.org/
   gem 'rails-assets-chartjs'
-  # A browser detector https://github.com/lancedikson/bowser
-  gem 'rails-assets-bowser'
+  # NOTY is a notification library that makes it easy to create alert - success - error - warning - information - confirmation messages as an alternative the standard alert dialog.
+  gem 'rails-assets-noty'
   # A JavaScript library for binding keyboard combos without the pain of key codes and key combo conflicts. https://github.com/RobertWHurst/KeyboardJS
   gem 'rails-assets-KeyboardJS'
-  # Javascript audio library for the modern web. https://github.com/goldfire/howler.js
-  gem 'rails-assets-howler'
   # A set of javascript tools for working with files. http://mailru.github.io/FileAPI/
   gem 'rails-assets-FileAPI'
+  # Javascript audio library for the modern web. https://github.com/goldfire/howler.js
+  # gem 'rails-assets-howler'
   # Full featured context menu handler capable of handling thousands of elements https://swisnl.github.io/jQuery-contextMenu/
-  gem 'rails-assets-jQuery-contextMenu'
+  # gem 'rails-assets-jQuery-contextMenu'
+  # Beautifier for javascript http://jsbeautifier.org/
+  # gem 'rails-assets-js-beautify'
+  # Sortable — is a JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery. Supports Meteor, AngularJS, React, Polymer, Knockout and any CSS library, e.g. Bootstrap. http://rubaxa.github.io/Sortable/
+  gem 'rails-assets-sortablejs'
 end
 
 # Rails engine with helpers and JavaScript for displaying times and dates to users in their local time

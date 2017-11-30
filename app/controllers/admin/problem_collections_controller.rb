@@ -21,10 +21,12 @@ class Admin::ProblemCollectionsController < AdminController
   # GET /admin/problem_collections/new
   def new
     @admin_problem_collection = Admin::ProblemCollection.new(problem_source_id: params[:problem_source_id], subject_id: params[:subject_id], test_day: params[:test_day])
+    render 'form'
   end
 
   # GET /admin/problem_collections/1/edit
   def edit
+    render 'form'
   end
 
   # POST /admin/problem_collections

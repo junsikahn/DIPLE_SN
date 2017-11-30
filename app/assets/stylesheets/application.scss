@@ -10,273 +10,222 @@
  * files in this directory. Styles in this file should be added after the last require_* statement.
  * It is generally better to create a new file per style scope.
  *
- *= require_tree .
- *= require noty
  *= require katex
- *= require jQuery-contextMenu
+ *= require noty
+ *= require summernote
+ *= require_tree .
  *= require_self
  */
 
-@import "semantic-ui";
+ @import "font-awesome-sprockets";
+ @import "font-awesome";
 
-/* Mobile */
-@media only screen and (max-width: 767px) {
-  [class*="mobile hidden"],
-  [class*="tablet only"]:not(.mobile),
-  [class*="computer only"]:not(.mobile),
-  [class*="largescreen only"]:not(.mobile),
-  [class*="widescreen only"]:not(.mobile),
-  [class*="or lower hidden"] {
-    display: none !important;
-  }
-}
+// .square_seg {
+//   width: 100%; height: 100%; margin: 0 auto;
+//   .square_img {
+//     width: 100%; overflow: hidden;
+//     &::before { content: ''; display: block; width: 100%; padding-top: 100%; }
+//     img { position: absolute; top: 0; width: 100%; height: 100%; }
+//   }
+// }
 
-/* Tablet / iPad Portrait */
-@media only screen and (min-width: 768px) and (max-width: 991px) {
-  [class*="mobile only"]:not(.tablet),
-  [class*="tablet hidden"],
-  [class*="computer only"]:not(.tablet),
-  [class*="largescreen only"]:not(.tablet),
-  [class*="widescreen only"]:not(.tablet),
-  [class*="or lower hidden"]:not(.mobile) {
-    display: none !important;
-  }
-}
+// #test_screen {
+//   margin: 0 !important;
+//   width: 100% !important;
+//   height: 100% !important;
+//   overflow: hidden;
+// }
+// #test_screen > .content {
+//   height: 100% !important; padding: 20px !important;
+//   .test_wrapper { margin: 0 auto; height: 100%; overflow: hidden; border: 1px solid lightgrey; border-radius: .3em;
+//     .problems_header { height: 50px; overflow: scroll; border-top: 0; }
+//     .problems_wrapper, .answers_wrapper { position: relative; display: inline-block; height: 100%; vertical-align: top; overflow: hidden; }
+//     .problems_wrapper { box-shadow: 1px 0 lightgrey;
+//       .problems_seg { width: 100%; height: calc(100% - 50px); background-color: #fff; }
+//       .problems_row { position: relative; min-width: 100%; max-width: 100%; height: 100%; transition: transform .25s; }
+//       .problems_row::after { content: ''; position: absolute; top: 0; left: 540px; display: inline-block; width: 1px; height: 100%; margin-left: -1px; background: lightgrey; }
+//       .problems_column { position: relative; }
+//     }
+//     .answers_wrapper { box-shadow: -1px 0 lightgrey;
+//       .answers_seg { height: calc(100% - 100px); background-color: #fff; overflow: scroll; -webkit-overflow-scrolling: touch;
+//         & > table { border-radius: 0; box-shadow: 0 1px 0 lightgrey; }
+//       }
+//       .answer_radio .button { margin: 0; padding: 0; width: 18px; height: 30px; line-height: 30px; }
+//       .answer_input { padding-right: 0.8em !important; }
+//       .submit.button, .answers_score { height: 50px; }
+//     }
+//   }
+//
+//   .test_wrapper.with_audio {
+//     .answers_seg { height: calc(100% - 150px) !important; }
+//     .audio_seg { position: relative; width: 100%; height: 50px; background-color: #fff; overflow: hidden; border-bottom: 1px solid lightgrey;
+//       audio { display: none; }
+//       .progress_bar { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background-color: rgba(33, 33, 33, 0.1); }
+//       .basic.button, .basic.buttons { position: relative; background-color: #fff !important; }
+//       .tiny.buttons { float: right; margin: 9px 6px 0 0; overflow: hidden; }
+//       .playBtn { position: relative; display: inline-block; margin: 7px 0 7px 6px; }
+//       .pauseBtn { position: relative; display: none; margin: 7px 0 7px 6px; }
+//       .startBtn { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: crimson; color: white; transition: transform .5s; transform: translateY(0); cursor: pointer; }
+//       .endBtn { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #eee; color: #999; transition: transform .5s; transform: translateY(100%); }
+//       .volSlider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: lightgrey; overflow: hidden; transition: transform .25s, background-color .25s; transform: translateX(-100%); cursor: pointer; }
+//       .volSlider.adjusting { transform: translateX(0); }
+//       .volSlider:hover,
+//       .volSlider:active { background-color: #999; }
+//       .volSlider .volBar {
+//         position: relative; height: 100%; width: 95%; background: rgba(33, 33, 33, 0.6); border-radius: 3px;
+//         box-shadow: 1px 0 0px rgba(255, 255, 255, 1), 2px 0 0px rgba(99, 99, 99, 1), 3px 0 0px rgba(255, 255, 255, 1), 4px 0 0px rgba(99, 99, 99, 1), 5px 0 0px rgba(255, 255, 255, 1), 6px 0 0px rgba(99, 99, 99, 1);
+//       }
+//       &.started .startBtn { transform: translateY(100%); }
+//       &.ended .endBtn { transform: translateY(0); }
+//     }
+//   }
+// }
+//
+// .problem_container { width: 540px; max-width: 100%; padding: 20px; max-height: 100%; display: inline-flex; flex-direction: column; flex: 0 1 auto; }
+// .problem_container img { max-width: 100%; }
+// .problem_seg { overflow-x: scroll; overflow-y: scroll; }
+// .exm_list { display: flex; flex-wrap: wrap; }
+// .exm_item { min-width: 50%; padding: 10px !important; }
+// .exm_item > .ui.circular.label { margin-top: 1px; }
+// .exm_container { display: inline-block; width: calc(100% - 25px); padding: 3px; float: right; }
+//
+// @media only screen and (min-width: 1481px) {
+//   #test_screen {
+//     .test_wrapper { max-width: 1442px;
+//       .problems_wrapper { width: 75%;
+//         .problems_seg { overflow: hidden; }
+//         .problems_column { display: flex; width: 100%; height: 100%; flex-direction: column; flex-wrap: wrap; justify-content: space-between; overflow: hidden; }
+//       }
+//       .answers_wrapper { width: 25%; }
+//     }
+//   }
+// }
+//
+// @media only screen and (min-width: 942px) and (max-width: 1480px) {
+//   #test_screen {
+//     .test_wrapper { max-width: 902px;
+//       .problems_wrapper { width: 60%;
+//         .problems_seg { overflow-y: scroll; -webkit-overflow-scrolling: touch; }
+//         .problems_header .ui.buttons { display: none; }
+//         .problems_row_divider { display: none; }
+//         .problems_column { display: block; width: 100%; min-height: 100%; }
+//       }
+//       .answers_wrapper { width: 40%; }
+//     }
+//   }
+// }
+//
+// @media only screen and (max-width: 941px) {
+//   #test_screen {
+//     .test_wrapper { max-width: 542px;
+//       .problems_wrapper { width: 100%; height: calc(100% - 50px) !important; border-bottom: 1px solid lightgrey;
+//         .problems_seg { overflow-y: scroll; -webkit-overflow-scrolling: touch; }
+//         .problems_header .ui.labels { display: none; }
+//         .problems_header .ui.buttons { display: none; }
+//         .problems_row_divider { display: none; }
+//         .problems_column { display: block; width: 100%; min-height: 100%; }
+//       }
+//       .answers_wrapper { width: 100%; height: 50px !important;
+//         form { overflow: scroll; -webkit-overflow-scrolling: touch; }
+//         .problems_header { display: none; }
+//         .answers_seg { display: none;
+//           tbody { display: table-row-group !important; }
+//           tr { display: table-row !important; }
+//           td { display: table-cell !important; padding-top: 20px 0 !important; padding-bottom: 20px 0 !important; }
+//         }
+//       }
+//     }
+//     .test_wrapper.with_audio {
+//       .problems_wrapper { height: calc(100% - 100px) !important; }
+//       .answers_wrapper { height: 100px !important; }
+//     }
+//   }
+// }
 
-/* Computer / Desktop / iPad Landscape */
-@media only screen and (min-width: 992px) and (max-width: 1199px) {
-  [class*="mobile only"]:not(.computer),
-  [class*="tablet only"]:not(.computer),
-  [class*="computer hidden"],
-  [class*="largescreen only"]:not(.computer),
-  [class*="widescreen only"]:not(.computer),
-  [class*="or lower hidden"]:not(.tablet):not(.mobile) {
-    display: none !important;
-  }
-}
-
-/* Large Monitor */
-@media only screen and (min-width: 1200px) and (max-width: 1919px) {
-  [class*="mobile only"]:not([class*="largescreen"]),
-  [class*="tablet only"]:not([class*="largescreen"]),
-  [class*="computer only"]:not([class*="largescreen"]),
-  [class*="largescreen hidden"],
-  [class*="widescreen only"]:not([class*="largescreen"]),
-  [class*="or lower hidden"]:not(.computer):not(.tablet):not(.mobile) {
-    display: none !important;
-  }
-}
-
-/* Widescreen Monitor */
-@media only screen and (min-width: 1920px) {
-  [class*="mobile only"]:not([class*="widescreen"]),
-  [class*="tablet only"]:not([class*="widescreen"]),
-  [class*="computer only"]:not([class*="widescreen"]),
-  [class*="largescreen only"]:not([class*="widescreen"]),
-  [class*="widescreen hidden"],
-  [class*="widescreen or lower hidden"] {
-    display: none !important;
-  }
-}
-
-.clearfix {
-  position: relative;
-  zoom: 1;
-  &::before, &::after {
-    content: '';
-    display: block;
-    clear: both;
-  }
-}
-
-.top-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 1rem 0;
-  background-color: oldlace;
-  box-shadow: 0 0 10px lightgrey;
-  z-index: 10;
-}
-.center-main {
-  min-height: 100vh;
-  padding: 7em 0 5em 0;
-}
-.bottom-footer {
-  margin: 5em 0 0 !important;
-  padding: 5em 0 !important;
-}
-
-@media only screen and (max-width: 767px) {
-  .ui.stackable.cards .card:first-child {
-    margin-top: 1em !important;
-  }
-}
-
-@media only screen and (min-width: 768px) {
-  .ui.form .fields:last-child,
-  .ui.form .fields .field:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.year_select .text:not(.default)::after,
-.year_select .item::after {
-  content: '년'
-}
-
-.with_hint .tooltip,
-.with_hint .hint {
-  float: right;
-  color: lightgrey;
-}
-
-.square_seg {
-  width: 100%; height: 100%; margin: 0 auto;
-  .square_img {
-    width: 100%; overflow: hidden;
-    &::before { content: ''; display: block; width: 100%; padding-top: 100%; }
-    img { position: absolute; top: 0; width: 100%; height: 100%; }
-  }
-}
-
-.ui.floated.header { margin-bottom: 0em; }
-.ui.inverted.segment > .ui.header .ui.sub.header { color: #fff; }
-.ui.modal > .header:first-of-type {
-  border-top-left-radius: 0.28571429rem;
-  border-top-right-radius: 0.28571429rem;
-}
-
-.multiline.table > tbody > tr:only-of-type > td {
-  background-color: rgba(0, 0, 50, 0.02) !important;
-}
-
-.multiline.table > tbody:not(:first-of-type) > tr:first-of-type > td {
-  border-top: 1px solid rgba(34, 36, 38, 0.1);
-}
-
-.selectable.table tr {
-  cursor: pointer;
-}
-
-.dashboard-table:empty::before {
-  content: attr(empty);
-  display: block;
-  text-align: center;
-  color: rgba(40, 40, 40, 0.3);
-  padding: 50px 0;
-}
-
-#test_screen {
-  margin: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  overflow: hidden;
-}
-#test_screen > .content {
-  height: 100% !important; padding: 20px !important;
-  .test_wrapper { margin: 0 auto; height: 100%; overflow: hidden; border: 1px solid lightgrey; border-radius: .3em;
-    .problems_header { height: 50px; overflow: scroll; border-top: 0; }
-    .problems_wrapper, .answers_wrapper { position: relative; display: inline-block; height: 100%; vertical-align: top; overflow: hidden; }
-    .problems_wrapper { box-shadow: 1px 0 lightgrey;
-      .problems_seg { width: 100%; height: calc(100% - 50px); background-color: #fff; }
-      .problems_row { position: relative; min-width: 100%; max-width: 100%; height: 100%; transition: transform .25s; }
-      .problems_row::after { content: ''; position: absolute; top: 0; left: 540px; display: inline-block; width: 1px; height: 100%; margin-left: -1px; background: lightgrey; }
-      .problems_column { position: relative; }
+.problem-container { width: 540px; max-width: 100%; padding: 20px; max-height: 100%; display: inline-flex; flex-direction: column; flex: 0 1 auto; word-break: break-all;
+  img { display: inline-block; max-width: 100%; }
+  .problem-info { font-size: 0.8em; margin-bottom: 0.5em;
+    & > div > span { display: inline-block; border-radius: 0.75em; margin-right: 0.2em;
+      &:last-of-type { margin-right: 0; }
     }
-    .answers_wrapper { box-shadow: -1px 0 lightgrey;
-      .answers_seg { height: calc(100% - 100px); background-color: #fff; overflow: scroll; -webkit-overflow-scrolling: touch;
-        & > table { border-radius: 0; box-shadow: 0 1px 0 lightgrey; }
-      }
-      .answer_radio .button { margin: 0; padding: 0; width: 18px; height: 30px; line-height: 30px; }
-      .answer_input { padding-right: 0.8em !important; }
-      .submit.button, .answers_score { height: 50px; }
-    }
+    .problem-order { padding: 0.2em 0.7em; background: #000; border: 1px solid #fff; color: #fff; font-weight: bold; }
+    .problem-score { padding: 0.2em 0.7em; background: #fff; border: 1px solid lightgrey; }
+    .problem-subject { padding: 0.2em 0.5em; color: lightgrey; text-align: right; }
+    .problem-level { padding: 0.5em; }
   }
-
-  .test_wrapper.with_audio {
-    .answers_seg { height: calc(100% - 150px) !important; }
-    .audio_seg { position: relative; width: 100%; height: 50px; background-color: #fff; overflow: hidden; border-bottom: 1px solid lightgrey;
-      audio { display: none; }
-      .progress_bar { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background-color: rgba(33, 33, 33, 0.1); }
-      .basic.button, .basic.buttons { position: relative; background-color: #fff !important; }
-      .tiny.buttons { float: right; margin: 9px 6px 0 0; overflow: hidden; }
-      .playBtn { position: relative; display: inline-block; margin: 7px 0 7px 6px; }
-      .pauseBtn { position: relative; display: none; margin: 7px 0 7px 6px; }
-      .startBtn { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: crimson; color: white; transition: transform .5s; transform: translateY(0); cursor: pointer; }
-      .endBtn { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #eee; color: #999; transition: transform .5s; transform: translateY(100%); }
-      .volSlider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: lightgrey; overflow: hidden; transition: transform .25s, background-color .25s; transform: translateX(-100%); cursor: pointer; }
-      .volSlider.adjusting { transform: translateX(0); }
-      .volSlider:hover,
-      .volSlider:active { background-color: #999; }
-      .volSlider .volBar {
-        position: relative; height: 100%; width: 95%; background: rgba(33, 33, 33, 0.6); border-radius: 3px;
-        box-shadow: 1px 0 0px rgba(255, 255, 255, 1), 2px 0 0px rgba(99, 99, 99, 1), 3px 0 0px rgba(255, 255, 255, 1), 4px 0 0px rgba(99, 99, 99, 1), 5px 0 0px rgba(255, 255, 255, 1), 6px 0 0px rgba(99, 99, 99, 1);
-      }
-      &.started .startBtn { transform: translateY(100%); }
-      &.ended .endBtn { transform: translateY(0); }
+  .problem-wrapper {
+    & > div { background: #fff; border: 1px solid lightgrey; border-top: 0; padding: 16px; position: relative; zoom: 1;
+      &::after { content: ''; display: block; clear: both; }
     }
-  }
-}
-
-.problem_container { width: 540px; max-width: 100%; padding: 20px; max-height: 100%; display: inline-flex; flex-direction: column; flex: 0 1 auto; }
-.problem_container img { max-width: 100%; }
-.problem_seg { overflow-x: scroll; overflow-y: scroll; }
-.exm_list { display: flex; flex-wrap: wrap; }
-.exm_item { min-width: 50%; padding: 10px !important; }
-.exm_item > .ui.circular.label { margin-top: 1px; }
-.exm_container { display: inline-block; width: calc(100% - 25px); padding: 3px; float: right; }
-
-@media only screen and (min-width: 1481px) {
-  #test_screen {
-    .test_wrapper { max-width: 1442px;
-      .problems_wrapper { width: 75%;
-        .problems_seg { overflow: hidden; }
-        .problems_column { display: flex; width: 100%; height: 100%; flex-direction: column; flex-wrap: wrap; justify-content: space-between; overflow: hidden; }
-      }
-      .answers_wrapper { width: 25%; }
+    & > div:first-child { border-top: 3px solid black; border-radius: 5px 5px 0 0; }
+    & > div:last-child { border-radius: 0 0 5px 5px; }
+    .problem-content, .problem-exm-content, .problem-explanation {
+      &:empty::after { content: '내용이 없습니다'; color: lightgrey; }
     }
-  }
-}
-
-@media only screen and (min-width: 942px) and (max-width: 1480px) {
-  #test_screen {
-    .test_wrapper { max-width: 902px;
-      .problems_wrapper { width: 60%;
-        .problems_seg { overflow-y: scroll; -webkit-overflow-scrolling: touch; }
-        .problems_header .ui.buttons { display: none; }
-        .problems_row_divider { display: none; }
-        .problems_column { display: block; width: 100%; min-height: 100%; }
+    .problem-exm { padding: 10px; display: flex; flex-wrap: wrap;
+      .problem-exm-wrapper { position: relative; display: flex; align-items: center; min-width: 50%; padding: 10px; border-radius: 5px; cursor: pointer; transition: background .25s;
+        .problem-exm-index { display: inline-block; margin: 2px; min-width: 20px; width: 20px; height: 20px; line-height: 20px; text-align: center; font-size: 0.75em; background: white; border: 1px solid lightgrey; border-radius: 50%; transition: background .25s, border .25s; cursor: pointer; }
+        &:hover { background: #f1f1f1;
+          .problem-exm-index { background: lightgrey; border-color: transparent; }
+        }
+        &.active { background: rgba(40, 167, 69, .25);
+          .problem-exm-index { background: #28a745; border-color: transparent; color: #fff; }
+        }
       }
-      .answers_wrapper { width: 40%; }
+      .problem-exm-content { padding-left: 5px; line-height: 24px; }
     }
-  }
-}
-
-@media only screen and (max-width: 941px) {
-  #test_screen {
-    .test_wrapper { max-width: 542px;
-      .problems_wrapper { width: 100%; height: calc(100% - 50px) !important; border-bottom: 1px solid lightgrey;
-        .problems_seg { overflow-y: scroll; -webkit-overflow-scrolling: touch; }
-        .problems_header .ui.labels { display: none; }
-        .problems_header .ui.buttons { display: none; }
-        .problems_row_divider { display: none; }
-        .problems_column { display: block; width: 100%; min-height: 100%; }
-      }
-      .answers_wrapper { width: 100%; height: 50px !important;
-        form { overflow: scroll; -webkit-overflow-scrolling: touch; }
-        .problems_header { display: none; }
-        .answers_seg { display: none;
-          tbody { display: table-row-group !important; }
-          tr { display: table-row !important; }
-          td { display: table-cell !important; padding-top: 20px 0 !important; padding-bottom: 20px 0 !important; }
+    .problem-answer-input { padding: 10px; }
+    .problem-explanation { background: #f1f1f1; }
+    .problem-answer { background: #f1f1f1; padding: 10px 16px; text-align: right;
+      .problem-answer-wrapper {
+        &::before { content: '정답은 ' } &::after { content: ' 입니다' }
+        .problem-answer-seg { display: inline-block; font-weight: bold; min-width: 10px;
+          &.is-objective::after { content: '번' }
+          &:empty::before { content: '-' }
         }
       }
     }
-    .test_wrapper.with_audio {
-      .problems_wrapper { height: calc(100% - 100px) !important; }
-      .answers_wrapper { height: 100px !important; }
+  }
+  .problem-source { font-size: 0.9em; color: grey; padding: 0 0.5em; }
+  .problem-tags { text-align: right; }
+}
+
+.problem-preview {
+  .problem-score, .problem-subject, .problem-level i, .problem-answer-wrapper, .problem-answer-input > input { cursor: pointer; }
+  .problem-wrapper {
+    .problem-content, .problem-exm-content, .problem-explanation {
+      &:empty::after { content: '내용을 입력해주세요!'; color: lightgrey; }
+    }
+    .problem-score, .problem-subject, .problem-content, .problem-exm-wrapper, .problem-answer-input, .problem-explanation, .problem-answer {
+      position: relative; cursor: pointer; outline: none; transition: background .25s;
+      &:hover, &.is-editing { background-color: rgba(0, 123, 255, .1) !important; }
+      &::before {
+        content: '*';
+        color: red;
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 3px;
+        line-height: 1;
+      }
     }
   }
 }
+
+.editor-grid {
+  img { display: inline-block; max-width: 100%; }
+  .preview-wrapper { max-width: 500px; border: 1px solid lightgrey; border-radius: 5px;
+    .preview-header { height: 80px; line-height: 80px; text-align: center; background-color: rgba(0, 0, 0, .03); border-bottom: 1px solid rgba(0, 0, 0, 0.125); }
+    .preview-content { padding: 10px 16px; height: calc(100% - 80px);
+      &:empty::before { content: '내용을 입력해주세요'; color: #ccc; }
+      &:empty::after { content: '*'; color: red; float: right; }
+    }
+  }
+}
+
+.cursor-pointer { cursor: pointer !important; }
+.form-group:only-child, .form-group:last-child,
+.table:only-child, .table:last-child { margin-bottom: 0 !important; }
+.btn { cursor: pointer !important; }
+label { margin-bottom: 0.2em !important; font-size: 0.8em; font-weight: bold; margin-left: 0.5em; }
+.bg-hover { background: rgba(0, 0, 0, .075) !important; }

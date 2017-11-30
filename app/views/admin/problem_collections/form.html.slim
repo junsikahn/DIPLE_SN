@@ -1,0 +1,15 @@
+= simple_nested_form_for @admin_problem_collection do |f|
+  = f.error_notification
+  table.table.table-bordered
+    thead.thead-default
+      tr
+        th 입력해주세요
+    tbody
+      tr
+        td = f.input :name
+      tr
+        td
+          = f.hidden_field :test_day
+          = f.hidden_field :subject_id
+          = f.hidden_field :problem_source_id
+          = f.button :button, '저장', class: 'btn-block btn-success', data: { disable_with: "<i class='fa spinner spin'/>" }
