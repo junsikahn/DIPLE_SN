@@ -24,7 +24,7 @@
 //= require katex/contrib/auto-render.min
 //= require chartjs
 //= require noty
-//= require KeyboardJS
+
 //= require FileAPI
 //= require sortablejs
 //= require local_time_ko
