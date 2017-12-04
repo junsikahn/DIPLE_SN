@@ -581,7 +581,7 @@ javascript:
         if (content && content.length > 0) {
           var eqs = content.match(/\$[^\$]*\$/g);
           _.each(eqs, function(eq) {
-            var nodes = $.parseHTML(eq.replace(/\&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&nbsp;/g, ' ')),
+            var nodes = $.parseHTML(eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
                 annotation = _.map(nodes, function(node) {
                   return node = $(node).text();
                 }).join('').replace(/\n/g, '').replace(/\$/g, '');
@@ -600,20 +600,31 @@ javascript:
         var content = this.editor.content;
         var eqs = content.match(/\$[^\$]*\$/g);
         _.each(eqs, function(eq) {
-          var nodes = $.parseHTML(eq.replace(/\&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&nbsp;/g, ' ')),
+          var nodes = $.parseHTML(eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
               annotation = _.map(nodes, function(node) {
                 return node = $(node).text();
               }).join('').replace(/\n/g, '');
           content = content.replace(eq, annotation);
         });
-        this.$parent.$data['problem'][this.target] = content.replace(/&nbsp;/g, ' ').replace(/>\s*</g, '>\n<');
+        content = content.replace(/\s(style=""|class="")/g, '')
+                         .replace(/<div> <\/div>/g, '<div><br></div>')
+                         .replace(/<div><br><\/div>/g, '\n<br>\n')
+                         .replace(/<\/div>\s*<div/g, '<\/div>\n<div')
+                         .replace(/([^\n])<div/g, '$1\n<div')
+                         .replace(/<\/div>([^\n])/g, '<\/div>\n$1');
+        this.$parent.$data['problem'][this.target] = content;
         return $(this.$refs.editorModal).modal('hide');
       }
     },
     beforeMount: function() {
       if (!this.target) return false;
       this.editor.title = (this.target == 'content' ? '문제' : (this.target == 'explanation' ? '해설' : '보기')) + ' 입력하기';
-      this.editor.content = this.$parent.$data['problem'][this.target].replace(/>[\n]</g, '><').replace(/[\s^\r\n]/g, '&nbsp;');
+      var content = this.$parent.$data['problem'][this.target];
+      var eqs = content.match(/\$[^\$]*\$/g);
+      _.each(eqs, function(eq) {
+        content = content.replace(eq, eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/\s/g, '&nbsp;'));
+      });
+      this.editor.content = content;
     },
     mounted: function() {
       if (!this.target) return false;
@@ -702,9 +713,7 @@ javascript:
             });
           }.bind(this),
           onChange: function(content) {
-            this.editor.content = content.replace(/\s(style=""|class="")/g, '')
-                                         .replace(/<div> <\/div>/g, '<div><br></div>')
-                                         .replace(/<div><br><\/div>/g, '<br>');
+            this.editor.content = content;
           }.bind(this),
           onPaste: function(e) {
             e.preventDefault();
@@ -2783,7 +2792,7 @@ javascript:
       equationCheck: function(content) {
         var err_check = 0, eqs = content.match(/\$[^\$]*\$/g);
         _.each(eqs, function(eq) {
-          var nodes = $.parseHTML(eq.replace(/\&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&nbsp;/g, ' ')),
+          var nodes = $.parseHTML(eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
         	  annotation = _.map(nodes, function(node) {
                           return node = $(node).text();
                         }).join('').replace(/\n/g, '').replace(/\$/g, '');
