@@ -36,8 +36,8 @@ gem 'redis', '~> 3.0'
 # gem 'bcrypt', '~> 3.1.7'
 
 # Sprockets ES6 transformer
-gem 'sprockets'
-gem 'sprockets-es6'
+# gem 'sprockets'
+# gem 'sprockets-es6'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
