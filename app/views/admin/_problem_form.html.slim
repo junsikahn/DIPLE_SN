@@ -9,7 +9,7 @@ div#problem-edit
           i.fa.fa-caret-left.mr-2
           | 목록으로
       div.col
-        = f.button :button, '저장', class: 'btn-block', ':class': '[ notReadySubmit ? "btn-secondary" : "btn-success" ]', '@click.prevent': 'saveProblem', data: { disable_with: "<i class='fa fa-spinner fa-spin'/>" }
+        = f.button :button, '저장', class: 'btn-block', ':class': '[ readySubmit ? "btn-success" : "btn-secondary" ]', '@click.prevent': 'saveProblem', data: { disable_with: "<i class='fa fa-spinner fa-spin'/>" }
     hr
     div.row.mb-5
       div.col style="width: calc(540px + 2rem); min-width: calc(540px + 2rem); max-width: calc(540px + 2rem)" ref="problemPreview"
@@ -117,10 +117,10 @@ div#problem-edit
             tr
               td
                 = f.hidden_field :problem_tag_ids, ':value': 'problem_tag_ids'
-                / = f.hidden_field :year
-                / = f.hidden_field :problem_source_id
-                / = f.hidden_field :problem_source_order
-                = f.button :button, '저장', class: 'btn-block', ':class': '[ notReadySubmit ? "btn-secondary" : "btn-success" ]', '@click.prevent': 'saveProblem', data: { disable_with: "<i class='fa fa-spinner fa-spin'/>" }
+                = f.hidden_field :year
+                = f.hidden_field :problem_source_id
+                = f.hidden_field :problem_source_order
+                = f.button :button, '저장', class: 'btn-block', ':class': '[ readySubmit ? "btn-success" : "btn-secondary" ]', '@click.prevent': 'saveProblem', data: { disable_with: "<i class='fa fa-spinner fa-spin'/>" }
   subject-modal inline-template="true" :problem="problem" ref="subjectModalComponent"
     div.modal role="dialog" data-backdrop="static" ref="subjectModal"
       div.modal-dialog.modal-lg role="document" style="min-width: 1050px; max-width: 90%;"
@@ -570,8 +570,8 @@ javascript:
     data: function() {
       return {
         editor: {
-          title: (this.target == 'content' ? '문제' : (this.target == 'explanation' ? '해설' : '보기')) + ' 입력하기',
-          content: this.$parent.$data['problem'][this.target]
+          title: '',
+          content: ''
         }
       }
     },
@@ -581,9 +581,9 @@ javascript:
         if (content && content.length > 0) {
           var eqs = content.match(/\$[^\$]*\$/g);
           _.each(eqs, function(eq) {
-            var nodes = $.parseHTML(eq),
+            var nodes = $.parseHTML(eq.replace(/\&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&nbsp;/g, ' ')),
                 annotation = _.map(nodes, function(node) {
-                  return node = $(node).text().replace(/\&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&nbsp;/g, ' ');
+                  return node = $(node).text();
                 }).join('').replace(/\n/g, '').replace(/\$/g, '');
             try {
               content = content.replace(eq, katex.renderToString(annotation));
@@ -600,15 +600,20 @@ javascript:
         var content = this.editor.content;
         var eqs = content.match(/\$[^\$]*\$/g);
         _.each(eqs, function(eq) {
-          var nodes = $.parseHTML(eq),
+          var nodes = $.parseHTML(eq.replace(/\&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&nbsp;/g, ' ')),
               annotation = _.map(nodes, function(node) {
-                return node = $(node).text().replace(/\&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&nbsp;/g, ' ');
+                return node = $(node).text();
               }).join('').replace(/\n/g, '');
           content = content.replace(eq, annotation);
         });
-        this.$parent.$data['problem'][this.target] = content.replace(/></g, '>\n<');
+        this.$parent.$data['problem'][this.target] = content.replace(/&nbsp;/g, ' ').replace(/>\s*</g, '>\n<');
         return $(this.$refs.editorModal).modal('hide');
       }
+    },
+    beforeMount: function() {
+      if (!this.target) return false;
+      this.editor.title = (this.target == 'content' ? '문제' : (this.target == 'explanation' ? '해설' : '보기')) + ' 입력하기';
+      this.editor.content = this.$parent.$data['problem'][this.target].replace(/>[\n]</g, '><').replace(/[\s^\r\n]/g, '&nbsp;');
     },
     mounted: function() {
       if (!this.target) return false;
@@ -2736,14 +2741,10 @@ javascript:
       problem_tag_ids: function() {
         return _.pluck(this.problem.problem_tags, 'id');
       },
-      notReadySubmit: function() {
-        if (_.isNull(this.problem.subject_id) || _.isEmpty(this.problem.content) || _.isEmpty(this.problem.explanation) || _.isNull(this.problem.answer) || this.problem.answer == 0 || _.isNull(this.problem.score) || this.problem.score == 0) return true;
-        if (this.is_objective & (_.isEmpty(this.problem.exm_1) || _.isEmpty(this.problem.exm_2) || _.isEmpty(this.problem.exm_3) || _.isEmpty(this.problem.exm_4) || _.isEmpty(this.problem.exm_5))) return true;
-        if (this.is_changed) {
-          return false;
-        } else {
-          return true;
-        }
+      readySubmit: function() {
+        if (_.isNull(this.problem.subject_id) || _.isEmpty(this.problem.content) || _.isEmpty(this.problem.explanation) || _.isNull(this.problem.answer) || this.problem.answer == 0 || _.isNull(this.problem.score) || this.problem.score == 0) return false;
+        if (this.is_objective && (_.isEmpty(this.problem.exm_1) || _.isEmpty(this.problem.exm_2) || _.isEmpty(this.problem.exm_3) || _.isEmpty(this.problem.exm_4) || _.isEmpty(this.problem.exm_5))) return false;
+        return true;
       }
     },
     methods: {
@@ -2782,9 +2783,9 @@ javascript:
       equationCheck: function(content) {
         var err_check = 0, eqs = content.match(/\$[^\$]*\$/g);
         _.each(eqs, function(eq) {
-          var nodes = $.parseHTML(eq),
+          var nodes = $.parseHTML(eq.replace(/\&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&nbsp;/g, ' ')),
         	  annotation = _.map(nodes, function(node) {
-                          return node = $(node).text().replace(/\&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&nbsp;/g, ' ');
+                          return node = $(node).text();
                         }).join('').replace(/\n/g, '').replace(/\$/g, '');
       	  try {
       		  katex.renderToString(annotation);
@@ -2797,20 +2798,32 @@ javascript:
       saveProblem: function() {
         if (!this.is_changed && !confirm('변경내용이 없습니다. 그래도 전송할까요?')) return false;
 
-        this.problem.content = this.problem.content.trim();
-        this.problem.exm_1 = this.problem.exm_1.trim();
-        this.problem.exm_2 = this.problem.exm_2.trim();
-        this.problem.exm_3 = this.problem.exm_3.trim();
-        this.problem.exm_4 = this.problem.exm_4.trim();
-        this.problem.exm_5 = this.problem.exm_5.trim();
-        this.problem.explanation = this.problem.explanation.trim();
+        if (this.problem.content) this.problem.content = this.problem.content.trim();
+        if (this.problem.explanation) this.problem.explanation = this.problem.explanation.trim();
+
+        if (this.equationCheck(this.problem.content)
+            || this.equationCheck(this.problem.explanation)) {
+          return alert('수식 오류가 있습니다. 확인해주세요!')
+        }
 
         if (this.is_objective) {
-          if (this.problem.exm_1.indexOf('$') == -1 && String(Number(this.problem.exm_1)).length == this.problem.exm_1.length) this.problem.exm_1 = '$' + this.problem.exm_1 + '$';
-          if (this.problem.exm_2.indexOf('$') == -1 && String(Number(this.problem.exm_2)).length == this.problem.exm_2.length) this.problem.exm_2 = '$' + this.problem.exm_2 + '$';
-          if (this.problem.exm_3.indexOf('$') == -1 && String(Number(this.problem.exm_3)).length == this.problem.exm_3.length) this.problem.exm_3 = '$' + this.problem.exm_3 + '$';
-          if (this.problem.exm_4.indexOf('$') == -1 && String(Number(this.problem.exm_4)).length == this.problem.exm_4.length) this.problem.exm_4 = '$' + this.problem.exm_4 + '$';
-          if (this.problem.exm_5.indexOf('$') == -1 && String(Number(this.problem.exm_5)).length == this.problem.exm_5.length) this.problem.exm_5 = '$' + this.problem.exm_5 + '$';
+          if (this.problem.exm_1) this.problem.exm_1 = this.problem.exm_1.trim();
+          if (this.problem.exm_2) this.problem.exm_2 = this.problem.exm_2.trim();
+          if (this.problem.exm_3) this.problem.exm_3 = this.problem.exm_3.trim();
+          if (this.problem.exm_4) this.problem.exm_4 = this.problem.exm_4.trim();
+          if (this.problem.exm_5) this.problem.exm_5 = this.problem.exm_5.trim();
+          if (this.problem.exm_1.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_1))) this.problem.exm_1 = '$' + this.problem.exm_1 + '$';
+          if (this.problem.exm_2.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_2))) this.problem.exm_2 = '$' + this.problem.exm_2 + '$';
+          if (this.problem.exm_3.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_3))) this.problem.exm_3 = '$' + this.problem.exm_3 + '$';
+          if (this.problem.exm_4.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_4))) this.problem.exm_4 = '$' + this.problem.exm_4 + '$';
+          if (this.problem.exm_5.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_5))) this.problem.exm_5 = '$' + this.problem.exm_5 + '$';
+          if (this.equationCheck(this.problem.exm_1)
+              || this.equationCheck(this.problem.exm_2)
+              || this.equationCheck(this.problem.exm_3)
+              || this.equationCheck(this.problem.exm_4)
+              || this.equationCheck(this.problem.exm_5)) {
+            return alert('수식 오류가 있습니다. 확인해주세요!')
+          }
         } else {
           this.problem.exm_1 = undefined;
           this.problem.exm_2 = undefined;
@@ -2819,17 +2832,9 @@ javascript:
           this.problem.exm_5 = undefined;
         }
 
-        if (this.equationCheck(this.problem.content)
-            || this.equationCheck(this.problem.exm_1)
-            || this.equationCheck(this.problem.exm_2)
-            || this.equationCheck(this.problem.exm_3)
-            || this.equationCheck(this.problem.exm_4)
-            || this.equationCheck(this.problem.exm_5)
-            || this.equationCheck(this.problem.explanation)) {
-          return alert('수식 오류가 있습니다. 확인해주세요!')
-        }
-
-        return $(this.$refs.problemForm).submit();
+        this.$nextTick(function() {
+          return $(this.$refs.problemForm).submit();
+        }.bind(this));
       }
     },
     created: function() { this.is_changed = false; },
