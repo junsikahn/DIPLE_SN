@@ -25,21 +25,4 @@
         tr
           td.text-center = @admin_problems.pluck(:subject_id).count{ |subject_id| !subject_id.nil? }.to_s + '개 / ' + @admin_problems.size.to_s + '개'
           td.text-center = @admin_problems.sum{ |problem| problem.score }.to_s + '점 만점'
-  table.table.table-bordered
-    thead.thead-default
-      tr
-        th.text-center 문제
-        th.text-center 정답률
-        th.text-center 수정
-        th.text-center 삭제
-    tbody
-      - @admin_problems.each do |admin_problem|
-        tr
-          td.p-0 style="width: 540px"
-            == render '/admin/problem', problem: admin_problem, order: admin_problem.problem_source_order
-          td.text-center
-            == "총 #{admin_problem.total_count}회 중 정답 #{admin_problem.correct_count}회"
-            br
-            == "(#{admin_problem.total_count.zero? ? '-'  : "정답률 #{admin_problem.correct_count * 100 / admin_problem.total_count}%"})"
-          td.text-center = link_to "<i class='fa fa-edit'></i>".html_safe, edit_admin_problem_path(admin_problem), class: 'btn btn-warning text-white'
-          td.text-center = link_to "<i class='fa fa-trash'></i>".html_safe, admin_problem_path(admin_problem), class: 'btn btn-danger', data: { confirm: 'Are you sure?' }, method: :delete
+  == render '/admin/problems', problems: @admin_problems, show_id: false

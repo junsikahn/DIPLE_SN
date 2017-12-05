@@ -2,7 +2,7 @@ div.jumbotron.p-4.mb-3
   h1.mb-0 == problem.id ? '문제 수정' : '문제 추가'
 
 div#problem-edit
-  = simple_form_for problem, url: admin_problem_path(redirect_url: request.referer), html: { 'ref': 'problemForm' } do |f|
+  = simple_form_for problem, html: { 'ref': 'problemForm' } do |f|
     div.row
       div.col style="width: calc(540px + 2rem); min-width: calc(540px + 2rem); max-width: calc(540px + 2rem)"
         a.btn.btn-light href="#{request.referer}"
@@ -38,14 +38,14 @@ div#problem-edit
                         i.fa :class="[ problem.level >= 2 ? 'fa-star' : 'fa-star-o' ]" @mouseup="problem.level = 2"
                         i.fa :class="[ problem.level == 3 ? 'fa-star' : 'fa-star-o' ]" @mouseup="problem.level = 3"
                   div.problem-wrapper
-                    div.problem-content v-html="problem.content" @click="editTarget = 'content'" :class="{ 'is-editing': focusInput == 'content' }"
+                    div.problem-content v-html="problem.content" @click="openEditorModal('content')" :class="{ 'is-editing': focusInput == 'content' }"
                     div.problem-exm v-if="is_objective"
-                      div.problem-exm-wrapper v-for="(exm, index) in [problem.exm_1, problem.exm_2, problem.exm_3, problem.exm_4, problem.exm_5]" :key="index" @click="editTarget = 'exm_' + (index + 1)" :class="[ problem.answer == index + 1 ? 'active' : '', { 'is-editing': focusInput == 'exm_' + (index + 1) }]"
+                      div.problem-exm-wrapper v-for="(exm, index) in [problem.exm_1, problem.exm_2, problem.exm_3, problem.exm_4, problem.exm_5]" :key="index" @click="openEditorModal('exm_' + (index + 1))" :class="[ problem.answer == index + 1 ? 'active' : '', { 'is-editing': focusInput == 'exm_' + (index + 1) }]"
                         span.problem-exm-index v-text="index + 1" :class="[ problem.answer == index + 1 ? 'active' : '' ]" @click.stop="inputAnswer(index + 1)"
                         span.problem-exm-content v-html="exm"
                     div.problem-answer-input v-else=""
                       input.form-control type="text" readonly="true" :value="problem.answer" @click="inputAnswer()"
-                    div.problem-explanation v-html="problem.explanation" @click="editTarget = 'explanation'" :class="{ 'is-editing': focusInput == 'explanation' }" v-if="show_explanation"
+                    div.problem-explanation v-html="problem.explanation" @click="openEditorModal('explanation')" :class="{ 'is-editing': focusInput == 'explanation' }" v-if="show_explanation"
                     div.problem-answer :class="{ 'is-editing': focusInput == 'answer' }" @click="inputAnswer()" v-if="show_explanation"
                       i.fa.fa-caret-right.mr-1
                       span.problem-answer-wrapper
@@ -158,7 +158,7 @@ div#problem-edit
                         span.badge.badge-secondary.mr-2 :class='{ "badge-info" : problem.subject.id == subject.id }' v-text="subject.order"
                         span :class='{ "text-info" : problem.subject.id == subject.id }' v-text="subject.name"
                       small.text-muted v-text="subject.path"
-  editor-modal inline-template="true" :target="editTarget" :key="editTarget" ref="editorModalComponent"
+  editor-modal inline-template="true" ref="editorModalComponent"
     div.modal role="dialog" data-backdrop="static" ref="editorModal"
       div.modal-dialog.modal-lg role="document" style="width: 1062px; max-width: 1062px;"
         div.modal-content
@@ -566,12 +566,12 @@ javascript:
   }
 
   var editorModalComponent = {
-    props: ['target'],
     data: function() {
       return {
         editor: {
-          title: '',
-          content: ''
+          target: null,
+          title: null,
+          content: null
         }
       }
     },
@@ -596,6 +596,117 @@ javascript:
       }
     },
     methods: {
+      openEdit: function(type) {
+        var content = this.$parent.$data['problem'][type];
+        var eqs = content.match(/\$[^\$]*\$/g);
+        _.each(eqs, function(eq) {
+          content = content.replace(eq, eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/\s/g, '&nbsp;'));
+        });
+        content = content.replace(/\n<br>/g, '<div><br></div>').replace(/\n|\r/g, '');
+
+        this.editor.target = type;
+        this.editor.title = (type == 'content' ? '문제' : (type == 'explanation' ? '해설' : '보기')) + ' 입력하기';
+        this.editor.content = content;
+
+        this.$nextTick(function() {
+          $(this.$refs.editorModal)
+            .on('hide.bs.modal', function(e) {
+              $(this.$refs.summernote).summernote('destroy');
+              this.editor.target = null;
+              this.editor.title = null;
+              this.editor.content = null;
+              this.$parent.focusInput = null;
+            }.bind(this)).modal({
+              keyboard: false
+            });
+          this.$refs.summernote = $(this.$refs.editorModal).find('.editor-wrapper').summernote({
+            width: 500,
+            focus: true,
+            placeholder: '내용을 입력해주세요',
+            tableClassName: 'table table-bordered',
+            dialogsInBody: true,
+            insertTableMaxSize: {
+              col: 20,
+              row: 20
+            },
+            toolbar: [
+              ['para', ['style', 'paragraph', 'height', 'ul', 'ol']],
+              ['font', ['fontsize', 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript']], //, 'color']],
+              ['styleclear', ['clear']],
+              ['insert', ['picture', 'graph', 'table', 'hr']],
+              ['misc', ['codeview', 'help']]
+            ],
+            popover: {
+              image: [
+                ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+                ['float', ['floatLeft', 'floatRight', 'floatNone']],
+                ['remove', ['removeMedia']]
+              ],
+              link: [
+                ['link', ['linkDialogShow', 'unlink']]
+              ],
+              table: [
+                ['add', ['addRowDown', 'addRowUp', 'addColLeft', 'addColRight']],
+                ['delete', ['deleteRow', 'deleteCol']],
+                ['style', ['toggleTDColor']],
+                ['deleteAll', ['deleteTable']]
+              ]
+            },
+            buttons: {
+              graph: function(context) {
+                return $.summernote.ui.button({
+                  contents: '<i class="fa fa-area-chart"/>',
+                  tooltip: '그래프를 추가합니다',
+                  click: function () {
+                    this.$parent.$refs.graphModalComponent.graphData = {
+                      id: Math.round(Math.random() * 1000000),
+                      board: {
+                        width: 400, height: 300, padding: 20, square: 1,
+                        xmax: 5, xmin: -5, ymax: 4, ymin: -4,
+                        doGrids: 1, showXgrid: 1, showYgrid: 1, gdx: 1, gdy: 1,
+                        doAxes: 1, showXaxis: 1, showYaxis: 1, showXmarks: 1, showYmarks: 1, showXlabels: 1, showYlabels: 1, dx: 1, dy: 1,
+                        isDrawing: false, current_c: [], previews: [], drawingHandler: null, drawingData: [], drawingTip: '',
+                        fontfamily: 'KaTeX_Math, Times New Roman, Times, sans-serif',
+                      },
+                      customs: []
+                    }
+                    $(this.$parent.$refs.graphModalComponent.$refs.graphModal).modal();
+                    return false;
+                  }.bind(this)
+                }).render();
+              }.bind(this),
+              toggleTDColor: function(context) {
+                return $.summernote.ui.button({
+                  contents: '<i class="fa fa-paint-brush"/>',
+                  tooltip: '테이블 스타일을 토글합니다',
+                  click: function() {
+                    var target = $(context.invoke('createRange').sc);
+                    while ($(target).parent()[0].nodeName == 'TD') {
+                      target = $(target).parent();
+                    }
+                    target.toggleClass('table-secondary');
+                    return context.triggerEvent('change', context.code());
+                  }
+                }).render();
+              }
+            },
+            callbacks: {
+              onInit: function() {
+                $(this.$refs.editorModal).find('[contenteditable=true]').on('DOMNodeInserted', function(e) {
+                  if (e.target.nodeName == 'SPAN') $(e.target).replaceWith($(e.target).html());
+                });
+              }.bind(this),
+              onChange: function(content) {
+                this.editor.content = content;
+              }.bind(this),
+              onPaste: function(e) {
+                e.preventDefault();
+                $(this.$refs.summernote).summernote('insertText', e.originalEvent.clipboardData.getData('text'));
+              }.bind(this)
+            }
+          });
+        }.bind(this));
+      },
       saveEdit: function() {
         var content = this.editor.content;
         var eqs = content.match(/\$[^\$]*\$/g);
@@ -606,121 +717,15 @@ javascript:
               }).join('').replace(/\n/g, '');
           content = content.replace(eq, annotation);
         });
-        content = content.replace(/\s(style=""|class="")/g, '')
-                         .replace(/<div> <\/div>/g, '<div><br></div>')
-                         .replace(/<div><br><\/div>/g, '\n<br>\n')
+        content = content.replace(/\n|\r/g, '').replace(/\s(style=""|class="")/g, '')
                          .replace(/<\/div>\s*<div/g, '<\/div>\n<div')
                          .replace(/([^\n])<div/g, '$1\n<div')
-                         .replace(/<\/div>([^\n])/g, '<\/div>\n$1');
-        this.$parent.$data['problem'][this.target] = content;
+                         .replace(/<\/div>([^\n])/g, '<\/div>\n$1')
+                         .replace(/(\n?)<div.*><br><\/div>(\n?)/g, '$1<br>$2')
+                         .replace(/(<div.*>.+)<br>(<\/div>)/g, '$1$2');
+        this.$parent.$data['problem'][this.editor.target] = content;
         return $(this.$refs.editorModal).modal('hide');
       }
-    },
-    beforeMount: function() {
-      if (!this.target) return false;
-      this.editor.title = (this.target == 'content' ? '문제' : (this.target == 'explanation' ? '해설' : '보기')) + ' 입력하기';
-      var content = this.$parent.$data['problem'][this.target];
-      var eqs = content.match(/\$[^\$]*\$/g);
-      _.each(eqs, function(eq) {
-        content = content.replace(eq, eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/\s/g, '&nbsp;'));
-      });
-      this.editor.content = content;
-    },
-    mounted: function() {
-      if (!this.target) return false;
-      $(this.$refs.editorModal)
-        .on('hide.bs.modal', function(e) {
-          this.$parent.editTarget = null;
-        }.bind(this)).modal({
-          keyboard: false
-        });
-      this.$refs.summernote = $(this.$refs.editorModal).find('.editor-wrapper').summernote({
-        width: 500,
-        // minHeight: 500,
-        focus: true,
-        placeholder: '내용을 입력해주세요',
-        tableClassName: 'table table-bordered',
-        dialogsInBody: true,
-        insertTableMaxSize: {
-          col: 20,
-          row: 20
-        },
-        toolbar: [
-          ['para', ['style', 'paragraph', 'height', 'ul', 'ol']],
-          ['font', ['fontsize', 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript']], //, 'color']],
-          ['styleclear', ['clear']],
-          ['insert', ['picture', 'graph', 'table', 'hr']],
-          ['misc', ['codeview', 'help']]
-        ],
-        popover: {
-          image: [
-            ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
-            ['float', ['floatLeft', 'floatRight', 'floatNone']],
-            ['remove', ['removeMedia']]
-          ],
-          link: [
-            ['link', ['linkDialogShow', 'unlink']]
-          ],
-          table: [
-            ['add', ['addRowDown', 'addRowUp', 'addColLeft', 'addColRight']],
-            ['delete', ['deleteRow', 'deleteCol']],
-            ['style', ['toggleTDColor']],
-            ['deleteAll', ['deleteTable']]
-          ]
-        },
-        buttons: {
-          graph: function(context) {
-            return $.summernote.ui.button({
-              contents: '<i class="fa fa-area-chart"/>',
-              tooltip: '그래프를 추가합니다',
-              click: function () {
-                this.$parent.$refs.graphModalComponent.graphData = {
-                  id: Math.round(Math.random() * 1000000),
-                  board: {
-                    width: 400, height: 300, padding: 20, square: 1,
-                    xmax: 5, xmin: -5, ymax: 4, ymin: -4,
-                    doGrids: 1, showXgrid: 1, showYgrid: 1, gdx: 1, gdy: 1,
-                    doAxes: 1, showXaxis: 1, showYaxis: 1, showXmarks: 1, showYmarks: 1, showXlabels: 1, showYlabels: 1, dx: 1, dy: 1,
-                    isDrawing: false, current_c: [], previews: [], drawingHandler: null, drawingData: [], drawingTip: '',
-                    fontfamily: 'KaTeX_Math, Times New Roman, Times, sans-serif',
-                  },
-                  customs: []
-                }
-                $(this.$parent.$refs.graphModalComponent.$refs.graphModal).modal();
-                return false;
-              }.bind(this)
-            }).render();
-          }.bind(this),
-          toggleTDColor: function(context) {
-            return $.summernote.ui.button({
-              contents: '<i class="fa fa-paint-brush"/>',
-              tooltip: '테이블 스타일을 토글합니다',
-              click: function() {
-                var target = $(context.invoke('createRange').sc);
-                while ($(target).parent()[0].nodeName == 'TD') {
-                  target = $(target).parent();
-                }
-                target.toggleClass('table-secondary');
-                return context.triggerEvent('change', context.code());
-              }
-            }).render();
-          }
-        },
-        callbacks: {
-          onInit: function() {
-            $(this.$refs.editorModal).find('[contenteditable=true]').on('DOMNodeInserted', function(e) {
-              if (e.target.nodeName == 'SPAN') $(e.target).replaceWith($(e.target).html());
-            });
-          }.bind(this),
-          onChange: function(content) {
-            this.editor.content = content;
-          }.bind(this),
-          onPaste: function(e) {
-            e.preventDefault();
-            $(this.$refs.summernote).summernote('insertText', e.originalEvent.clipboardData.getData('text'));
-          }.bind(this)
-        }
-      });
     }
   };
 
@@ -2737,7 +2742,6 @@ javascript:
       problem: #{{ problem.as_json(include: [:subject, :problem_tags, :problem_source]).to_json.html_safe }},
       is_objective: #{{ problem.id ? (problem.exm_1.blank? ? false : true) : true }},
       show_explanation: true,
-      editTarget: null,
       focusInput: null
     },
     components: {
@@ -2761,6 +2765,10 @@ javascript:
         this.$refs.subjectModalComponent.keyword = '';
         $(this.$refs.subjectModalComponent.$refs.subjectModal).modal();
         $(this.$refs.subjectModalComponent.$refs.subjectModalInput).trigger('focus');
+      },
+      openEditorModal: function(type) {
+        this.focusInput = type;
+        return this.$refs.editorModalComponent.openEdit(type);
       },
       convertObjective: function(is_objective) {
         if (is_objective & (this.problem.answer == 0 || this.problem.answer > 5)) this.problem.answer = null;

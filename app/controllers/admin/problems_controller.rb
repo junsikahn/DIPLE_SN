@@ -48,13 +48,7 @@ class Admin::ProblemsController < AdminController
   # PATCH/PUT /admin/problems/1.json
   def update
     if @admin_problem.update(admin_problem_params)
-      if params[:redirect_url] && Rails.application.routes.recognize_path(params[:redirect_url])[:action] == 'test'
-        redirect_to test_admin_problems_path(problem_source_id: @admin_problem.problem_source_id)
-      elsif params[:redirect_url]
-        redirect_to params[:redirect_url]
-      else
-        redirect_to @admin_problem
-      end
+      redirect_to @admin_problem
     else
       render :edit
     end

@@ -24,7 +24,7 @@ div.problem-container
             span.problem-exm-index class="#{'active' if correct}" == index
             span.problem-exm-content == problem['exm_' + index.to_s]
       - else
-        input.form-control type="text" readonly="true"
+        input.form-control type="text" readonly="true" value="#{problem.answer}"
     - if problem.explanation
       div.problem-explanation == problem.explanation
     div.problem-answer
