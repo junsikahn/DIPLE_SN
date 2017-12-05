@@ -28,4 +28,8 @@ class Standard::Problem < ApplicationRecord
     return false if exm_1.blank? && exm_2.blank? && exm_3.blank? && exm_4.blank? && exm_5.blank?
     true
   end
+
+  def updated?
+    updated_at && updated_at > created_at
+  end
 end

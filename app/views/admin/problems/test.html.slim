@@ -16,7 +16,7 @@
           td.text-center == problem_source.problems.first.year
           td == problem_source.name
           td.text-center == "#{problem_source.problems.to_a.count{ |problem| problem.subject_id }}문항"
-          td.text-center == "#{problem_source.problems.to_a.count{ |problem| problem.updated_at > problem.created_at }}문항"
+          td.text-center == "#{problem_source.problems.to_a.count{ |problem| problem.updated? }}문항"
           td.text-center == "#{problem_source.problems.size}문항"
           td.text-center == "#{problem_source.problems.sum{ |problem| problem.score }}점"
 - else
@@ -32,7 +32,7 @@
       tbody
         tr
           td.text-center == "#{@admin_problems.to_a.count{ |problem| problem.subject_id }}문항"
-          td.text-center == "#{@admin_problems.to_a.count{ |problem| problem.updated_at > problem.created_at }}문항"
+          td.text-center == "#{@admin_problems.to_a.count{ |problem| problem.updated? }}문항"
           td.text-center == "#{@admin_problems.size}문항"
           td.text-center == "#{@admin_problems.sum{ |problem| problem.score }}점"
   == render '/admin/problems', problems: @admin_problems, show_id: false
