@@ -7,6 +7,7 @@
         th.text-center 연도
         th.text-center 구분
         th.text-center 분류
+        th.text-center 수정
         th.text-center 문항
         th.text-center 점수
     tbody
@@ -14,15 +15,24 @@
         tr.cursor-pointer onclick='location.href="#{test_admin_problems_path(problem_source_id: problem_source.id)}"'
           td.text-center == problem_source.problems.first.year
           td == problem_source.name
-          td.text-center == "#{problem_source.problems.to_a.count{ |problem| problem.subject_id }} / #{problem_source.problems.size}"
+          td.text-center == "#{problem_source.problems.to_a.count{ |problem| problem.subject_id }}문항"
+          td.text-center == "#{problem_source.problems.to_a.count{ |problem| problem.updated_at > problem.created_at }}문항"
           td.text-center == "#{problem_source.problems.size}문항"
           td.text-center == "#{problem_source.problems.sum{ |problem| problem.score }}점"
 - else
   div.jumbotron.p-4.mb-3
     h1.mb-3 == @problem_source.name
     table.table.table-bordered.bg-white
+      thead
+        tr
+          th.text-center 분류
+          th.text-center 수정
+          th.text-center 문항
+          th.text-center 점수
       tbody
         tr
-          td.text-center = @admin_problems.pluck(:subject_id).count{ |subject_id| !subject_id.nil? }.to_s + '개 / ' + @admin_problems.size.to_s + '개'
-          td.text-center = @admin_problems.sum{ |problem| problem.score }.to_s + '점 만점'
+          td.text-center == "#{@admin_problems.to_a.count{ |problem| problem.subject_id }}문항"
+          td.text-center == "#{@admin_problems.to_a.count{ |problem| problem.updated_at > problem.created_at }}문항"
+          td.text-center == "#{@admin_problems.size}문항"
+          td.text-center == "#{@admin_problems.sum{ |problem| problem.score }}점"
   == render '/admin/problems', problems: @admin_problems, show_id: false

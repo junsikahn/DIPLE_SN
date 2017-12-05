@@ -175,11 +175,12 @@ div#problem-edit
                   div.preview-header 미리보기
                   div.preview-content v-html="renderedHTML"
             p.mb-0.pl-2.pr-2.pt-2.text-muted style="font-size: 0.75em;"
-              | - 수식 입력 : $$ 사이에 수식을 입력 (<a href="https://khan.github.io/KaTeX/function-support">수식 참고 링크</a>) <br>
+              | - 수식 입력 : $$ 사이에 수식을 입력 (<a href="https://khan.github.io/KaTeX/function-support" target="_blank">수식 참고 링크</a>) <br>
               | - 가로줄 삽입 : ctrl + 엔터
           div.modal-footer
             button.btn.btn-secondary type="button" data-dismiss="modal" 취소
             button.btn.btn-primary type="button" @click="saveEdit" 저장
+              i.fa.fa-spinner.fa-spin
   graph-modal inline-template="true" ref="graphModalComponent"
     div.modal role="dialog" data-backdrop="static" ref="graphModal"
       div.modal-dialog.modal-lg role="document" style="min-width: 1062px; max-width: 90%;" v-if="graphData"
@@ -584,7 +585,7 @@ javascript:
             var nodes = $.parseHTML(eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
                 annotation = _.map(nodes, function(node) {
                   return node = $(node).text();
-                }).join('').replace(/\n/g, '').replace(/\$/g, '');
+                }).join('').replace(/^\$|\$$/g, '');
             try {
               content = content.replace(eq, katex.renderToString(annotation));
             } catch(err) {
@@ -602,7 +603,23 @@ javascript:
         _.each(eqs, function(eq) {
           content = content.replace(eq, eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/\s/g, '&nbsp;'));
         });
-        content = content.replace(/\n<br>/g, '<div><br></div>').replace(/\n|\r/g, '');
+
+        var nodes = $.parseHTML(content);
+        content = _.compact(_.map(nodes, function(node) {
+          if (node.nodeType == 1) {
+            if (node.style.length == 0) node.removeAttribute('style');
+            if (node.classList.length == 0) node.removeAttribute('class');
+            node.innerHTML = node.innerHTML.trim();
+            if (node.nodeName == 'DIV' && node.innerHTML.length == 0) return '';
+            if (node.nodeName == 'BR' || (node.childNodes.length == 1 && node.firstChild.nodeName == 'BR')) return '<div><br></div>';
+            if (node.childNodes.length > 1 && node.lastChild.nodeName == 'BR') node.removeChild(node.lastChild);
+            return node.outerHTML;
+          } else if (node.nodeType == 3) {
+            if (node.nodeValue.trim().length > 0) return '<div>' + node.nodeValue.trim() + '</div>';
+          } else {
+            return '';
+          }
+        })).join('\n');
 
         this.editor.target = type;
         this.editor.title = (type == 'content' ? '문제' : (type == 'explanation' ? '해설' : '보기')) + ' 입력하기';
@@ -714,17 +731,33 @@ javascript:
           var nodes = $.parseHTML(eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
               annotation = _.map(nodes, function(node) {
                 return node = $(node).text();
-              }).join('').replace(/\n/g, '');
+              }).join('');
           content = content.replace(eq, annotation);
         });
-        content = content.replace(/\n|\r/g, '').replace(/\s(style=""|class="")/g, '')
-                         .replace(/<\/div>\s*<div/g, '<\/div>\n<div')
-                         .replace(/([^\n])<div/g, '$1\n<div')
-                         .replace(/<\/div>([^\n])/g, '<\/div>\n$1')
-                         .replace(/(\n?)<div.*><br><\/div>(\n?)/g, '$1<br>$2')
-                         .replace(/(<div.*>.+)<br>(<\/div>)/g, '$1$2');
-        this.$parent.$data['problem'][this.editor.target] = content;
-        return $(this.$refs.editorModal).modal('hide');
+
+        var nodes = $.parseHTML(content);
+        content = _.compact(_.map(nodes, function(node) {
+          if (node.nodeType == 1) {
+            if (node.style.length == 0) node.removeAttribute('style');
+            if (node.classList.length == 0) node.removeAttribute('class');
+            node.innerHTML = node.innerHTML.trim();
+            if (node.nodeName == 'DIV' && node.innerHTML.length == 0) return '';
+            if (node.nodeName == 'BR' || (node.childNodes.length == 1 && node.firstChild.nodeName == 'BR')) return '<br>';
+            if (node.childNodes.length > 1 && node.lastChild.nodeName == 'BR') node.removeChild(node.lastChild);
+            return node.outerHTML;
+          } else if (node.nodeType == 3) {
+            if (node.nodeValue.trim().length > 0) return '<div>' + node.nodeValue.trim() + '</div>';
+          } else {
+            return '';
+          }
+        })).join('\n');
+
+        if (this.$parent.equationCheck(content)) {
+          return alert('수식 오류가 있습니다. 확인해주세요!');
+        } else {
+          this.$parent.$data['problem'][this.editor.target] = content;
+          return $(this.$refs.editorModal).modal('hide');
+        }
       }
     }
   };
@@ -2820,7 +2853,7 @@ javascript:
 
         if (this.equationCheck(this.problem.content)
             || this.equationCheck(this.problem.explanation)) {
-          return alert('수식 오류가 있습니다. 확인해주세요!')
+          return alert('수식 오류가 있습니다. 확인해주세요!');
         }
 
         if (this.is_objective) {
@@ -2839,7 +2872,7 @@ javascript:
               || this.equationCheck(this.problem.exm_3)
               || this.equationCheck(this.problem.exm_4)
               || this.equationCheck(this.problem.exm_5)) {
-            return alert('수식 오류가 있습니다. 확인해주세요!')
+            return alert('수식 오류가 있습니다. 확인해주세요!');
           }
         } else {
           this.problem.exm_1 = undefined;

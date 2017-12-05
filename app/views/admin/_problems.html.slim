@@ -1,6 +1,7 @@
 table.table.table-bordered
   thead.thead-default
     tr
+      th.text-center ID
       th.text-center 문제
       th.text-center 정답률
       th.text-center 새로고침
@@ -8,8 +9,10 @@ table.table.table-bordered
       th.text-center 삭제
   - problems.each_with_index do |problem, index|
     tr id="problem_tr_#{problem.id}"
+      td.text-center
+        kbd.badge == problem.id
       td.p-0 style="width: 540px"
-        == render '/admin/problem', problem: problem, order: (show_id ? problem.id : index + 1)
+        == render '/admin/problem', problem: problem, show_id: show_id
       td.text-center
         == "총 #{problem.total_count}회 중 정답 #{problem.correct_count}회"
         br

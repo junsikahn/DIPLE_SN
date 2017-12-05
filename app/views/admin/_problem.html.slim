@@ -1,7 +1,7 @@
 div.problem-container
   div.problem-info.d-flex.justify-content-between.align-items-end.flex-wrap
     div.d-inline-flex
-      span.problem-order == order ? "#{order}번" : "ID #{problem.id}"
+      span.problem-order class="#{'bg-secondary' if show_id}" == show_id ? "ID #{problem.id}" : "#{problem.problem_source_order}번"
       span.problem-score == "#{problem.score}점"
     div.d-inline-flex.justify-content-end.align-items-end.w-75
       span.problem-subject class="#{'text-danger' if !problem.subject_id}" == problem.subject_id ? problem.subject.path : '미분류'
