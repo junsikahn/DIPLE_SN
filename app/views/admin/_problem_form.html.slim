@@ -173,14 +173,13 @@ div#problem-edit
               div.col-6
                 div.preview-wrapper
                   div.preview-header 미리보기
-                  div.preview-content v-html="renderedHTML"
+                  div.preview-content.clearfix v-html="renderedHTML"
             p.mb-0.pl-2.pr-2.pt-2.text-muted style="font-size: 0.75em;"
               | - 수식 입력 : $$ 사이에 수식을 입력 (<a href="https://khan.github.io/KaTeX/function-support" target="_blank">수식 참고 링크</a>) <br>
               | - 가로줄 삽입 : ctrl + 엔터
           div.modal-footer
             button.btn.btn-secondary type="button" data-dismiss="modal" 취소
             button.btn.btn-primary type="button" @click="saveEdit" 저장
-              i.fa.fa-spinner.fa-spin
   graph-modal inline-template="true" ref="graphModalComponent"
     div.modal role="dialog" data-backdrop="static" ref="graphModal"
       div.modal-dialog.modal-lg role="document" style="min-width: 1062px; max-width: 90%;" v-if="graphData"
@@ -2769,8 +2768,11 @@ javascript:
     }
   };
 
+  const noDelimiter = {replace: () => '(?!x)x'}; // return a non-matching regexp.
+
   var vm = new Vue({
     el: '#problem-edit',
+    delimiters: [noDelimiter, noDelimiter],
     data: {
       problem: #{{ problem.as_json(include: [:subject, :problem_tags, :problem_source]).to_json.html_safe }},
       is_objective: #{{ problem.id ? (problem.exm_1.blank? ? false : true) : true }},
@@ -2831,6 +2833,7 @@ javascript:
         });
       },
       equationCheck: function(content) {
+        if (!content) return false;
         var err_check = 0, eqs = content.match(/\$[^\$]*\$/g);
         _.each(eqs, function(eq) {
           var nodes = $.parseHTML(eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
@@ -2862,11 +2865,11 @@ javascript:
           if (this.problem.exm_3) this.problem.exm_3 = this.problem.exm_3.trim();
           if (this.problem.exm_4) this.problem.exm_4 = this.problem.exm_4.trim();
           if (this.problem.exm_5) this.problem.exm_5 = this.problem.exm_5.trim();
-          if (this.problem.exm_1.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_1))) this.problem.exm_1 = '$' + this.problem.exm_1 + '$';
-          if (this.problem.exm_2.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_2))) this.problem.exm_2 = '$' + this.problem.exm_2 + '$';
-          if (this.problem.exm_3.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_3))) this.problem.exm_3 = '$' + this.problem.exm_3 + '$';
-          if (this.problem.exm_4.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_4))) this.problem.exm_4 = '$' + this.problem.exm_4 + '$';
-          if (this.problem.exm_5.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_5))) this.problem.exm_5 = '$' + this.problem.exm_5 + '$';
+          if (this.problem.exm_1 && this.problem.exm_1.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_1))) this.problem.exm_1 = '$' + this.problem.exm_1 + '$';
+          if (this.problem.exm_2 && this.problem.exm_2.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_2))) this.problem.exm_2 = '$' + this.problem.exm_2 + '$';
+          if (this.problem.exm_3 && this.problem.exm_3.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_3))) this.problem.exm_3 = '$' + this.problem.exm_3 + '$';
+          if (this.problem.exm_4 && this.problem.exm_4.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_4))) this.problem.exm_4 = '$' + this.problem.exm_4 + '$';
+          if (this.problem.exm_5 && this.problem.exm_5.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_5))) this.problem.exm_5 = '$' + this.problem.exm_5 + '$';
           if (this.equationCheck(this.problem.exm_1)
               || this.equationCheck(this.problem.exm_2)
               || this.equationCheck(this.problem.exm_3)

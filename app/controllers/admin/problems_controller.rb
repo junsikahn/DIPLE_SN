@@ -24,13 +24,11 @@ class Admin::ProblemsController < AdminController
   # GET /admin/problems/new
   def new
     @admin_problem = Admin::Problem.new(subject: Admin::Subject.new)
-    render 'form'
   end
 
   # GET /admin/problems/1/edit
   def edit
     @admin_problem.subject = Admin::Subject.new if @admin_problem.subject_id.nil?
-    render 'form'
   end
 
   # POST /admin/problems

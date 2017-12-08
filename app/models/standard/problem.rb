@@ -32,4 +32,9 @@ class Standard::Problem < ApplicationRecord
   def updated?
     updated_at && updated_at > created_at
   end
+
+  def ready?
+    return false if subject_id.nil? || content.blank? || explanation.blank?
+    true
+  end
 end
