@@ -596,7 +596,7 @@ javascript:
         var content = this.editor.content;
         var eqs = content ? content.match(/\$[^\$]*\$/g) : '';
         _.each(eqs, function(eq) {
-          var nodes = $.parseHTML(eq.replace(/&gt;(\s?)(.)/g, '\\gt&nbsp;$2').replace(/&lt;(\s?)(.)/g, '\\lt&nbsp;$2').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
+          var nodes = $.parseHTML(eq.replace(/&gt;/g, '{\\gt}').replace(/&lt;/g, '{\\lt}').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')),
               annotation = _.map(nodes, function(node) { return node = $(node).text(); }).join('\n');
           try {
             content = content.replace(eq, katex.renderToString(annotation.replace(/^\$|\$$/g, '')));
@@ -2796,20 +2796,11 @@ javascript:
           return false;
         }
       },
-      customFormula: function(content) {
-        var eqs = content ? content.match(/\$[^\$]*\$/g) : '';
-        _.each(eqs, function(eq) {
-          var nodes = $.parseHTML(eq.replace(/&gt;(\s?)(.)/g, '\\gt&nbsp;$2').replace(/&lt;(\s?)(.)/g, '\\lt&nbsp;$2').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
-              annotation = _.map(nodes, function(node) { return node = $(node).text(); }).join('\n');
-          content = content.replace(eq, annotation.replace('\\rightarrow', '\\to').replace(' _', '_').replace(' ^', '^').replace(' +', '+').replace(' -', '-'));
-        });
-        return content;
-      },
       sanitizeFormula: function(content) {
         // 편집용 String to 저장용 String
         var eqs = content ? content.match(/\$[^\$]*\$/g) : '';
         _.each(eqs, function(eq) {
-          var nodes = $.parseHTML(eq.replace(/&gt;(\s?)(.)/g, '\\gt&nbsp;$2').replace(/&lt;(\s?)(.)/g, '\\lt&nbsp;$2').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
+          var nodes = $.parseHTML(eq.replace(/&gt;/g, '{\\gt}').replace(/&lt;/g, '{\\lt}').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')),
               annotation = _.map(nodes, function(node) { return node = $(node).text(); }).join('\n');
           content = content.replace(eq, annotation);
         });
@@ -2819,7 +2810,7 @@ javascript:
         // 저장용 String to 편집용 String
         var eqs = content ? content.match(/\$[^\$]*\$/g) : '';
         _.each(eqs, function(eq) {
-          content = content.replace(eq, eq.replace(/&gt;(\s?)(.)/g, '\\gt&nbsp;$2').replace(/&lt;(\s?)(.)/g, '\\lt&nbsp;$2').replace(/\s/g, '&nbsp;'));
+          content = content.replace(eq, eq.replace(/&gt;/g, '{\\gt}').replace(/&lt;/g, '{\\lt}').replace(/\s/g, '&nbsp;'));
         });
         return content;
       },
@@ -2827,7 +2818,7 @@ javascript:
         var err_check = 0
         var eqs = content ? content.match(/\$[^\$]*\$/g) : '';
         _.each(eqs, function(eq) {
-          var nodes = $.parseHTML(eq.replace(/&gt;(\s?)(.)/g, '\\gt&nbsp;$2').replace(/&lt;(\s?)(.)/g, '\\lt&nbsp;$2').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
+          var nodes = $.parseHTML(eq.replace(/&gt;/g, '{\\gt}').replace(/&lt;/g, '{\\lt}').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')),
         	    annotation = _.map(nodes, function(node) { return node = $(node).text(); }).join('\n');
       	  try {
       		  katex.renderToString(annotation.replace(/^\$|\$$/g, ''));
@@ -2839,8 +2830,8 @@ javascript:
       },
       sanitizeHTML: function(content) {
         // 편집용 String to 저장용 String
-        var nodes = $.parseHTML(this.sanitizeFormula(content));
-        return _.compact(_.map(nodes, function(node) {
+        var nodes = $.parseHTML(content);
+        return this.sanitizeFormula(_.compact(_.map(nodes, function(node) {
           if (node.nodeType == 1) {
             if (node.style.length == 0) node.removeAttribute('style');
             if (node.classList.length == 0) node.removeAttribute('class');
@@ -2848,18 +2839,20 @@ javascript:
             if (node.nodeName == 'DIV' && node.innerHTML.length == 0) return '';
             if (node.nodeName == 'BR' || (node.childNodes.length == 1 && node.firstChild.nodeName == 'BR')) return '<br>';
             if (node.childNodes.length > 1 && node.lastChild.nodeName == 'BR') node.removeChild(node.lastChild);
+            if (!Number.isNaN(Number(node.innerHTML)) && node.innerHTML.indexOf('$') == -1) node.innerHTML = '$' + node.innerHTML + '$';
             return node.outerHTML;
           } else if (node.nodeType == 3 && node.nodeValue.trim().length > 0) {
+            if (!Number.isNaN(Number(node.nodeValue)) && node.nodeValue.indexOf('$') == -1) node.nodeValue = '$' + node.nodeValue + '$';
             return '<div>' + node.nodeValue.trim() + '</div>';
           } else {
             return '';
           }
-        }.bind(this))).join('\n');
+        }.bind(this))).join('\n'));
       },
       insanitizeHTML: function(content) {
         // 저장용 String to 편집용 String
-        var nodes = $.parseHTML(this.insanitizeFormula(content));
-        return _.compact(_.map(nodes, function(node) {
+        var nodes = $.parseHTML(content);
+        return this.insanitizeFormula(_.compact(_.map(nodes, function(node) {
           if (node.nodeType == 1) {
             if (node.nodeName == 'BR' || (node.childNodes.length == 1 && node.firstChild.nodeName == 'BR')) return '<div><br></div>';
             return node.outerHTML;
@@ -2868,7 +2861,29 @@ javascript:
           } else {
             return '';
           }
-        })).join('\n');
+        }.bind(this))).join('\n'));
+      },
+      initHTML: function(content) {
+        content = this.sanitizeHTML(content);
+
+        var eqs = content ? content.match(/\$[^\$]*\$/g) : '';
+        _.each(eqs, function(eq) {
+          var nodes = $.parseHTML(eq.replace(/&gt;/g, '{\\gt}').replace(/&lt;/g, '{\\lt}').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')),
+              annotation = _.map(nodes, function(node) { return node = $(node).text(); }).join('\n'),
+              replace = annotation.replace(/[^\S\r\n](_|-|\+|\^|\=)/g, '$1')
+                                  .replace(/(_|-|\+|\^|\=)[^\S\r\n]/g, '$1')
+                                  .replace(/\\rightarrow/g, '\\to')
+                                  .replace(/</g, '{\\lt}')
+                                  .replace(/>/g, '{\\gt}');
+          if (annotation != replace) {
+            console.warn(annotation, '\n→', replace);
+          } else {
+            console.log('변경사항 없음', annotation);
+          }
+          content = content.replace(eq, replace);
+        });
+
+        return content;
       },
       saveProblem: function() {
         if (this.problem.content) this.problem.content = this.problem.content.trim();
@@ -2900,13 +2915,13 @@ javascript:
       }
     },
     created: function() {
-      this.problem.content = this.sanitizeHTML(this.customFormula(this.problem.content));
-      this.problem.exm_1 = this.sanitizeHTML(this.customFormula(this.problem.exm_1));
-      this.problem.exm_2 = this.sanitizeHTML(this.customFormula(this.problem.exm_2));
-      this.problem.exm_3 = this.sanitizeHTML(this.customFormula(this.problem.exm_3));
-      this.problem.exm_4 = this.sanitizeHTML(this.customFormula(this.problem.exm_4));
-      this.problem.exm_5 = this.sanitizeHTML(this.customFormula(this.problem.exm_5));
-      this.problem.explanation = this.sanitizeHTML(this.customFormula(this.problem.explanation));
+      this.problem.content = this.initHTML(this.problem.content);
+      this.problem.exm_1 = this.initHTML(this.problem.exm_1);
+      this.problem.exm_2 = this.initHTML(this.problem.exm_2);
+      this.problem.exm_3 = this.initHTML(this.problem.exm_3);
+      this.problem.exm_4 = this.initHTML(this.problem.exm_4);
+      this.problem.exm_5 = this.initHTML(this.problem.exm_5);
+      this.problem.explanation = this.initHTML(this.problem.explanation);
     },
     mounted: function() {
       $(window).on('resize', _.debounce(function() {
