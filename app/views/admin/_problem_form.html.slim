@@ -39,14 +39,14 @@ div#problem-edit
                         i.fa :class="[ problem.level == 3 ? 'fa-star' : 'fa-star-o' ]" @mouseup="problem.level = 3"
                   div.problem-wrapper
                     div.problem-content v-html="problem.content" @click="openEditorModal('content')" :class="{ 'is-editing': focusInput == 'content' }"
-                    div.problem-exm v-if="is_objective"
+                    div.problem-exm v-show="is_objective"
                       div.problem-exm-wrapper v-for="(exm, index) in [problem.exm_1, problem.exm_2, problem.exm_3, problem.exm_4, problem.exm_5]" :key="index" @click="openEditorModal('exm_' + (index + 1))" :class="[ problem.answer == index + 1 ? 'active' : '', { 'is-editing': focusInput == 'exm_' + (index + 1) }]"
                         span.problem-exm-index v-text="index + 1" :class="[ problem.answer == index + 1 ? 'active' : '' ]" @click.stop="inputAnswer(index + 1)"
                         span.problem-exm-content v-html="exm"
-                    div.problem-answer-input v-else=""
+                    div.problem-answer-input v-show="!is_objective"
                       input.form-control type="text" readonly="true" :value="problem.answer" @click="inputAnswer()"
-                    div.problem-explanation v-html="problem.explanation" @click="openEditorModal('explanation')" :class="{ 'is-editing': focusInput == 'explanation' }" v-if="show_explanation"
-                    div.problem-answer :class="{ 'is-editing': focusInput == 'answer' }" @click="inputAnswer()" v-if="show_explanation"
+                    div.problem-explanation v-html="problem.explanation" @click="openEditorModal('explanation')" :class="{ 'is-editing': focusInput == 'explanation' }" v-show="show_explanation"
+                    div.problem-answer :class="{ 'is-editing': focusInput == 'answer' }" @click="inputAnswer()" v-show="show_explanation"
                       i.fa.fa-caret-right.mr-1
                       span.problem-answer-wrapper
                         span.problem-answer-seg.align-bottom :class="{ 'is-objective' : is_objective }" v-html="problem.answer"
@@ -54,7 +54,7 @@ div#problem-edit
                     i.fa.fa-caret-right.mr-1
                     span v-text="'출처 : ' + problem.problem_source.name + ' - ' + problem.problem_source_order + '번'"
                   tag-input inline-template="true" :problem="problem" ref="tagInputComponent"
-                    div.problem-tags
+                    div.problem-tags v-if="problem.problem_tags"
                       a.badge.badge-secondary.mt-1.mr-1 v-for="tag in problem.problem_tags" :key="tag.id" v-html="tag.name" href="#" @click.prevent="remove(tag)"
                       div.text-right
                         a.badge.badge-success.mt-1.mr-1 href="#" @click.prevent="open" v-show="!is_opened" <i class="fa fa-plus"></i> 추가
@@ -82,8 +82,8 @@ div#problem-edit
                 div
                   label.m-1.mr-2 타입
                   div.btn-group.btn-group-sm
-                    div.btn :class="[ is_objective ? 'btn-secondary' : 'btn-outline-secondary' ]" @click="convertObjective(true)" 객관식
-                    div.btn :class="[ !is_objective ? 'btn-secondary' : 'btn-outline-secondary' ]" @click="convertObjective(false)" 주관식
+                    div.btn :class="[ is_objective ? 'btn-secondary' : 'btn-outline-secondary' ]" @click="is_objective = true" 객관식
+                    div.btn :class="[ !is_objective ? 'btn-secondary' : 'btn-outline-secondary' ]" @click="is_objective = false" 주관식
           tbody
             tr
               td
@@ -97,23 +97,39 @@ div#problem-edit
                   div.col.mb-0.pl-0
                     = f.input :level, label: '난이도', wrapper_html: { class: 'mb-0' }, input_html: { class: 'd-none', 'v-model': 'problem.level' }
                     div.btn-group.w-100
-                      button.btn.w-100 :class="[ problem.level == 1 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.level = 1" 하
-                      button.btn.w-100 :class="[ problem.level == 2 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.level = 2" 중
-                      button.btn.w-100 :class="[ problem.level == 3 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.level = 3" 상
+                      button.btn.w-100 :class="[ !problem.level ? 'btn-outline-danger' : '', problem.level == 1 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.level = 1" 하
+                      button.btn.w-100 :class="[ !problem.level ? 'btn-outline-danger' : '', problem.level == 2 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.level = 2" 중
+                      button.btn.w-100 :class="[ !problem.level ? 'btn-outline-danger' : '', problem.level == 3 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.level = 3" 상
             tr
               td
-                = f.input :content, input_html: { rows: '1', 'v-model.trim': 'problem.content', ':class': "{ 'border-danger' : _.isEmpty(problem.content) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "content"', '@blur': 'focusInput = null'  }
-            tr v-if="is_objective"
+                = f.input :content,
+                          input_html: { rows: '1', 'v-model.trim': 'problem.content', ':class': "{ 'border-danger' : _.isEmpty(problem.content) }", '@focus': 'focusInput = "content"', '@blur': 'focusInput = null' }
+            tr v-show="is_objective"
               td
-                = f.input :exm_1, wrapper_html: { class: 'd-inline-block w-50 pr-1' }, input_html: { rows: '1', 'v-model.trim': "problem.exm_1", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_1) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "exm_1"', '@blur': 'focusInput = null' }
-                = f.input :exm_2, wrapper_html: { class: 'd-inline-block w-50' }, input_html: { rows: '1', 'v-model.trim': "problem.exm_2", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_2) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "exm_2"', '@blur': 'focusInput = null' }
-                = f.input :exm_3, wrapper_html: { class: 'd-inline-block w-50 pr-1' }, input_html: { rows: '1', 'v-model.trim': "problem.exm_3", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_3) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "exm_3"', '@blur': 'focusInput = null' }
-                = f.input :exm_4, wrapper_html: { class: 'd-inline-block w-50' }, input_html: { rows: '1', 'v-model.trim': "problem.exm_4", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_4) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "exm_4"', '@blur': 'focusInput = null' }
-                = f.input :exm_5, wrapper_html: { class: 'd-inline-block w-50 pr-1' }, input_html: { rows: '1', 'v-model.trim': "problem.exm_5", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_5) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "exm_5"', '@blur': 'focusInput = null' }
+                = f.input :exm_1, wrapper_html: { class: 'd-inline-block w-50 pr-1' },
+                          input_html: { rows: '1', 'v-model.trim': "problem.exm_1", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_1) }", '@focus': 'focusInput = "exm_1"', '@blur': 'focusInput = null' }
+                = f.input :exm_2, wrapper_html: { class: 'd-inline-block w-50' },
+                          input_html: { rows: '1', 'v-model.trim': "problem.exm_2", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_2) }", '@focus': 'focusInput = "exm_2"', '@blur': 'focusInput = null' }
+                = f.input :exm_3, wrapper_html: { class: 'd-inline-block w-50 pr-1' },
+                          input_html: { rows: '1', 'v-model.trim': "problem.exm_3", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_3) }", '@focus': 'focusInput = "exm_3"', '@blur': 'focusInput = null' }
+                = f.input :exm_4, wrapper_html: { class: 'd-inline-block w-50' },
+                          input_html: { rows: '1', 'v-model.trim': "problem.exm_4", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_4) }", '@focus': 'focusInput = "exm_4"', '@blur': 'focusInput = null' }
+                = f.input :exm_5, wrapper_html: { class: 'd-inline-block w-50 pr-1' },
+                          input_html: { rows: '1', 'v-model.trim': "problem.exm_5", ':class': "{ 'border-danger' : _.isEmpty(problem.exm_5) }", '@focus': 'focusInput = "exm_5"', '@blur': 'focusInput = null' }
             tr
-              td = f.input :explanation, input_html: { rows: '1', 'v-model.trim': 'problem.explanation', ':class': "{ 'border-danger' : _.isEmpty(problem.explanation) }", '@input': 'resizeTextarea', '@focus': 'focusInput = "explanation"', '@blur': 'focusInput = null' }
+              td
+                = f.input :answer, as: :integer, wrapper_html: { class: 'mb-0' },
+                          input_html: { 'ref': 'inputAnswer', 'v-model.number': 'problem.answer', ':class': "{ 'border-danger' : _.isNull(problem.answer) || problem.answer == 0 }", '@focus': 'focusInput = "answer"', '@blur': 'focusInput = null', 'v-show': '!is_objective' }
+                div.btn-group.w-100 v-show="is_objective"
+                  button.btn.w-100 :class="[ !problem.answer ? 'btn-outline-danger' : '', problem.answer == 1 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.answer = 1" 1
+                  button.btn.w-100 :class="[ !problem.answer ? 'btn-outline-danger' : '', problem.answer == 2 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.answer = 2" 2
+                  button.btn.w-100 :class="[ !problem.answer ? 'btn-outline-danger' : '', problem.answer == 3 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.answer = 3" 3
+                  button.btn.w-100 :class="[ !problem.answer ? 'btn-outline-danger' : '', problem.answer == 4 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.answer = 4" 4
+                  button.btn.w-100 :class="[ !problem.answer ? 'btn-outline-danger' : '', problem.answer == 5 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.answer = 5" 5
             tr
-              td = f.input :answer, as: :integer, input_html: { 'ref': 'inputAnswer', 'v-model.number': 'problem.answer', ':class': "{ 'border-danger' : _.isNull(problem.answer) || problem.answer == 0 }", '@focus': 'focusInput = "answer"', '@blur': 'focusInput = null' }
+              td
+                = f.input :explanation,
+                          input_html: { rows: '1', 'v-model.trim': 'problem.explanation', ':class': "{ 'border-danger' : _.isEmpty(problem.explanation) }", '@focus': 'focusInput = "explanation"', '@blur': 'focusInput = null' }
             tr
               td
                 = f.hidden_field :problem_tag_ids, ':value': 'problem_tag_ids'
@@ -131,7 +147,7 @@ div#problem-edit
               span aria-hidden="true" &times;
           div.modal-body
             div.border.border-info.rounded.pt-2.pb-2.pl-3.pr-3.mb-2
-              div.text-muted v-if="!problem.subject.id" 현재 설정된 과목이 없습니다
+              div.text-muted v-if="!problem.subject_id" 현재 설정된 과목이 없습니다
               div v-else=""
                 span.badge.badge-dark.mr-1 v-text="problem.subject.depth"
                 span.badge.badge-info.mr-2 v-text="problem.subject.order"
@@ -155,8 +171,8 @@ div#problem-edit
                     div.d-flex.align-items-center.justify-content-between.pr-1 :class="[ subject.depth == 1 ? 'pl-1' : (subject.depth == 2) ? 'pl-4' : 'pl-5' ]"
                       div
                         span.badge.badge-dark.mr-1 v-text="subject.depth"
-                        span.badge.badge-secondary.mr-2 :class='{ "badge-info" : problem.subject.id == subject.id }' v-text="subject.order"
-                        span :class='{ "text-info" : problem.subject.id == subject.id }' v-text="subject.name"
+                        span.badge.badge-secondary.mr-2 :class='{ "badge-info" : problem.subject_id == subject.id }' v-text="subject.order"
+                        span :class='{ "text-info" : problem.subject_id == subject.id }' v-text="subject.name"
                       small.text-muted v-text="subject.path"
   editor-modal inline-template="true" ref="editorModalComponent"
     div.modal role="dialog" data-backdrop="static" ref="editorModal"
@@ -578,60 +594,34 @@ javascript:
     computed: {
       renderedHTML: function() {
         var content = this.editor.content;
-        if (content && content.length > 0) {
-          var eqs = content.match(/\$[^\$]*\$/g);
-          _.each(eqs, function(eq) {
-            var nodes = $.parseHTML(eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
-                annotation = _.map(nodes, function(node) {
-                  return node = $(node).text();
-                }).join('').replace(/^\$|\$$/g, '');
-            try {
-              content = content.replace(eq, katex.renderToString(annotation));
-            } catch(err) {
-              content = content.replace(eq, '<mark>' + eq + '</mark>');
-            }
-          });
-          return content;
-        }
+        var eqs = content ? content.match(/\$[^\$]*\$/g) : '';
+        _.each(eqs, function(eq) {
+          var nodes = $.parseHTML(eq.replace(/&gt;(\s?)(.)/g, '\\gt&nbsp;$2').replace(/&lt;(\s?)(.)/g, '\\lt&nbsp;$2').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
+              annotation = _.map(nodes, function(node) { return node = $(node).text(); }).join('\n');
+          try {
+            content = content.replace(eq, katex.renderToString(annotation.replace(/^\$|\$$/g, '')));
+          } catch(err) {
+            content = content.replace(eq, '<mark class="bg-danger text-light">' + eq + '</mark>');
+          }
+        });
+        return content;
       }
     },
     methods: {
       openEdit: function(type) {
-        var content = this.$parent.$data['problem'][type];
-        var eqs = content.match(/\$[^\$]*\$/g);
-        _.each(eqs, function(eq) {
-          content = content.replace(eq, eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/\s/g, '&nbsp;'));
-        });
-
-        var nodes = $.parseHTML(content);
-        content = _.compact(_.map(nodes, function(node) {
-          if (node.nodeType == 1) {
-            if (node.style.length == 0) node.removeAttribute('style');
-            if (node.classList.length == 0) node.removeAttribute('class');
-            node.innerHTML = node.innerHTML.trim();
-            if (node.nodeName == 'DIV' && node.innerHTML.length == 0) return '';
-            if (node.nodeName == 'BR' || (node.childNodes.length == 1 && node.firstChild.nodeName == 'BR')) return '<div><br></div>';
-            if (node.childNodes.length > 1 && node.lastChild.nodeName == 'BR') node.removeChild(node.lastChild);
-            return node.outerHTML;
-          } else if (node.nodeType == 3) {
-            if (node.nodeValue.trim().length > 0) return '<div>' + node.nodeValue.trim() + '</div>';
-          } else {
-            return '';
-          }
-        })).join('\n');
-
         this.editor.target = type;
         this.editor.title = (type == 'content' ? '문제' : (type == 'explanation' ? '해설' : '보기')) + ' 입력하기';
-        this.editor.content = content;
+        this.editor.content = this.$parent.insanitizeHTML(this.$parent.problem[type]);
 
         this.$nextTick(function() {
           $(this.$refs.editorModal)
             .on('hide.bs.modal', function(e) {
+              $(window).trigger('resize');
               $(this.$refs.summernote).summernote('destroy');
+              this.$parent.focusInput = null;
               this.editor.target = null;
               this.editor.title = null;
               this.editor.content = null;
-              this.$parent.focusInput = null;
             }.bind(this)).modal({
               keyboard: false
             });
@@ -724,37 +714,12 @@ javascript:
         }.bind(this));
       },
       saveEdit: function() {
-        var content = this.editor.content;
-        var eqs = content.match(/\$[^\$]*\$/g);
-        _.each(eqs, function(eq) {
-          var nodes = $.parseHTML(eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
-              annotation = _.map(nodes, function(node) {
-                return node = $(node).text();
-              }).join('');
-          content = content.replace(eq, annotation);
-        });
+        var content = this.$parent.sanitizeHTML(this.editor.content);
 
-        var nodes = $.parseHTML(content);
-        content = _.compact(_.map(nodes, function(node) {
-          if (node.nodeType == 1) {
-            if (node.style.length == 0) node.removeAttribute('style');
-            if (node.classList.length == 0) node.removeAttribute('class');
-            node.innerHTML = node.innerHTML.trim();
-            if (node.nodeName == 'DIV' && node.innerHTML.length == 0) return '';
-            if (node.nodeName == 'BR' || (node.childNodes.length == 1 && node.firstChild.nodeName == 'BR')) return '<br>';
-            if (node.childNodes.length > 1 && node.lastChild.nodeName == 'BR') node.removeChild(node.lastChild);
-            return node.outerHTML;
-          } else if (node.nodeType == 3) {
-            if (node.nodeValue.trim().length > 0) return '<div>' + node.nodeValue.trim() + '</div>';
-          } else {
-            return '';
-          }
-        })).join('\n');
-
-        if (this.$parent.equationCheck(content)) {
+        if (!this.$parent.equationCheck(content)) {
           return alert('수식 오류가 있습니다. 확인해주세요!');
         } else {
-          this.$parent.$data['problem'][this.editor.target] = content;
+          this.$parent.problem[this.editor.target] = content;
           return $(this.$refs.editorModal).modal('hide');
         }
       }
@@ -2805,10 +2770,6 @@ javascript:
         this.focusInput = type;
         return this.$refs.editorModalComponent.openEdit(type);
       },
-      convertObjective: function(is_objective) {
-        if (is_objective & (this.problem.answer == 0 || this.problem.answer > 5)) this.problem.answer = null;
-        return this.is_objective = is_objective;
-      },
       inputScore: function() {
         return $(this.$refs.inputScore).focus();
       },
@@ -2819,46 +2780,99 @@ javascript:
           return $(this.$refs.inputAnswer).focus();
         }
       },
-      resizeTextarea: function(e, textarea = e.target) {
-        let st = $(window).scrollTop();
-        $(textarea).css('height', 'auto').height(textarea.scrollHeight - 14);
-        $(window).scrollTop(st);
-      },
-      init: function() {
-        $.each($('textarea'), function(index, textarea) { this.resizeTextarea(null, textarea); }.bind(this));
-        renderMathInElement(this.$refs.problemPreview, {
+      renderMath: _.debounce(function() {
+        if (this.$refs.problemPreview) renderMathInElement(this.$refs.problemPreview, {
           delimiters: [ { left: "$",  right: "$",  display: false } ],
           errorCallback: function(msg, err) {
           }
         });
+      }, 250),
+      textareaCheck: function(e, textarea = e.target) {
+        if (this.equationCheck(textarea.value)) {
+          $(textarea).removeClass('bg-danger border-white text-light');
+          return true;
+        } else {
+          $(textarea).addClass('bg-danger border-white text-light');
+          return false;
+        }
+      },
+      customFormula: function(content) {
+        var eqs = content ? content.match(/\$[^\$]*\$/g) : '';
+        _.each(eqs, function(eq) {
+          var nodes = $.parseHTML(eq.replace(/&gt;(\s?)(.)/g, '\\gt&nbsp;$2').replace(/&lt;(\s?)(.)/g, '\\lt&nbsp;$2').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
+              annotation = _.map(nodes, function(node) { return node = $(node).text(); }).join('\n');
+          content = content.replace(eq, annotation.replace('\\rightarrow', '\\to').replace(' _', '_').replace(' ^', '^').replace(' +', '+').replace(' -', '-'));
+        });
+        return content;
+      },
+      sanitizeFormula: function(content) {
+        // 편집용 String to 저장용 String
+        var eqs = content ? content.match(/\$[^\$]*\$/g) : '';
+        _.each(eqs, function(eq) {
+          var nodes = $.parseHTML(eq.replace(/&gt;(\s?)(.)/g, '\\gt&nbsp;$2').replace(/&lt;(\s?)(.)/g, '\\lt&nbsp;$2').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
+              annotation = _.map(nodes, function(node) { return node = $(node).text(); }).join('\n');
+          content = content.replace(eq, annotation);
+        });
+        return content;
+      },
+      insanitizeFormula: function(content) {
+        // 저장용 String to 편집용 String
+        var eqs = content ? content.match(/\$[^\$]*\$/g) : '';
+        _.each(eqs, function(eq) {
+          content = content.replace(eq, eq.replace(/&gt;(\s?)(.)/g, '\\gt&nbsp;$2').replace(/&lt;(\s?)(.)/g, '\\lt&nbsp;$2').replace(/\s/g, '&nbsp;'));
+        });
+        return content;
       },
       equationCheck: function(content) {
-        if (!content) return false;
-        var err_check = 0, eqs = content.match(/\$[^\$]*\$/g);
+        var err_check = 0
+        var eqs = content ? content.match(/\$[^\$]*\$/g) : '';
         _.each(eqs, function(eq) {
-          var nodes = $.parseHTML(eq.replace(/&gt;/g, '\\gt').replace(/&lt;/g, '\\lt').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
-        	  annotation = _.map(nodes, function(node) {
-                          return node = $(node).text();
-                        }).join('').replace(/\n/g, '').replace(/\$/g, '');
+          var nodes = $.parseHTML(eq.replace(/&gt;(\s?)(.)/g, '\\gt&nbsp;$2').replace(/&lt;(\s?)(.)/g, '\\lt&nbsp;$2').replace(/&nbsp;/g, ' ').replace(/\&amp;/g, '&')),
+        	    annotation = _.map(nodes, function(node) { return node = $(node).text(); }).join('\n');
       	  try {
-      		  katex.renderToString(annotation);
+      		  katex.renderToString(annotation.replace(/^\$|\$$/g, ''));
       	  } catch(err) {
       		  err_check += 1;
       	  }
         });
-        return err_check > 0;
+        return err_check == 0;
+      },
+      sanitizeHTML: function(content) {
+        // 편집용 String to 저장용 String
+        var nodes = $.parseHTML(this.sanitizeFormula(content));
+        return _.compact(_.map(nodes, function(node) {
+          if (node.nodeType == 1) {
+            if (node.style.length == 0) node.removeAttribute('style');
+            if (node.classList.length == 0) node.removeAttribute('class');
+            node.innerHTML = node.innerHTML.trim();
+            if (node.nodeName == 'DIV' && node.innerHTML.length == 0) return '';
+            if (node.nodeName == 'BR' || (node.childNodes.length == 1 && node.firstChild.nodeName == 'BR')) return '<br>';
+            if (node.childNodes.length > 1 && node.lastChild.nodeName == 'BR') node.removeChild(node.lastChild);
+            return node.outerHTML;
+          } else if (node.nodeType == 3 && node.nodeValue.trim().length > 0) {
+            return '<div>' + node.nodeValue.trim() + '</div>';
+          } else {
+            return '';
+          }
+        }.bind(this))).join('\n');
+      },
+      insanitizeHTML: function(content) {
+        // 저장용 String to 편집용 String
+        var nodes = $.parseHTML(this.insanitizeFormula(content));
+        return _.compact(_.map(nodes, function(node) {
+          if (node.nodeType == 1) {
+            if (node.nodeName == 'BR' || (node.childNodes.length == 1 && node.firstChild.nodeName == 'BR')) return '<div><br></div>';
+            return node.outerHTML;
+          } else if (node.nodeType == 3 && node.nodeValue.trim().length > 0) {
+            return '<div>' + node.nodeValue.trim() + '</div>';
+          } else {
+            return '';
+          }
+        })).join('\n');
       },
       saveProblem: function() {
-        if (!this.is_changed && !confirm('변경내용이 없습니다. 그래도 전송할까요?')) return false;
-
         if (this.problem.content) this.problem.content = this.problem.content.trim();
         if (this.problem.explanation) this.problem.explanation = this.problem.explanation.trim();
-
-        if (this.equationCheck(this.problem.content)
-            || this.equationCheck(this.problem.explanation)) {
-          return alert('수식 오류가 있습니다. 확인해주세요!');
-        }
-
         if (this.is_objective) {
           if (this.problem.exm_1) this.problem.exm_1 = this.problem.exm_1.trim();
           if (this.problem.exm_2) this.problem.exm_2 = this.problem.exm_2.trim();
@@ -2870,28 +2884,44 @@ javascript:
           if (this.problem.exm_3 && this.problem.exm_3.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_3))) this.problem.exm_3 = '$' + this.problem.exm_3 + '$';
           if (this.problem.exm_4 && this.problem.exm_4.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_4))) this.problem.exm_4 = '$' + this.problem.exm_4 + '$';
           if (this.problem.exm_5 && this.problem.exm_5.indexOf('$') == -1 && !Number.isNaN(Number(this.problem.exm_5))) this.problem.exm_5 = '$' + this.problem.exm_5 + '$';
-          if (this.equationCheck(this.problem.exm_1)
-              || this.equationCheck(this.problem.exm_2)
-              || this.equationCheck(this.problem.exm_3)
-              || this.equationCheck(this.problem.exm_4)
-              || this.equationCheck(this.problem.exm_5)) {
-            return alert('수식 오류가 있습니다. 확인해주세요!');
-          }
         } else {
-          this.problem.exm_1 = undefined;
-          this.problem.exm_2 = undefined;
-          this.problem.exm_3 = undefined;
-          this.problem.exm_4 = undefined;
-          this.problem.exm_5 = undefined;
+          this.problem.exm_1 = null;
+          this.problem.exm_2 = null;
+          this.problem.exm_3 = null;
+          this.problem.exm_4 = null;
+          this.problem.exm_5 = null;
         }
 
         this.$nextTick(function() {
-          return $(this.$refs.problemForm).submit();
+          if (_.every(_.map($('textarea'), function(textarea) {
+	          return this.textareaCheck(null, textarea);
+          }.bind(this)))) $(this.$refs.problemForm).submit();
         }.bind(this));
       }
     },
-    created: function() { this.is_changed = false; },
-    mounted: function() { this.init(); },
-    beforeUpdate: function() { this.is_changed = true; },
-    updated: function() { this.init(); }
+    created: function() {
+      this.problem.content = this.sanitizeHTML(this.customFormula(this.problem.content));
+      this.problem.exm_1 = this.sanitizeHTML(this.customFormula(this.problem.exm_1));
+      this.problem.exm_2 = this.sanitizeHTML(this.customFormula(this.problem.exm_2));
+      this.problem.exm_3 = this.sanitizeHTML(this.customFormula(this.problem.exm_3));
+      this.problem.exm_4 = this.sanitizeHTML(this.customFormula(this.problem.exm_4));
+      this.problem.exm_5 = this.sanitizeHTML(this.customFormula(this.problem.exm_5));
+      this.problem.explanation = this.sanitizeHTML(this.customFormula(this.problem.explanation));
+    },
+    mounted: function() {
+      $(window).on('resize', _.debounce(function() {
+        _.each($('textarea'), function(textarea) {
+          $(textarea)
+            .off('input focus blur change')
+            .on('input focus blur change', this.textareaCheck)
+            .on('input focus blur change', function() {
+              $(textarea).height('auto').height(Math.max(20, textarea.scrollHeight - 16));
+            }.bind(this)).trigger('change');
+        }.bind(this));
+      }.bind(this), 50)).trigger('resize');
+      this.renderMath();
+    },
+    updated: function() {
+      this.renderMath();
+    }
   });

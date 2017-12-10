@@ -24,24 +24,35 @@
         //     reader.readAsDataURL(file_input[0].files[0]);
         //   });
         // });
+
+        var err_vue = new Vue({
+          data: { msgs: [] },
+          watch: {
+            msgs: function(msgs) {
+              _.each(msgs, function(msg, index) {
+  	            $('body').highlight('$' + msg + '$', { element: 'mark', className: 'bg-danger text-light' });
+              });
+              new Noty({
+                type: 'error',
+                text: '<div class="text-center pr-2"><i class="fa fa-exclamation-triangle"></i> 현재 페이지에 <b>' + msgs.length + '개</b>의 수식 에러가 있습니다</div>',
+                layout: 'bottomRight',
+                closeWith: ['click', 'button'],
+                timeout: 5000,
+                progressBar: true,
+                animation: {
+                  open: 'noty_effects_open',
+                  close: 'noty_effects_close'
+                }
+              }).show();
+            }
+          }
+        });
+
         renderMathInElement(document.body, {
           delimiters: [ { left: "$",  right: "$",  display: false } ],
           errorCallback: function(msg, err) {
-            var err_msg = msg.split('`')[1];
-            $('body').highlight(err_msg, { element: 'mark', className: 'bg-danger text-light' });
-            new Noty({
-              type: 'error',
-              text: '<i class="fa fa-exclamation-triangle"/> 수식 에러가 있습니다',
-              layout: 'bottomRight',
-              timeout: 5000,
-              progressBar: true,
-              closeWith: ['click', 'button'],
-              animation: {
-                open: 'noty_effects_open',
-                close: 'noty_effects_close'
-              }
-            }).show();
-            console.error(err);
+            err_vue.msgs.push(msg.split('`')[1]);
+            // console.error(err);
           }
         });
       });
