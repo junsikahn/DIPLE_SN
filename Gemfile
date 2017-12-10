@@ -38,6 +38,7 @@ gem 'redis', '~> 3.0'
 # Sprockets ES6 transformer
 gem 'sprockets'
 gem 'sprockets-es6'
+gem 'babel-transpiler'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
