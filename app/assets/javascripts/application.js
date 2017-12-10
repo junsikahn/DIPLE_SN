@@ -22,6 +22,7 @@
 //= require summernote
 //= require katex
 //= require katex/contrib/auto-render.min
+//= require jquery.highlight
 //= require chartjs
 //= require noty
 //= require KeyboardJS
