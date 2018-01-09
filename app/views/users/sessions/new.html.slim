@@ -1,16 +1,11 @@
-div.ui.attached.message
-  div.header 로그인
-  p 학번과 비밀번호를 입력해주세요
-div.ui.bottom.attached.segment
+div.jumbotron.w-100
+  h1.display-4 로그인
+  p.lead 학번과 비밀번호를 입력해주세요
+  hr.my-4
   = simple_form_for resource, as: resource_name, url: session_path(resource_name) do |f|
-    div
-      = f.error_notification
-      div.two.fields
-        = f.input :uid,
-                  icon: 'user', input_wrapper_html: { class: 'left icon' },
-                  autofocus: true
-        = f.input :password,
-                  icon: 'lock', input_wrapper_html: { class: 'left icon' },
-                  required: true
-    div.ui.divider
-    = f.button :button, '로그인'
+    = f.error_notification
+    = f.input :uid, autofocus: true
+    = f.input :password, required: true
+    hr.my-4
+    div.text-right
+      = f.button :button, '로그인', class: 'btn-dark btn-block'

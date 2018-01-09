@@ -10,9 +10,11 @@
  * files in this directory. Styles in this file should be added after the last require_* statement.
  * It is generally better to create a new file per style scope.
  *
+ *= require bootstrap.min
  *= require katex
- *= require noty
  *= require summernote
+ *= require noty
+ *= require vex
  *= require_tree .
  *= require_self
  */
@@ -144,27 +146,32 @@
 
 .problem-container { width: 540px; max-width: 100%; padding: 20px; max-height: 100%; display: inline-flex; flex-direction: column; flex: 0 1 auto; word-break: break-all;
   img { display: inline-block; max-width: 100%; }
-  .problem-info { font-size: 0.8em; margin-bottom: 0.5em;
-    & > div > span { display: inline-block; border-radius: 0.75em; margin-right: 0.2em;
+  blockquote { margin: 0; padding: .75rem; border: 1px solid #e9ecef; background: #fff; }
+  .problem-info { font-size: 0.8em;
+    & > div { margin-right: 0.25em;
       &:last-of-type { margin-right: 0; }
     }
-    .problem-order { padding: 0.2em 0.7em; background: #000; border: 1px solid #fff; color: #fff; font-weight: bold; }
-    .problem-score { padding: 0.2em 0.7em; background: #fff; border: 1px solid lightgrey; }
-    .problem-subject { padding: 0.2em 0.5em; color: lightgrey; text-align: right; }
+    & > div > span { display: inline-block; border-radius: 0.75em; margin-right: 0.25em;
+      &:last-of-type { margin-right: 0; }
+    }
+    .problem-order { padding: 0.25em 0.7em; background: #000; border: 1px solid #fff; color: #fff; font-weight: bold; }
+    .problem-score { padding: 0.25em 0.7em; background: #fff; border: 1px solid lightgrey; }
+    .problem-subject { padding: 0.25em; color: lightgrey; text-align: right; }
     .problem-level { padding: 0.5em; }
   }
   .problem-wrapper {
     & > div { background: #fff; border: 1px solid lightgrey; border-top: 0; padding: 16px; position: relative; zoom: 1;
       &::after { content: ''; display: block; clear: both; }
     }
-    & > div:first-child { border-top: 3px solid black; border-radius: 5px 5px 0 0; }
-    & > div:last-child { border-radius: 0 0 5px 5px; }
+    & > div:first-of-type { border-top: 3px solid black; border-radius: 5px 5px 0 0; }
+    & > div:last-of-type { border-radius: 0 0 5px 5px; }
     .problem-content, .problem-exm-content, .problem-explanation {
       &:empty::after { content: '내용이 없습니다'; color: lightgrey; }
     }
     .problem-exm { padding: 10px; display: flex; flex-wrap: wrap;
-      .problem-exm-wrapper { position: relative; display: flex; align-items: center; min-width: 50%; padding: 10px; border-radius: 5px; cursor: pointer; transition: background .25s;
+      .problem-exm-wrapper { position: relative; display: flex; align-items: center; min-width: 20%; padding: 10px; border-radius: 5px; cursor: pointer; transition: background .25s, width .25s;
         .problem-exm-index { display: inline-block; margin: 2px; min-width: 20px; width: 20px; height: 20px; line-height: 20px; text-align: center; font-size: 0.75em; background: white; border: 1px solid lightgrey; border-radius: 50%; transition: background .25s, border .25s; cursor: pointer; }
+        .problem-exm-content { margin-left: 5px; line-height: 24px; max-width: 100%; }
         &:hover { background: #f1f1f1;
           .problem-exm-index { background: lightgrey; border-color: transparent; }
         }
@@ -172,7 +179,6 @@
           .problem-exm-index { background: #28a745; border-color: transparent; color: #fff; }
         }
       }
-      .problem-exm-content { padding-left: 5px; line-height: 24px; }
     }
     .problem-answer-input { padding: 10px; }
     .problem-explanation { background: #f1f1f1; }
@@ -180,13 +186,19 @@
       .problem-answer-wrapper {
         &::before { content: '정답은 ' } &::after { content: ' 입니다' }
         .problem-answer-seg { display: inline-block; font-weight: bold; min-width: 10px;
-          &.is-objective::after { content: '번' }
           &:empty::before { content: '-' }
         }
       }
+      .problem-ratio { font-size: 0.8em; color: grey;
+        .under-border { border-bottom: 1px solid; }
+        &::before { content: "정답률: " }
+      }
+      &.is-objective {
+        .problem-answer-seg::after { content: '번' }
+        .problem-ratio::before { content: "문항별 선택률: " }
+      }
     }
   }
-  .problem-source { font-size: 0.9em; color: grey; padding: 0 0.5em; }
   .problem-tags { text-align: right; }
 }
 
@@ -212,10 +224,11 @@
   }
 }
 
-.editor-grid {
+.editor-grid { width: 1060px; margin: 0 auto; word-break: break-all;
   img { display: inline-block; max-width: 100%; }
+  blockquote { margin: 0; padding: .75rem; border: 1px solid #e9ecef; background: #fff; }
   .preview-wrapper { max-width: 500px; border: 1px solid lightgrey; border-radius: 5px;
-    .preview-header { height: 80px; line-height: 80px; text-align: center; background-color: rgba(0, 0, 0, .03); border-bottom: 1px solid rgba(0, 0, 0, 0.125); }
+    .preview-header { height: 43px; line-height: 43px; text-align: center; background-color: rgba(0, 0, 0, .03); border-bottom: 1px solid rgba(0, 0, 0, 0.125); }
     .preview-content { padding: 10px 16px; height: calc(100% - 80px);
       &:empty::before { content: '내용을 입력해주세요'; color: #ccc; }
       &:empty::after { content: '*'; color: red; float: right; }
@@ -225,12 +238,59 @@
 
 .cursor-pointer { cursor: pointer !important; }
 .form-group:only-child, .form-group:last-child,
-.table:only-child, .table:last-child { margin-bottom: 0 !important; }
-.btn { cursor: pointer !important; }
-label { margin-bottom: 0.2em !important; font-size: 0.8em; font-weight: bold; margin-left: 0.5em; }
+.table:only-child, .table:last-child { margin-bottom: 0; }
+.btn { cursor: pointer; }
+label { margin-bottom: 0.25em !important; font-size: 0.8em; font-weight: bold; margin-left: 0.5em; }
 .bg-hover { background: rgba(0, 0, 0, .075) !important; }
 
 .katex .hangul_fallback { font-family: initial; font-size: initial; }
 .katex .mfrac .frac-line,
 .katex .overline .overline-line,
 .katex .underline .underline-line { min-height: 1px; }
+
+.modal-fullscreen {
+  width: 100vw; min-width: 100vw; max-width: 100vw;
+  height: 100vh; min-height: 100vh; max-height: 100vh;
+  margin: 0;
+  .modal-content { height: 100vh;
+    .modal-body {
+      max-height: calc(100vh - 128px); overflow: scroll;
+    }
+  }
+}
+
+
+.loader { position: relative; min-height: 120px;
+  &::before, &::after { content: ''; position: absolute; z-index: 999; pointer-events: none; opacity: 0; transition: opacity .5s; }
+  &::before {
+    width: 100%; height: 100%; top: 0; left: 0;
+    background: rgba(0,0,0,.85);
+    border-radius: .25rem !important;
+  }
+  &::after {
+    width: 36px; height: 36px; top: 50%; left: 50%; margin-top: -18px; margin-left: -18px;
+    border-radius: 50%;
+    border: 2px solid white;
+    border-color: white transparent;
+    animation: busybox_kf 1s linear 0s infinite normal none running;
+  }
+  &.active {
+    &::before, &::after { opacity: 1; pointer-events: auto; }
+  }
+}
+@keyframes busybox_kf {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@-webkit-keyframes busybox_kf {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+[v-cloak] { display: none; }
+.fade-enter-active, .fade-leave-active { transition: opacity .25s }
+.fade-enter, .fade-leave-to { opacity: 0 }
+
+.w-20 { width: 20% !important; }
+.w-33 { width: 33% !important; }
+body.vex-open { overflow: hidden; }

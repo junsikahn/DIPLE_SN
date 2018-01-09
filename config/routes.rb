@@ -16,12 +16,14 @@ Rails.application.routes.draw do
         end
       end
       resources :problems do
-        get :list, on: :collection
         get :test, on: :collection
+        get :source, on: :collection
+        get :list, on: :collection
       end
       resources :tmp_problems do
         post :upload, on: :collection
       end
+      resources :problem_images, only: [:show, :create]
       resources :problem_tags do
         get :search, on: :collection
       end
@@ -38,9 +40,9 @@ Rails.application.routes.draw do
   # end
 
   scope module: :app do
-    resources :home, path: '/', as: :problems
+    resources :home, path: '/'
   end
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
-  root 'app/home#index'
+  root 'home#index'
 end

@@ -2,72 +2,81 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>SN일일테스트 - 썸머캠프 재학생을 위한 맞춤형 문제집</title>
+    <title>SN일일테스트</title>
     <%= csrf_meta_tags %>
     <%= action_cable_meta_tag %>
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-  </head>
-  <body>
-    <nav class="ui right vertical menu sidebar inverted">
-      <% if current_user %>
-        <%= link_to '로그아웃', destroy_user_session_path, class: 'item', method: :delete %>
-      <% else %>
-        <%= link_to '로그인', new_user_session_path, class: 'item' %>
-      <% end %>
-    </nav>
-    <div class="pusher">
-      <header class="ui top-header clearfix">
-        <div class="ui container">
-            <div class="ui secondary menu">
-              <%= link_to root_path, style: 'position: relative' do %>
-                <img src="http://snacademy.co.kr/images/logo.png">
-                <span style="position: absolute; bottom: 0; right: 0; font-weight: bold; color: crimson;">썸머캠프 재학생 전용</span>
-              <% end %>
-              <div class="right menu">
-                <% if current_user %>
-                  <%= link_to '로그아웃', destroy_user_session_path, class: 'item', method: :delete %>
-                <% else %>
-                  <%= link_to '로그인', new_user_session_path, class: 'item' %>
-                <% end %>
-                <div class="item mobile only">
-                  <%= link_to '#', class: 'ui button red inverted icon', id: 'nav-menu-icon' do %>
-                    <i class="icon content"></i>
-                  <% end %>
-                </div>
-              </div>
-            </div>
-        </div>
-      </header>
-
-      <main class="ui container center-main">
-        <%= yield %>
-      </main>
-    </div>
-
-    <script>
-      $(function(){
-        $('#nav-menu-icon').on('click', function(e) {
-          e.preventDefault();
-          $('.ui.sidebar').sidebar('toggle');
+    <script type="text/javascript">
+      $(document).on('turbolinks:load', function() {
+        var err_vue = new Vue({
+          data: { msgs: [] },
+          watch: {
+            msgs: function(msgs) {
+              _.each(msgs, function(msg, index) {
+                $('body').highlight('$' + msg + '$', { element: 'mark', className: 'bg-danger text-light' });
+              });
+              new Noty({
+                type: 'error',
+                text: '<div class="text-center pr-2"><i class="fa fa-exclamation-triangle"></i> 현재 페이지에 <b>' + msgs.length + '개</b>의 수식 에러가 있습니다</div>',
+                layout: 'bottomRight',
+                closeWith: ['click', 'button'],
+                timeout: 5000,
+                progressBar: true,
+                animation: {
+                  open: 'noty_effects_open',
+                  close: 'noty_effects_close'
+                }
+              }).show();
+            }
+          }
         });
 
-        <% flash.each do |key, value| %>
-          new Noty({
-            type: '<%= flash_class key %>',
-            text: '<%= value %>',
-            layout: 'bottomRight',
-            theme: 'semanticui',
-            timeout: 5000,
-            progressBar: true,
-            closeWith: ['click', 'button'],
-            animation: {
-              open: 'noty_effects_open',
-              close: 'noty_effects_close'
-            }
-          }).show();
-        <% end %>
+        renderMathInElement(document.body, {
+          delimiters: [ { left: "$",  right: "$",  display: false } ],
+          errorCallback: function(msg, err) {
+            err_vue.msgs.push(msg.split('`')[1]);
+            // console.error(err);
+          }
+        });
       });
     </script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
+      <div class="container">
+        <%= link_to root_path, style: 'position: relative', class: 'navbar-brand' do %>
+          <img src="http://snacademy.co.kr/images/logo.png" style="height: 30px;">
+        <% end %>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <!-- <li class="nav-item <%== 'active' if controller_name == 'problems' && action_name == 'test' %>"><%= link_to '기출문제', test_admin_problems_path, class: 'nav-link' %></li>
+            <li class="nav-item <%== 'active' if controller_name == 'problems' && action_name != 'test' %>"><%= link_to '문제관리', admin_problems_path, class: 'nav-link' %></li>
+            <li class="nav-item <%== 'active' if controller_name == 'problem_collections' %>"><%= link_to '문제모음관리', admin_problem_collections_path, class: 'nav-link' %></li>
+            <li class="nav-item <%== 'active' if controller_name == 'subjects' %>"><%= link_to '과목관리', admin_subjects_path, class: 'nav-link' %></li> -->
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <%= link_to '어드민', admin_root_path, class: 'nav-link' %>
+            </li>
+            <li class="nav-item">
+              <% if current_user %>
+                <%= link_to '로그아웃', destroy_user_session_path, class: 'nav-link', method: :delete %>
+              <% else %>
+                <%= link_to '로그인', new_user_session_path, class: 'nav-link' %>
+              <% end %>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <main class="container-fluid pt-3 pb-5 d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 58px);">
+      <div class="container">
+        <%= yield %>
+      </div>
+    </main>
   </body>
 </html>

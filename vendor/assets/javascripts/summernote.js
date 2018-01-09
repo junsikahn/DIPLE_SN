@@ -9,28 +9,22 @@
  * Date: 2017-09-09T11:03Z
  */
 (function (factory) {
-  /* global define */
+  // global define
   if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module.
-    define(['jquery'], factory);
+    define(['jquery'], factory); // AMD. Register as an anonymous module.
   } else if (typeof module === 'object' && module.exports) {
-    // Node/CommonJS
-    module.exports = factory(require('jquery'));
+    module.exports = factory(require('jquery')); // Node/CommonJS
   } else {
-    // Browser globals
-    factory(window.jQuery);
+    factory(window.jQuery); // Browser globals
   }
 }(function ($) {
   'use strict';
 
   var isSupportAmd = typeof define === 'function' && define.amd;
 
-  /**
-   * returns whether font is installed or not.
-   *
-   * @param {String} fontName
-   * @return {Boolean}
-   */
+  // returns whether font is installed or not.
+  // @param {String} fontName
+  // @return {Boolean}
   var isFontInstalled = function (fontName) {
     var testFontName = fontName === 'Comic Sans MS' ? 'Courier New' : 'Comic Sans MS';
     var $tester = $('<div>').css({
@@ -99,14 +93,10 @@
      (navigator.MaxTouchPoints > 0) ||
      (navigator.msMaxTouchPoints > 0));
 
-  /**
-   * @class core.agent
-   *
-   * Object which check platform and agent
-   *
-   * @singleton
-   * @alternateClassName agent
-   */
+  // @class core.agent
+  // Object which check platform and agent
+  // @singleton
+  // @alternateClassName agent
   var agent = {
     isMac: navigator.appVersion.indexOf('Mac') > -1,
     isMSIE: isMSIE,
@@ -125,14 +115,10 @@
     isW3CRangeSupport: !!document.createRange
   };
 
-  /**
-   * @class core.func
-   *
-   * func utils (for high-order func's arg)
-   *
-   * @singleton
-   * @alternateClassName func
-   */
+  // @class core.func
+  // func utils (for high-order func's arg)
+  // @singleton
+  // @alternateClassName func
   var func = (function () {
     var eq = function (itemA) {
       return function (itemB) {
@@ -289,14 +275,10 @@
     };
   })();
 
-  /**
-   * @class core.list
-   *
-   * list utils
-   *
-   * @singleton
-   * @alternateClassName list
-   */
+  // @class core.list
+  // list utils
+  // @singleton
+  // @alternateClassName list
   var list = (function () {
     /**
      * returns the first item of an array.
@@ -484,18 +466,13 @@
              clusterBy: clusterBy, compact: compact, unique: unique };
   })();
 
-
   var NBSP_CHAR = String.fromCharCode(160);
   var ZERO_WIDTH_NBSP_CHAR = '\ufeff';
 
-  /**
-   * @class core.dom
-   *
-   * Dom functions
-   *
-   * @singleton
-   * @alternateClassName dom
-   */
+  // @class core.dom
+  // Dom functions
+  // @singleton
+  // @alternateClassName dom
   var dom = (function () {
     /**
      * @method isEditable
@@ -1579,11 +1556,9 @@
     };
   })();
 
-  /**
-   * @param {jQuery} $note
-   * @param {Object} options
-   * @return {Context}
-   */
+  // @param {jQuery} $note
+  // @param {Object} options
+  // @return {Context}
   var Context = function ($note, options) {
     var self = this;
 
@@ -1922,12 +1897,9 @@
     '  </div>',
     '</div>'
   ].join(''));
-
   var airEditor = renderer.create('<div class="note-editor"/>');
   var airEditable = renderer.create('<div class="note-editable" contentEditable="true"/>');
-
   var buttonGroup = renderer.create('<div class="note-btn-group btn-group">');
-
   var dropdown = renderer.create('<div class="dropdown-menu">', function ($node, options) {
     var markup = $.isArray(options.items) ? options.items.map(function (item) {
       var value = (typeof item === 'string') ? item : (item.value || '');
@@ -1941,11 +1913,9 @@
 
     $node.html(markup);
   });
-
   var dropdownButtonContents = function (contents) {
     return contents;
   };
-
   var dropdownCheck = renderer.create('<div class="dropdown-menu note-check">', function ($node, options) {
     var markup = $.isArray(options.items) ? options.items.map(function (item) {
       var value = (typeof item === 'string') ? item : (item.value || '');
@@ -1954,7 +1924,6 @@
     }).join('') : options.items;
     $node.html(markup);
   });
-
   var palette = renderer.create('<div class="note-color-palette"/>', function ($node, options) {
     var contents = [];
     for (var row = 0, rowSize = options.colors.length; row < rowSize; row++) {
@@ -1984,7 +1953,6 @@
       });
     }
   });
-
   var dialog = renderer.create('<div class="modal" aria-hidden="false" tabindex="-1"/>', function ($node, options) {
     if (options.fade) {
       $node.addClass('fade');
@@ -2006,13 +1974,12 @@
       '</div>'
     ].join(''));
   });
-
   var popover = renderer.create([
-    '<div class="note-popover popover in">',
-    '  <div class="arrow"/>',
-    '  <div class="popover-content note-children-container"/>',
-    '</div>'
-  ].join(''), function ($node, options) {
+      '<div class="note-popover popover in">',
+      '  <div class="arrow"/>',
+      '  <div class="popover-content note-children-container"/>',
+      '</div>'
+    ].join(''), function ($node, options) {
     var direction = typeof options.direction !== 'undefined' ? options.direction : 'bottom';
 
     $node.addClass(direction);
@@ -2021,7 +1988,6 @@
       $node.find('.arrow').hide();
     }
   });
-
   var checkbox = renderer.create('<label class="custom-control custom-checkbox"></label>', function ($node, options) {
       if (options.id) {
           $node.attr('for', options.id);
@@ -2034,7 +2000,6 @@
           '</label>'
       ].join(''));
   });
-
   var icon = function (iconClassName, tagName) {
     tagName = tagName || 'i';
     return '<' + tagName + ' class="' + iconClassName + '"/>';
@@ -2291,15 +2256,10 @@
     }
   });
 
-
-  /**
-   * @class core.key
-   *
-   * Object for keycodes.
-   *
-   * @singleton
-   * @alternateClassName key
-   */
+  // @class core.key
+  // Object for keycodes.
+  // @singleton
+  // @alternateClassName key
   var key = (function () {
     var keyMap = {
       'BACKSPACE': 8,
@@ -3008,18 +2968,18 @@
       };
     };
 
-  /**
-   * @class core.range
-   *
-   * Data structure
-   *  * BoundaryPoint: a point of dom tree
-   *  * BoundaryPoints: two boundaryPoints corresponding to the start and the end of the Range
-   *
-   * See to http://www.w3.org/TR/DOM-Level-2-Traversal-Range/ranges.html#Level-2-Range-Position
-   *
-   * @singleton
-   * @alternateClassName range
-   */
+    /**
+    * @class core.range
+    *
+    * Data structure
+    *  * BoundaryPoint: a point of dom tree
+    *  * BoundaryPoints: two boundaryPoints corresponding to the start and the end of the Range
+    *
+    * See to http://www.w3.org/TR/DOM-Level-2-Traversal-Range/ranges.html#Level-2-Range-Position
+    *
+    * @singleton
+    * @alternateClassName range
+    */
     return {
       /**
        * create Range Object From arguments or Browser Selection
@@ -3177,14 +3137,10 @@
     };
   })();
 
-  /**
-   * @class core.async
-   *
-   * Async functions which returns `Promise`
-   *
-   * @singleton
-   * @alternateClassName async
-   */
+  // @class core.async
+  // Async functions which returns `Promise`
+  // @singleton
+  // @alternateClassName async
   var async = (function () {
     /**
      * @method readFileAsDataURL
@@ -4053,29 +4009,14 @@
 
     init();
   };
-  /**
-  *
-  * Where action occours enum.
-  */
+  // Where action occours enum.
   TableResultAction.where = { 'Row': 0, 'Column': 1 };
-  /**
-  *
-  * Requested action to apply enum.
-  */
+  // Requested action to apply enum.
   TableResultAction.requestAction = { 'Add': 0, 'Delete': 1 };
-  /**
-  *
-  * Result action to be executed enum.
-  */
+  // Result action to be executed enum.
   TableResultAction.resultAction = { 'Ignore': 0, 'SubtractSpanCount': 1, 'RemoveCell': 2, 'AddCell': 3, 'SumSpanCount': 4 };
 
-  /**
-   *
-   * @class editing.Table
-   *
-   * Table
-   *
-   */
+  // @class editing.Table
   var Table = function () {
     /**
      * handle tab key
@@ -4367,13 +4308,10 @@
     };
   };
 
-
   var KEY_BOGUS = 'bogus';
 
-  /**
-   * @class Editor
-   */
   var Editor = function (context) {
+    // @class Editor
     var self = this;
 
     var $note = context.layoutInfo.note;
@@ -5430,10 +5368,8 @@
     }
   }
 
-  /**
-   * @class Codeview
-   */
   var Codeview = function (context) {
+    // @class Codeview
     var $editor = context.layoutInfo.editor;
     var $editable = context.layoutInfo.editable;
     var $codable = context.layoutInfo.codable;
@@ -5811,10 +5747,8 @@
     };
   };
 
-  /**
-   * textarea auto sync.
-   */
   var AutoSync = function (context) {
+    // textarea auto sync
     var $note = context.layoutInfo.note;
 
     this.events = {
@@ -7047,13 +6981,10 @@
     };
   };
 
-
-  /**
-   * Image popover module
-   *  mouse events that show/hide popover will be handled by Handle.js.
-   *  Handle.js will receive the events and invoke 'imagePopover.update'.
-   */
   var ImagePopover = function (context) {
+    // Image popover module
+    // mouse events that show/hide popover will be handled by Handle.js.
+    // Handle.js will receive the events and invoke 'imagePopover.update'.
     var self = this;
     var ui = $.summernote.ui;
 
@@ -7112,7 +7043,7 @@
 
     this.events = {
       'summernote.mousedown': function (we, e) {
-        self.update(e.target);
+        if (e.button === 2) { self.update(e.target); } else { self.update(); }
       },
       'summernote.keyup summernote.scroll summernote.change': function () {
         self.update();
@@ -7149,7 +7080,8 @@
         return false;
       }
 
-      var isCell = dom.isCell(target);
+      // var isCell = dom.isCell(target);
+      var isCell = dom.ancestor(target, dom.isCell);
 
       if (isCell) {
         var pos = dom.posFromPlaceholder(target);
@@ -7443,10 +7375,13 @@
 
     var options = context.options;
 
-    var AIR_MODE_POPOVER_X_OFFSET = 20;
+    var AIR_MODE_POPOVER_X_OFFSET = 0;
 
     this.events = {
-      'summernote.keyup summernote.mouseup summernote.scroll': function () {
+      'summernote.mousedown': function (we, e) {
+        if (e.button === 2) { self.update(); } else { self.hide(); }
+      },
+      'summernote.keyup summernote.scroll': function () {
         self.update();
       },
       'summernote.disable summernote.change summernote.dialog.shown': function () {
@@ -7466,7 +7401,8 @@
     };
 
     this.shouldInitialize = function () {
-      return options.airMode && !list.isEmpty(options.popover.air);
+      // return options.airMode && !list.isEmpty(options.popover.air);
+      return !list.isEmpty(options.popover.air);
     };
 
     this.initialize = function () {

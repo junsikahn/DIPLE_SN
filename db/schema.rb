@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171130015332) do
+ActiveRecord::Schema.define(version: 20171215071301) do
 
   create_table "problem_collection_histories", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "user_id",               null: false
@@ -71,9 +71,25 @@ ActiveRecord::Schema.define(version: 20171130015332) do
     t.index ["user_id"], name: "index_problem_histories_on_user_id", using: :btree
   end
 
+  create_table "problem_images", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "image_file_name",    null: false
+    t.string   "image_content_type", null: false
+    t.integer  "image_file_size",    null: false
+    t.datetime "image_updated_at",   null: false
+    t.integer  "problem_id"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+    t.index ["problem_id"], name: "index_problem_images_on_problem_id", using: :btree
+  end
+
   create_table "problem_sources", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string  "name",     null: false
+    t.string  "name",       null: false
     t.boolean "category"
+    t.integer "year"
+    t.integer "time"
+    t.integer "subject_id"
+    t.integer "curriculum"
+    t.integer "grade"
   end
 
   create_table "problem_tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -113,6 +129,13 @@ ActiveRecord::Schema.define(version: 20171130015332) do
     t.datetime "updated_at",                                           null: false
     t.integer  "problem_source_id"
     t.integer  "problem_source_order"
+    t.boolean  "is_objective",                          default: true
+    t.integer  "correct_ratio"
+    t.integer  "exm_1_ratio"
+    t.integer  "exm_2_ratio"
+    t.integer  "exm_3_ratio"
+    t.integer  "exm_4_ratio"
+    t.integer  "exm_5_ratio"
     t.index ["problem_id"], name: "index_problems_on_problem_id", using: :btree
     t.index ["subject_id"], name: "index_problems_on_subject_id", using: :btree
   end

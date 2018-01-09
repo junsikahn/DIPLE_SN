@@ -1,759 +1,871 @@
-div#test_screen.ui.modal.fullscreen
-
-div.clearfix
-  h1.ui.left.floated.grey.header
-    i.desktop.icon
-    span.content
-      | 온라인 일일테스트
-      span.ui.horizontal.basic.label = "#{current_user.liberal ? '문과' : '이과'}"
-  div class="ui right floated header" style="margin-top: 15px;"
-    div class="ui red right ribbon large label"
-      i.bell.icon
-      = "#{current_user.name[1,2]}#{current_user.gender ? '군' : '양'}, 시험 밀리지 말고  꼭 보게나!"
-
-table.ui.celled.multiline.table#match_calendar
-  thead
-    tr.bottom.aligned
-      th.center.aligned 구분
-      - [1,2,3,4,5,6,0].each do |index|
-        th.two.wide.center.aligned = "#{t('date.day_names')[index]}"
-  - (@start_date.to_date.cweek..@end_date.to_date.cweek).each do |week|
+- if params[:problem_source_id].nil?
+  div.jumbotron.p-4.mb-3
+    h1.mb-0 기출문제 목록
+  table.table.table-hover.table-bordered
+    thead.thead-default
+      tr
+        th.text-center 연도
+        th.text-center 시기
+        th.text-center 과목
+        th.text-center 과정
+        th.text-center 학년
+        th.text-center 명칭
+        th.text-center 문항
+        th.text-center 점수
     tbody
-      tr.top.aligned
-        td.middle.aligned.center.aligned 일자
-        - week_days = (@start_date.to_date..@end_date.to_date).select{|date| date.cweek == week}
-        - [1,2,3,4,5,6,0].each do |index|
-          - if !week_days.first.nil? && week_days.first.wday == index
-            - date = week_days.shift
-            td.two.wide.center.aligned.clearfix class="#{'positive' if date == Date.today}"
-              span.ui.fluid.label class="#{date == Date.today ? 'green' : 'basic'}" == "#{l(date, format: :short)}"
-          - else
-            td.two.wide.center.aligned
-    = render 'calendar', problem_collections: @problem_collections, start_date: @start_date, end_date: @end_date, week: week
+      - @problem_sources.each do |problem_source|
+        tr.cursor-pointer onclick='location.href="#{home_index_path(problem_source_id: problem_source.id)}"'
+          td.text-center == problem_source.year
+          td.text-center == problem_source.time == 11 ? '수능' : "#{problem_source.time}월"
+          td.text-center == problem_source.subject_id == 3 ? '수학' : '기타'
+          td.text-center == problem_source.curriculum == 1 ? '이과' : problem_source.curriculum == 2 ? '문과' : '공통'
+          td.text-center == "고#{problem_source.grade}"
+          td == problem_source.name
+          td.text-center == "#{problem_source.problems.size}문항"
+          td.text-center == "#{problem_source.problems.sum{ |problem| problem.score }}점"
+- else
+  div.jumbotron.p-4.mb-3
+    h1.mb-3 == @problem_source.name
+    table.table.table-bordered.bg-white
+      thead
+        tr
+          th.text-center 문항
+          th.text-center 점수
+      tbody
+        tr
+          td.text-center == "#{@problems.size}문항"
+          td.text-center == "#{@problems.sum{ |problem| problem.score }}점"
+  table.table.table-bordered
+    thead.thead-default
+      tr
+        th.text-center 문제
+        th.text-center 해설
+    - @problems.each_with_index do |problem, index|
+      - show_id = false
+      tr id="problem_tr_#{problem.id}"
+        td.p-0 style="width: 540px"
+          div.problem-container
+            div.problem-info.d-flex.justify-content-between.align-items-end
+              div.d-inline-flex.mb-1
+                span.problem-order.text-nowrap class="#{'bg-secondary' if show_id}" == show_id ? "ID #{problem.id}" : "#{problem.problem_source_order}번"
+                span.problem-score.text-nowrap == "#{problem.score}점"
+              div.d-inline-flex.mb-1.justify-content-end.align-items-end
+                span.problem-subject class="#{'text-danger' if !problem.subject_id}" == problem.subject_id ? problem.subject.path : '미분류'
+                span.problem-level.d-flex.bg-light.text-warning
+                  - if problem.level.nil?
+                    == "<i class='fa fa-star-o'></i><i class='fa fa-star-o'></i><i class='fa fa-star-o'></i>".html_safe
+                  - else
+                    - problem.level.times do
+                      == "<i class='fa fa-star'></i>".html_safe
+                    - (3 - problem.level).times do
+                      == "<i class='fa fa-star-o'></i>".html_safe
+            div.problem-wrapper
+              div.problem-content == problem.content
+              div.problem-exm
+                - if problem.is_objective
+                  - (1..5).each do |index|
+                    - next if problem['exm_' + index.to_s].blank?
+                    - correct = index == problem.answer.to_i
+                    div.problem-exm-wrapper class="#{'active' if correct}"
+                      span.problem-exm-index class="#{'active' if correct}" == index
+                      span.problem-exm-content == problem['exm_' + index.to_s]
+                - else
+                  input.form-control type="text" readonly="true" value="#{problem.answer}"
+        td.p-0 style="width: 540px"
+          div.problem-container
+            div.problem-info.d-flex.justify-content-between.align-items-end style="opacity: 0;"
+              div.d-inline-flex.mb-1
+                span.problem-order.text-nowrap class="#{'bg-secondary' if show_id}" == show_id ? "ID #{problem.id}" : "#{problem.problem_source_order}번"
+                span.problem-score.text-nowrap == "#{problem.score}점"
+              div.d-inline-flex.mb-1.justify-content-end.align-items-end
+                span.problem-subject class="#{'text-danger' if !problem.subject_id}" == problem.subject_id ? problem.subject.path : '미분류'
+                span.problem-level.d-flex.bg-light.text-warning
+                  - if problem.level.nil?
+                    == "<i class='fa fa-star-o'></i><i class='fa fa-star-o'></i><i class='fa fa-star-o'></i>".html_safe
+                  - else
+                    - problem.level.times do
+                      == "<i class='fa fa-star'></i>".html_safe
+                    - (3 - problem.level).times do
+                      == "<i class='fa fa-star-o'></i>".html_safe
+            div.problem-wrapper
+              - if problem.explanation
+                div.problem-explanation == problem.explanation
+              div.problem-answer
+                i.fa.fa-caret-right.mr-1
+                span.problem-answer-wrapper
+                  span.problem-answer-seg.align-bottom class="#{'is-objective' if problem.is_objective}" == problem.answer
+            div.problem-info.d-flex.justify-content-between.align-items-start
+              - if problem.problem_source_id
+                div.text-muted.mt-1.pl-2.pr-2
+                  i.fa.fa-caret-right.mr-1
+                  span =="출처 : #{problem.problem_source.name}"
+                  span ==" - #{problem.problem_source_order}번" if problem.problem_source_order
+              - if problem.correct_ratio
+                div.text-muted.mt-1.pl-2.pr-2
+                  span =="정답률: #{problem.correct_ratio}%"
+            div.problem-tags
+              - problem.problem_tags.each do |tag|
+                a.badge.badge-secondary.mr-1 == tag.name
 
 
+
+
+/ div#test_screen.ui.modal.fullscreen
+/
 / div.clearfix
-/   h1.ui.left.floated.header
-/     = "#{current_user.name} "
-/     small 오답노트
-/ 
-/ div style="width: 100%; height: 400px;"
-/   div style="display: inline-block; position: relative; width: 33%; height: 400px;"
-/     canvas#myChart1
-/   div style="display: inline-block; position: relative; width: 33%; height: 400px;"
-/     canvas#myChart2
-/   div style="display: inline-block; position: relative; width: 33%; height: 400px;"
-/     canvas#myChart3
-
+/   h1.ui.left.floated.grey.header
+/     i.desktop.icon
+/     span.content
+/       | 온라인 일일테스트
+/       span.ui.horizontal.basic.label = "#{current_user.liberal ? '문과' : '이과'}"
+/   div class="ui right floated header" style="margin-top: 15px;"
+/     div class="ui red right ribbon large label"
+/       i.bell.icon
+/       = "#{current_user.name[1,2]}#{current_user.gender ? '군' : '양'}, 시험 밀리지 말고  꼭 보게나!"
+/
+/ table.ui.celled.multiline.table#match_calendar
+/   thead
+/     tr.bottom.aligned
+/       th.center.aligned 구분
+/       - [1,2,3,4,5,6,0].each do |index|
+/         th.two.wide.center.aligned = "#{t('date.day_names')[index]}"
+/   - (@start_date.to_date.cweek..@end_date.to_date.cweek).each do |week|
+/     tbody
+/       tr.top.aligned
+/         td.middle.aligned.center.aligned 일자
+/         - week_days = (@start_date.to_date..@end_date.to_date).select{|date| date.cweek == week}
+/         - [1,2,3,4,5,6,0].each do |index|
+/           - if !week_days.first.nil? && week_days.first.wday == index
+/             - date = week_days.shift
+/             td.two.wide.center.aligned.clearfix class="#{'positive' if date == Date.today}"
+/               span.ui.fluid.label class="#{date == Date.today ? 'green' : 'basic'}" == "#{l(date, format: :short)}"
+/           - else
+/             td.two.wide.center.aligned
+/     = render 'calendar', problem_collections: @problem_collections, start_date: @start_date, end_date: @end_date, week: week
+/
+/
+/ / div.clearfix
+/ /   h1.ui.left.floated.header
+/ /     = "#{current_user.name} "
+/ /     small 오답노트
+/ /
+/ / div style="width: 100%; height: 400px;"
+/ /   div style="display: inline-block; position: relative; width: 33%; height: 400px;"
+/ /     canvas#myChart1
+/ /   div style="display: inline-block; position: relative; width: 33%; height: 400px;"
+/ /     canvas#myChart2
+/ /   div style="display: inline-block; position: relative; width: 33%; height: 400px;"
+/ /     canvas#myChart3
+/
+/ / javascript:
+/ /   var ctx1 = document.getElementById("myChart1").getContext('2d');
+/ /   var ctx2 = document.getElementById("myChart2").getContext('2d');
+/ /   var ctx3 = document.getElementById("myChart3").getContext('2d');
+/ /   var myChart = new Chart(ctx1, {
+/ /     type: 'radar',
+/ /     data: {
+/ /         labels: #{{Standard::Subject.where(main_subject_id: 1, depth: 1).pluck(:name)}},
+/ /         datasets: [{
+/ /             label: '전체 푼 문제',
+/ /             data: [12, 19, 3, 10, 2, 3, 10],
+/ /             backgroundColor: [
+/ /                 'rgba(255, 99, 132, 0.2)',
+/ /                 'rgba(54, 162, 235, 0.2)',
+/ /                 'rgba(255, 206, 86, 0.2)',
+/ /                 'rgba(75, 192, 192, 0.2)',
+/ /                 'rgba(153, 102, 255, 0.2)',
+/ /                 'rgba(255, 159, 64, 0.2)',
+/ /                 'rgba(0, 0, 0, 0.2)'
+/ /             ],
+/ /             borderColor: [
+/ /                 'rgba(255,99,132,1)',
+/ /                 'rgba(54, 162, 235, 1)',
+/ /                 'rgba(255, 206, 86, 1)',
+/ /                 'rgba(75, 192, 192, 1)',
+/ /                 'rgba(153, 102, 255, 1)',
+/ /                 'rgba(255, 159, 64, 1)',
+/ /                 'rgba(0, 0, 0, 1)'
+/ /             ],
+/ /             borderWidth: 1
+/ /         },
+/ /         {
+/ /             label: '오답률',
+/ /             data: [3, 12, 1, 5, 1, 2, 9],
+/ /             backgroundColor: [
+/ /                 'rgba(255, 99, 132, 0.8)',
+/ /                 'rgba(54, 162, 235, 0.8)',
+/ /                 'rgba(255, 206, 86, 0.8)',
+/ /                 'rgba(75, 192, 192, 0.8)',
+/ /                 'rgba(153, 102, 255, 0.8)',
+/ /                 'rgba(255, 159, 64, 0.8)',
+/ /                 'rgba(0, 0, 0, 0.8)'
+/ /             ],
+/ /             borderWidth: 1
+/ /         }]
+/ /     },
+/ /     options: {
+/ /         maintainAspectRatio: false,
+/ /         title: {
+/ /             display: true,
+/ /             text: '국어'
+/ /         },
+/ /         scales: {
+/ /             display: false,
+/ /         }
+/ /     }
+/ /   });
+/ /
+/ /   var myChart = new Chart(ctx2, {
+/ /     type: 'radar',
+/ /     data: {
+/ /         labels: #{{Standard::Subject.where(main_subject_id: 2, depth: 1).pluck(:name)}},
+/ /         datasets: [{
+/ /             label: '전체 푼 문제',
+/ /             data: [12, 19, 3, 10, 2, 3, 10],
+/ /             backgroundColor: [
+/ /                 'rgba(255, 99, 132, 0.2)',
+/ /                 'rgba(54, 162, 235, 0.2)',
+/ /                 'rgba(255, 206, 86, 0.2)',
+/ /                 'rgba(75, 192, 192, 0.2)',
+/ /                 'rgba(153, 102, 255, 0.2)',
+/ /                 'rgba(255, 159, 64, 0.2)',
+/ /                 'rgba(0, 0, 0, 0.2)'
+/ /             ],
+/ /             borderColor: [
+/ /                 'rgba(255,99,132,1)',
+/ /                 'rgba(54, 162, 235, 1)',
+/ /                 'rgba(255, 206, 86, 1)',
+/ /                 'rgba(75, 192, 192, 1)',
+/ /                 'rgba(153, 102, 255, 1)',
+/ /                 'rgba(255, 159, 64, 1)',
+/ /                 'rgba(0, 0, 0, 1)'
+/ /             ],
+/ /             borderWidth: 1
+/ /         },
+/ /         {
+/ /             label: '오답률',
+/ /             data: [3, 12, 1, 5, 1, 2, 9],
+/ /             backgroundColor: [
+/ /                 'rgba(255, 99, 132, 0.8)',
+/ /                 'rgba(54, 162, 235, 0.8)',
+/ /                 'rgba(255, 206, 86, 0.8)',
+/ /                 'rgba(75, 192, 192, 0.8)',
+/ /                 'rgba(153, 102, 255, 0.8)',
+/ /                 'rgba(255, 159, 64, 0.8)',
+/ /                 'rgba(0, 0, 0, 0.8)'
+/ /             ],
+/ /             borderWidth: 1
+/ /         }]
+/ /     },
+/ /     options: {
+/ /         maintainAspectRatio: false,
+/ /         title: {
+/ /             display: true,
+/ /             text: '영어'
+/ /         },
+/ /         scales: {
+/ /             display: false,
+/ /         }
+/ /     }
+/ /   });
+/ /
+/ /   var myChart = new Chart(ctx3, {
+/ /     type: 'radar',
+/ /     data: {
+/ /         labels: #{{Standard::Subject.where(main_subject_id: 3, depth: 1).pluck(:name)}},
+/ /         datasets: [{
+/ /             label: '전체 푼 문제',
+/ /             data: [12, 19, 3, 10, 2, 3, 10],
+/ /             backgroundColor: [
+/ /                 'rgba(255, 99, 132, 0.2)',
+/ /                 'rgba(54, 162, 235, 0.2)',
+/ /                 'rgba(255, 206, 86, 0.2)',
+/ /                 'rgba(75, 192, 192, 0.2)',
+/ /                 'rgba(153, 102, 255, 0.2)',
+/ /                 'rgba(255, 159, 64, 0.2)',
+/ /                 'rgba(0, 0, 0, 0.2)'
+/ /             ],
+/ /             borderColor: [
+/ /                 'rgba(255,99,132,1)',
+/ /                 'rgba(54, 162, 235, 1)',
+/ /                 'rgba(255, 206, 86, 1)',
+/ /                 'rgba(75, 192, 192, 1)',
+/ /                 'rgba(153, 102, 255, 1)',
+/ /                 'rgba(255, 159, 64, 1)',
+/ /                 'rgba(0, 0, 0, 1)'
+/ /             ],
+/ /             borderWidth: 1
+/ /         },
+/ /         {
+/ /             label: '오답률',
+/ /             data: [3, 12, 1, 5, 1, 2, 9],
+/ /             backgroundColor: [
+/ /                 'rgba(255, 99, 132, 0.8)',
+/ /                 'rgba(54, 162, 235, 0.8)',
+/ /                 'rgba(255, 206, 86, 0.8)',
+/ /                 'rgba(75, 192, 192, 0.8)',
+/ /                 'rgba(153, 102, 255, 0.8)',
+/ /                 'rgba(255, 159, 64, 0.8)',
+/ /                 'rgba(0, 0, 0, 0.8)'
+/ /             ],
+/ /             borderWidth: 1
+/ /         }]
+/ /     },
+/ /     options: {
+/ /         maintainAspectRatio: false,
+/ /         title: {
+/ /             display: true,
+/ /             text: '수학'
+/ /         },
+/ /         scales: {
+/ /             display: false,
+/ /         }
+/ /     }
+/ /   });
+/ /
+/ / table.ui.celled.multiline.table#problem_histories
+/ /   tbody
+/ /     - @problem_histories.each do |problem_history|
+/ /       tr
+/ /         td = problem_history.problem.content
+/
+/
+/ css:
+/   .test_wrapper { position: relative; }
+/   .test_wrapper::before { position: absolute; content: ''; top: 0%; left: 0%; background: rgba(33, 33, 33, 0.8); width: 100%; height: 100%; z-index: -1; opacity: 0; transition: opacity .5s; }
+/   .test_wrapper::after { position: absolute; content: ''; top: 50%; left: 50%; margin: -1.5em 0em 0em -1.5em; width: 3em; height: 3em; border-radius: 500rem; border-color: #fff rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.5); border-style: solid; border-width: 0.2em; z-index: -1; opacity: 0; transition: opacity .5s; }
+/   .test_wrapper.loading::before { opacity: 1; z-index: 100; }
+/   .test_wrapper.loading::after { -webkit-animation: segment-spin 0.6s linear; animation: segment-spin 0.6s linear; -webkit-animation-iteration-count: infinite; animation-iteration-count: infinite; opacity: 1; z-index: 101; }
+/
+/   .problem_container.listening .black.label { background-color: #21BA45 !important; }
+/   .problem_container.listening .black.label::before { content: '\f026'; font-family: 'Icons'; margin-right: 5px; animation: flash 2s infinite; }
+/
+/   .submitBtn { overflow: hidden; }
+/   .submitBtn div { content: '모든 문항에 답변해주세요'; position: absolute; top: 0; left: 0; display: flex; width: 100%; height: 100%; justify-content: center; align-items: center; background: crimson; color: #fff; transition: transform .25s; transform: translateY(100%); }
+/   .submitBtn.not-ready div { transform: translateY(0); }
+/
+/
 / javascript:
-/   var ctx1 = document.getElementById("myChart1").getContext('2d');
-/   var ctx2 = document.getElementById("myChart2").getContext('2d');
-/   var ctx3 = document.getElementById("myChart3").getContext('2d');
-/   var myChart = new Chart(ctx1, {
-/     type: 'radar',
-/     data: {
-/         labels: #{{Standard::Subject.where(main_subject_id: 1, depth: 1).pluck(:name)}},
-/         datasets: [{
-/             label: '전체 푼 문제',
-/             data: [12, 19, 3, 10, 2, 3, 10],
-/             backgroundColor: [
-/                 'rgba(255, 99, 132, 0.2)',
-/                 'rgba(54, 162, 235, 0.2)',
-/                 'rgba(255, 206, 86, 0.2)',
-/                 'rgba(75, 192, 192, 0.2)',
-/                 'rgba(153, 102, 255, 0.2)',
-/                 'rgba(255, 159, 64, 0.2)',
-/                 'rgba(0, 0, 0, 0.2)'
-/             ],
-/             borderColor: [
-/                 'rgba(255,99,132,1)',
-/                 'rgba(54, 162, 235, 1)',
-/                 'rgba(255, 206, 86, 1)',
-/                 'rgba(75, 192, 192, 1)',
-/                 'rgba(153, 102, 255, 1)',
-/                 'rgba(255, 159, 64, 1)',
-/                 'rgba(0, 0, 0, 1)'
-/             ],
-/             borderWidth: 1
-/         },
-/         {
-/             label: '오답률',
-/             data: [3, 12, 1, 5, 1, 2, 9],
-/             backgroundColor: [
-/                 'rgba(255, 99, 132, 0.8)',
-/                 'rgba(54, 162, 235, 0.8)',
-/                 'rgba(255, 206, 86, 0.8)',
-/                 'rgba(75, 192, 192, 0.8)',
-/                 'rgba(153, 102, 255, 0.8)',
-/                 'rgba(255, 159, 64, 0.8)',
-/                 'rgba(0, 0, 0, 0.8)'
-/             ],
-/             borderWidth: 1
-/         }]
-/     },
-/     options: {
-/         maintainAspectRatio: false,
-/         title: {
-/             display: true,
-/             text: '국어'
-/         },
-/         scales: {
-/             display: false,
-/         }
-/     }
+/   $(function(){
+/     $('#match_calendar').delegate('.ui.button', 'ajax:beforeSend', function(){
+/       $(this).addClass('loading');
+/     }).delegate('.ui.button', 'ajax:complete', function(){
+/       $(this).removeClass('loading');
+/     });
+/
+/     keyboardJS.withContext('test_screen', function(){
+/       keyboardJS.on('left', testFormPrev);
+/       keyboardJS.on('right', testFormNext);
+/     });
 /   });
-/   
-/   var myChart = new Chart(ctx2, {
-/     type: 'radar',
-/     data: {
-/         labels: #{{Standard::Subject.where(main_subject_id: 2, depth: 1).pluck(:name)}},
-/         datasets: [{
-/             label: '전체 푼 문제',
-/             data: [12, 19, 3, 10, 2, 3, 10],
-/             backgroundColor: [
-/                 'rgba(255, 99, 132, 0.2)',
-/                 'rgba(54, 162, 235, 0.2)',
-/                 'rgba(255, 206, 86, 0.2)',
-/                 'rgba(75, 192, 192, 0.2)',
-/                 'rgba(153, 102, 255, 0.2)',
-/                 'rgba(255, 159, 64, 0.2)',
-/                 'rgba(0, 0, 0, 0.2)'
-/             ],
-/             borderColor: [
-/                 'rgba(255,99,132,1)',
-/                 'rgba(54, 162, 235, 1)',
-/                 'rgba(255, 206, 86, 1)',
-/                 'rgba(75, 192, 192, 1)',
-/                 'rgba(153, 102, 255, 1)',
-/                 'rgba(255, 159, 64, 1)',
-/                 'rgba(0, 0, 0, 1)'
-/             ],
-/             borderWidth: 1
-/         },
-/         {
-/             label: '오답률',
-/             data: [3, 12, 1, 5, 1, 2, 9],
-/             backgroundColor: [
-/                 'rgba(255, 99, 132, 0.8)',
-/                 'rgba(54, 162, 235, 0.8)',
-/                 'rgba(255, 206, 86, 0.8)',
-/                 'rgba(75, 192, 192, 0.8)',
-/                 'rgba(153, 102, 255, 0.8)',
-/                 'rgba(255, 159, 64, 0.8)',
-/                 'rgba(0, 0, 0, 0.8)'
-/             ],
-/             borderWidth: 1
-/         }]
-/     },
-/     options: {
-/         maintainAspectRatio: false,
-/         title: {
-/             display: true,
-/             text: '영어'
-/         },
-/         scales: {
-/             display: false,
-/         }
+/
+/   function fullScreen() {
+/     var i = $('html')[0];
+/     if (i.requestFullscreen) {
+/       i.requestFullscreen();
+/     } else if (i.webkitRequestFullscreen) {
+/       i.webkitRequestFullscreen();
+/     } else if (i.mozRequestFullScreen) {
+/       i.mozRequestFullScreen();
+/     } else if (i.msRequestFullscreen) {
+/       i.msRequestFullscreen();
 /     }
-/   });
-/   
-/   var myChart = new Chart(ctx3, {
-/     type: 'radar',
-/     data: {
-/         labels: #{{Standard::Subject.where(main_subject_id: 3, depth: 1).pluck(:name)}},
-/         datasets: [{
-/             label: '전체 푼 문제',
-/             data: [12, 19, 3, 10, 2, 3, 10],
-/             backgroundColor: [
-/                 'rgba(255, 99, 132, 0.2)',
-/                 'rgba(54, 162, 235, 0.2)',
-/                 'rgba(255, 206, 86, 0.2)',
-/                 'rgba(75, 192, 192, 0.2)',
-/                 'rgba(153, 102, 255, 0.2)',
-/                 'rgba(255, 159, 64, 0.2)',
-/                 'rgba(0, 0, 0, 0.2)'
-/             ],
-/             borderColor: [
-/                 'rgba(255,99,132,1)',
-/                 'rgba(54, 162, 235, 1)',
-/                 'rgba(255, 206, 86, 1)',
-/                 'rgba(75, 192, 192, 1)',
-/                 'rgba(153, 102, 255, 1)',
-/                 'rgba(255, 159, 64, 1)',
-/                 'rgba(0, 0, 0, 1)'
-/             ],
-/             borderWidth: 1
-/         },
-/         {
-/             label: '오답률',
-/             data: [3, 12, 1, 5, 1, 2, 9],
-/             backgroundColor: [
-/                 'rgba(255, 99, 132, 0.8)',
-/                 'rgba(54, 162, 235, 0.8)',
-/                 'rgba(255, 206, 86, 0.8)',
-/                 'rgba(75, 192, 192, 0.8)',
-/                 'rgba(153, 102, 255, 0.8)',
-/                 'rgba(255, 159, 64, 0.8)',
-/                 'rgba(0, 0, 0, 0.8)'
-/             ],
-/             borderWidth: 1
-/         }]
-/     },
-/     options: {
-/         maintainAspectRatio: false,
-/         title: {
-/             display: true,
-/             text: '수학'
-/         },
-/         scales: {
-/             display: false,
-/         }
+/   }
+/
+/   function exitFullScreen() {
+/     if (document.exitFullscreen) {
+/     	document.exitFullscreen();
+/     } else if (document.webkitExitFullscreen) {
+/     	document.webkitExitFullscreen();
+/     } else if (document.mozCancelFullScreen) {
+/     	document.mozCancelFullScreen();
+/     } else if (document.msExitFullscreen) {
+/     	document.msExitFullscreen();
 /     }
-/   });
-/ 
-/ table.ui.celled.multiline.table#problem_histories
-/   tbody
-/     - @problem_histories.each do |problem_history|
-/       tr
-/         td = problem_history.problem.content
-
-
-css:
-  .test_wrapper { position: relative; }
-  .test_wrapper::before { position: absolute; content: ''; top: 0%; left: 0%; background: rgba(33, 33, 33, 0.8); width: 100%; height: 100%; z-index: -1; opacity: 0; transition: opacity .5s; }
-  .test_wrapper::after { position: absolute; content: ''; top: 50%; left: 50%; margin: -1.5em 0em 0em -1.5em; width: 3em; height: 3em; border-radius: 500rem; border-color: #fff rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.5); border-style: solid; border-width: 0.2em; z-index: -1; opacity: 0; transition: opacity .5s; }
-  .test_wrapper.loading::before { opacity: 1; z-index: 100; }
-  .test_wrapper.loading::after { -webkit-animation: segment-spin 0.6s linear; animation: segment-spin 0.6s linear; -webkit-animation-iteration-count: infinite; animation-iteration-count: infinite; opacity: 1; z-index: 101; }
-
-  .problem_container.listening .black.label { background-color: #21BA45 !important; }
-  .problem_container.listening .black.label::before { content: '\f026'; font-family: 'Icons'; margin-right: 5px; animation: flash 2s infinite; }
-
-  .submitBtn { overflow: hidden; }
-  .submitBtn div { content: '모든 문항에 답변해주세요'; position: absolute; top: 0; left: 0; display: flex; width: 100%; height: 100%; justify-content: center; align-items: center; background: crimson; color: #fff; transition: transform .25s; transform: translateY(100%); }
-  .submitBtn.not-ready div { transform: translateY(0); }
-
-
-javascript:
-  $(function(){
-    $('#match_calendar').delegate('.ui.button', 'ajax:beforeSend', function(){
-      $(this).addClass('loading');
-    }).delegate('.ui.button', 'ajax:complete', function(){
-      $(this).removeClass('loading');
-    });
-
-    keyboardJS.withContext('test_screen', function(){
-      keyboardJS.on('left', testFormPrev);
-      keyboardJS.on('right', testFormNext);
-    });
-  });
-
-  function fullScreen() {
-    var i = $('html')[0];
-    if (i.requestFullscreen) {
-      i.requestFullscreen();
-    } else if (i.webkitRequestFullscreen) {
-      i.webkitRequestFullscreen();
-    } else if (i.mozRequestFullScreen) {
-      i.mozRequestFullScreen();
-    } else if (i.msRequestFullscreen) {
-      i.msRequestFullscreen();
-    }
-  }
-
-  function exitFullScreen() {
-    if (document.exitFullscreen) {
-    	document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-    	document.webkitExitFullscreen();
-    } else if (document.mozCancelFullScreen) {
-    	document.mozCancelFullScreen();
-    } else if (document.msExitFullscreen) {
-    	document.msExitFullscreen();
-    }
-  }
-
-  function testFormInit(){
-    var test_screen = $('#test_screen');
-    test_screen.on('touchmove', function(e){ return false; });
-    test_screen.find('.problems_row, .answers_seg').on('touchmove', function(e){
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-    });
-    renderMathInElement(document.getElementById("test_screen"),
-      {
-        delimiters: [
-          {left: "$$", right: "$$", display: true},
-          {left: "$",  right: "$",  display: false}
-        ]
-      }
-    );
-
-    var col = test_screen.find('.problems_column');
-    var mh = col.outerHeight();
-    var problems = col.children();
-    problems.css({transform: ''});
-    if ($(window).innerWidth() > 1480) {
-      _.each(problems, function(problem){
-        var page = Math.floor($(problem).position().left / 540 / 2);
-        $(problem).css({transform: 'translate(-' + (540 * 2 * page) + 'px, ' + (mh * page) + 'px'});
-      });
-    } else {
-    }
-
-    // if ($(window).innerWidth() > 1480) {
-    //   var seg = test_screen.find('.problems_seg');
-    //   var row = test_screen.find('.problems_row');
-    //   var col = test_screen.find('.problems_column');
-    //   var ch = seg.outerHeight();
-    //   var mh = col.outerHeight();
-    //   var cp = Math.ceil((-parseInt(row.css('transform').split(',')[4]) || 0)/540);
-    //   var mp = Math.ceil(mh/ch);
-    //   seg.scrollTop(0);
-    //   row.css({width: (50 * mp) + '%'});
-    //   if (mp - cp < 2) row.css({transform: 'translateX(-' + (540 * (mp - 2)) + 'px)'});
-    //   col.not(':first').remove();
-    //   test_screen.find('.problems_row_divider').remove();
-    //   for (var i=1; i<mp; i++) {
-    //     col.first().after(col.first().clone());
-    //     col.first().after('<div class="problems_row_divider"></div>');
-    //   }
-
-    //   var cols = test_screen.find('.problems_column');
-    //   $.each(cols, function(index, value){
-    //     $(this).css({transform: 'translateY(-' + (ch * index) + 'px)'})
-    //   });
-
-    //   var left_icon = $('.problems_header').find('a.ui.icon.button').eq(0);
-    //   var right_icon = $('.problems_header').find('a.ui.icon.button').eq(1);
-    //   left_icon.css({cursor: 'w-resize'}).off('click', testFormPrev).on('click', testFormPrev);
-    //   right_icon.css({cursor: 'e-resize'}).off('click', testFormNext).on('click', testFormNext);
-    // } else {
-    //   test_screen.find('.problems_row').css({ transform: '', width: '' });
-    //   test_screen.find('.problems_column').not(':first').remove();
-    //   test_screen.find('.problems_row_divider').remove();
-    // }
-
-    $.each($('.exm_seg'), function(p_index, seg){
-      var problem_order = $(seg).data('problem-order');
-      $.each($(seg).find('.item'), function(e_index, item) {
-        var exm_order = $(item).data('exm-order');
-        $(item).off('click').on('click', function(e){
-          var list = $('.item[data-problem-order=' + problem_order + ']');
-          var item = $('.item[data-problem-order=' + problem_order + '][data-exm-order=' + exm_order + ']');
-          list.removeClass('active');
-          list.find('.ui.label').removeClass('black').addClass('basic');
-          item.addClass('active');
-          item.find('.ui.label').addClass('black').removeClass('basic');
-
-          var tr = $('.answers_seg').find('tr')[problem_order - 1];
-          var td = $(tr).find('td')[exm_order];
-
-          $(tr).find('.ui.button').removeClass('black').addClass('basic');
-          $(td).find('.ui.button').addClass('black').removeClass('basic');
-
-          var input = $('#problem_collection_history_problem_histories_attributes_' + (problem_order - 1) + '_users_answer');
-          input.val(exm_order);
-
-          checkAnswerForm();
-        });
-      });
-      $(seg).find('input').off('input').on('input', function(e){
-        var problem_order = $(e.target).data('problem-order');
-        var answer_tr = test_screen.find('.answers_seg').find('tr')[problem_order - 1];
-        var answer_input = $(answer_tr).find('input');
-        answer_input.val($(e.target).val());
-      });
-    });
-
-    $('.test_wrapper').removeClass('loading');
-  }
-
-  function not_enough() {
-    var test_screen = $('#test_screen');
-    var form = test_screen.find('form');
-    var submit_btn = form.find('[type=submit]');
-    submit_btn.addClass('not-ready');
-    setTimeout(function(){
-      submit_btn.removeClass('not-ready');
-    }, 1000);
-    return false;
-  }
-
-  function checkAnswerForm(){
-    var test_screen = $('#test_screen');
-    var form = test_screen.find('form');
-    var submit_btn = form.find('[type=submit]');
-    var fields = $.map(form.find('input'), function(value, index) { return [value]; });
-
-    form.off('ajax:beforeSend', not_enough);
-
-    if (fields.every(function (field, index) { return field.value.length > 0; })) {
-      submit_btn.addClass('positive');
-      form.on('ajax:beforeSend', function(){
-        submit_btn.addClass('loading');
-      });
-    } else {
-      submit_btn.removeClass('positive');
-      form.on('ajax:beforeSend', not_enough);
-    }
-  }
-
-  function answerSegInit(){
-    checkAnswerForm();
-    $.each($('.answers_seg').find('tr'), function(p_index, tr){
-      var problem_order = p_index + 1;
-      $.each($(tr).find('td'), function(e_index, td) {
-        var exm_order = e_index;
-        $(td).on('click', function(e){
-          if (e.target.tagName == 'INPUT' || $(e.target).hasClass('answer_input')) return;
-          if (exm_order == 0) return;
-
-          var list = $('.item[data-problem-order=' + problem_order + ']');
-          var item = $('.item[data-problem-order=' + problem_order + '][data-exm-order=' + exm_order + ']');
-          list.removeClass('active');
-          list.find('.ui.label').removeClass('black').addClass('basic');
-          item.addClass('active');
-          item.find('.ui.label').addClass('black').removeClass('basic');
-
-          $(tr).find('.ui.button').removeClass('black').addClass('basic');
-          $(td).find('.ui.button').addClass('black').removeClass('basic');
-
-          var input = $('#problem_collection_history_problem_histories_attributes_' + (problem_order - 1) + '_users_answer');
-          input.val(exm_order);
-
-          checkAnswerForm();
-        })
-      });
-      $(tr).find('input').on('input', function(e){
-        var exm_input = $('input[data-problem-order=' + problem_order + ']');
-        exm_input.val($(e.target).val());
-      });
-    });
-  }
-
-  function testFormNext(){
-    var test_screen = $('#test_screen');
-    var seg = test_screen.find('.problems_seg');
-    var row = test_screen.find('.problems_row');
-    var cols = test_screen.find('.problems_column');
-    if (cols.length == 1) return;
-    var ch = seg.outerHeight();
-    var mh = cols.outerHeight();
-    var mp = Math.ceil(mh/ch);
-    var cp = Math.ceil((-parseInt(row.css('transform').split(',')[4]) || 0)/540);
-    if (cp >= mp -2) {
-      row.css({transform: 'translateX(-' + (540 * (mp - 2) + 10) + 'px)'});
-      setTimeout(function() { row.css({transform: 'translateX(-' + (540 * (mp - 2)) + 'px)'}); }, 250);
-    } else {
-      row.css({transform: 'translateX(-' + (540 * (cp + 1)) + 'px)'});
-    }
-  };
-
-  function testFormPrev(){
-    var test_screen = $('#test_screen');
-    var seg = test_screen.find('.problems_seg');
-    var row = test_screen.find('.problems_row');
-    var cols = test_screen.find('.problems_column');
-    if (cols.length == 1) return;
-    var ch = seg.outerHeight();
-    var mh = cols.outerHeight();
-    var mp = Math.ceil(mh/ch);
-    var cp = Math.ceil((-parseInt(row.css('transform').split(',')[4]) || 0)/540);
-    if (cp == 0) {
-      row.css({transform: 'translateX(10px)'});
-      setTimeout(function() { row.css({transform: 'translateX(0px)'}); }, 250);
-    } else {
-      row.css({transform: 'translateX(-' + (540 * (cp - 1)) + 'px)'});
-    }
-  };
-
-  function audioInit(){
-    var test_screen = $('#test_screen');
-    var audio_seg = test_screen.find('.audio_seg');
-    if (audio_seg.length == 0) return;
-
-    var playBtn = audio_seg.find('.playBtn')[0];
-    var pauseBtn = audio_seg.find('.pauseBtn')[0];
-    var startBtn = audio_seg.find('.startBtn')[0];
-
-    var timer = audio_seg.find('.durationCurrent')[0];
-    var duration = audio_seg.find('.durationMax')[0];
-    var progress = audio_seg.find('.progress_bar')[0];
-    var speedLabel = audio_seg.find('.rateBtn')[0];
-
-    var volBtn = audio_seg.find('.volBtn')[0];
-    var volIcon = $(volBtn).find('.icon');
-    var volSlider = audio_seg.find('.volSlider')[0];
-    var volBar = audio_seg.find('.volBar')[0];
-
-    var Player = function(playlist) {
-      this.playlist = playlist;
-      this.index = 0;
-      this.speed = 1.0;
-      this.sound = 0.95;
-      this.muted = false;
-    };
-
-    Player.prototype = {
-      play: function(index) {
-        var self = this;
-        var sound;
-
-        index = typeof index === 'number' ? index : self.index;
-        var data = self.playlist[index];
-
-        if (data.howl) {
-          sound = data.howl;
-        } else {
-          sound = data.howl = new Howl({
-            src: [data.src],
-            html5: true,
-            onplay: function() {
-              duration.innerHTML = self.formatTime(Math.round(sound.duration()));
-              pauseBtn.style.display = 'inline-block';
-              playBtn.style.display = 'none';
-              requestAnimationFrame(self.step.bind(self)); // Start upating the progress of the track.
-              audio_seg.addClass('started');
-              if (bowser.tablet || bowser.mobile) $('.problems_seg').animate({scrollTop : $('.problem_container').eq(index).position().top - 20}, 250);
-            },
-            onend: function() {
-              self.skip('right');
-            }
-          });
-        }
-
-        // Begin playing the sound.
-        sound.play();
-        sound.rate(self.speed);
-        sound.volume(self.sound);
-        if (self.muted) sound.mute(self.muted);
-
-        // Keep track of the index we are currently playing.
-        self.index = index;
-
-        test_screen.find('.listening').removeClass('listening');
-        $.each(test_screen.find('.problems_column'), function(i, col){
-          $(col).find('.problem_container').eq(index).addClass('listening');
-        });
-      },
-      pause: function() {
-        var self = this;
-        var sound = self.playlist[self.index].howl;
-        sound.pause();
-        playBtn.style.display = 'inline-block';
-        pauseBtn.style.display = 'none';
-
-        test_screen.find('.listening').removeClass('listening');
-      },
-      stop: function() {
-        var self = this;
-        var sound = self.playlist[self.index].howl;
-        sound.stop();
-        self.index = 0;
-        playBtn.style.display = 'inline-block';
-        pauseBtn.style.display = 'none';
-        test_screen.find('.listening').removeClass('listening');
-        audio_seg.addClass('ended');
-        self.destroy();
-      },
-      step: function() {
-        var self = this;
-        var sound = self.playlist[self.index].howl;
-        if (!sound) return;
-        var seek = sound.seek() || 0;
-        timer.innerHTML = self.formatTime(Math.round(seek));
-        progress.style.width = (((seek / sound.duration()) * 100) || 0) + '%';
-        // If the sound is still playing, continue stepping.
-        if (sound.playing()) requestAnimationFrame(self.step.bind(self));
-      },
-      rate: function(speed) {
-        var self = this;
-        var sound = self.playlist[self.index].howl;
-        sound.rate(speed);
-        self.speed = speed;
-        speedLabel.innerHTML = self.speed.toFixed(1) + '배속';
-      },
-      skip: function(direction) {
-        var self = this;
-        var index = 0;
-        if (direction === 'prev') {
-          index = self.index - 1;
-          if (index < 0) index = self.playlist.length - 1;
-        } else {
-          index = self.index + 1;
-          if (index >= self.playlist.length) index = 0;
-        }
-        index == 0 ? self.stop() : self.skipTo(index);
-      },
-      skipTo: function(index) {
-        var self = this;
-        if (self.playlist[self.index].howl) self.playlist[self.index].howl.stop();
-        if (index > 0 && (bowser.tablet || bowser.mobile)) {
-          self.pause();
-          self.index = index;
-          audio_seg.removeClass('started');
-          startBtn.lastChild.textContent = (self.index + 1) + '번 문제를 재생합니다'
-        } else {
-          self.play(index);
-        }
-        progress.style.width = '0%';
-      },
-      volume: function(val) {
-        var self = this;
-        Howler.volume(val);
-        self.sound = val;
-
-        // Update the display on the slider.
-        volBar.style.width = (val * 100) + '%';
-        if (val == 0) {
-          volIcon.addClass('off').removeClass('up');
-        } else {
-          volIcon.addClass('up').removeClass('off');
-        }
-      },
-      mute: function() {
-        var self = this;
-        var sound = self.playlist[self.index].howl;
-        if (!sound || !sound.playing()) return;
-        var muted = sound.mute();
-        sound.mute(!muted);
-        self.muted = !muted;
-        volIcon.toggleClass('off up');
-      },
-      formatTime: function(secs) {
-        var minutes = Math.floor(secs / 60) || 0;
-        var seconds = (secs - minutes * 60) || 0;
-        return minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
-      },
-      destroy: function() {
-        var self = this;
-        var sound = self.playlist[self.index].howl;
-        if (sound && sound.playing()) sound.fade(1, 0, 500);
-        keyboardJS.withContext('test_screen', function(){
-          keyboardJS.off('space');
-        });
-      }
-    };
-
-    var audio_src = [];
-    $.each(audio_seg.find('audio'), function(index, audio){
-      var hash = {};
-      hash.src = $(audio).attr('src');
-      hash.howl = null;
-      audio_src.push(hash);
-    });
-
-    var player = new Player(audio_src);
-
-    // Bind our player controls.
-    startBtn.addEventListener('click', function() {
-      player.play();
-    });
-    playBtn.addEventListener('click', function() {
-      player.play();
-    });
-    pauseBtn.addEventListener('click', function() {
-      player.pause();
-    });
-    volBtn.addEventListener('click', function() {
-      // player.mute();
-      $(volSlider).toggleClass('adjusting');
-    });
-
-    volSlider.addEventListener('click', function(event) {
-      var per = event.layerX / parseFloat(volSlider.scrollWidth);
-      player.volume(per);
-    });
-    volSlider.addEventListener('mousedown', function() {
-      window.sliderDown = true;
-    });
-    volSlider.addEventListener('touchstart', function() {
-      window.sliderDown = true;
-    });
-    document.addEventListener('mouseup', function() {
-      window.sliderDown = false;
-    });
-    document.addEventListener('touchend', function() {
-      window.sliderDown = false;
-    });
-
-    var move = function(event) {
-      if (window.sliderDown) {
-        var x = event.clientX || event.touches[0].clientX;
-        var startX = $(volSlider).offset().left;
-        var layerX = x - startX;
-        var per = Math.min(1, Math.max(0, layerX / parseFloat(volSlider.scrollWidth)));
-        player.volume(per);
-
-        // var per = event.layerX / parseFloat(volSlider.scrollWidth);
-        // player.volume(per);
-      }
-    };
-
-    volSlider.addEventListener('mousemove', move);
-    volSlider.addEventListener('touchmove', move);
-
-    var rateBtnDown = audio_seg.find('.rateBtnDown')[0];
-    rateBtnDown.addEventListener('click', function() {
-      if (player.speed == 0.5) return;
-      var speed = parseFloat((player.speed - 0.1).toFixed(1));
-      var sound = player.playlist[player.index].howl;
-      if (sound) player.rate(speed);
-    });
-    var rateBtn = audio_seg.find('.rateBtn')[0];
-    rateBtn.addEventListener('click', function() {
-      var sound = player.playlist[player.index].howl;
-      if (sound) player.rate(1.0);
-    });
-    var rateBtnUp = audio_seg.find('.rateBtnUp')[0];
-    rateBtnUp.addEventListener('click', function() {
-      if (player.speed == 3.0) return;
-      var speed = parseFloat((player.speed + 0.1).toFixed(1));
-      var sound = player.playlist[player.index].howl;
-      if (sound) player.rate(speed);
-    });
-
-    keyboardJS.withContext('test_screen', function(){
-      keyboardJS.off('space');
-      keyboardJS.on('space', function(e){
-        e.preventDefault();
-        var sound = player.playlist[player.index].howl;
-        (sound && sound.playing()) ? player.pause() : player.play();
-      });
-      keyboardJS.on('-', function(e){
-        e.preventDefault();
-        if (player.speed == 0.5) return;
-        var speed = parseFloat((player.speed - 0.1).toFixed(1));
-        var sound = player.playlist[player.index].howl;
-        if (sound) player.rate(speed);
-      });
-      keyboardJS.on('=', function(e){
-        e.preventDefault();
-        if (player.speed == 3.0) return;
-        var speed = parseFloat((player.speed + 0.1).toFixed(1));
-        var sound = player.playlist[player.index].howl;
-        if (sound) player.rate(speed);
-      });
-      keyboardJS.on('0', function(e){
-        e.preventDefault();
-        var sound = player.playlist[player.index].howl;
-        if (sound) player.rate(1.0);
-      });
-      keyboardJS.on('down', function(e){
-        e.preventDefault();
-        if (player.sound == 0) return;
-        var val = parseFloat((player.sound - 0.1).toFixed(1));
-        var sound = player.playlist[player.index].howl;
-        if (sound) player.volume(val);
-      });
-      keyboardJS.on('up', function(e){
-        e.preventDefault();
-        if (player.sound == 1.0) return;
-        var val = parseFloat((player.sound + 0.1).toFixed(1));
-        var sound = player.playlist[player.index].howl;
-        if (sound) player.volume(val);
-      });
-    });
-
-    return player;
-  }
+/   }
+/
+/   function testFormInit(){
+/     var test_screen = $('#test_screen');
+/     test_screen.on('touchmove', function(e){ return false; });
+/     test_screen.find('.problems_row, .answers_seg').on('touchmove', function(e){
+/       e.stopPropagation();
+/       e.stopImmediatePropagation();
+/     });
+/     renderMathInElement(document.getElementById("test_screen"),
+/       {
+/         delimiters: [
+/           {left: "$$", right: "$$", display: true},
+/           {left: "$",  right: "$",  display: false}
+/         ]
+/       }
+/     );
+/
+/     var col = test_screen.find('.problems_column');
+/     var mh = col.outerHeight();
+/     var problems = col.children();
+/     problems.css({transform: ''});
+/     if ($(window).innerWidth() > 1480) {
+/       _.each(problems, function(problem){
+/         var page = Math.floor($(problem).position().left / 540 / 2);
+/         $(problem).css({transform: 'translate(-' + (540 * 2 * page) + 'px, ' + (mh * page) + 'px'});
+/       });
+/     } else {
+/     }
+/
+/     // if ($(window).innerWidth() > 1480) {
+/     //   var seg = test_screen.find('.problems_seg');
+/     //   var row = test_screen.find('.problems_row');
+/     //   var col = test_screen.find('.problems_column');
+/     //   var ch = seg.outerHeight();
+/     //   var mh = col.outerHeight();
+/     //   var cp = Math.ceil((-parseInt(row.css('transform').split(',')[4]) || 0)/540);
+/     //   var mp = Math.ceil(mh/ch);
+/     //   seg.scrollTop(0);
+/     //   row.css({width: (50 * mp) + '%'});
+/     //   if (mp - cp < 2) row.css({transform: 'translateX(-' + (540 * (mp - 2)) + 'px)'});
+/     //   col.not(':first').remove();
+/     //   test_screen.find('.problems_row_divider').remove();
+/     //   for (var i=1; i<mp; i++) {
+/     //     col.first().after(col.first().clone());
+/     //     col.first().after('<div class="problems_row_divider"></div>');
+/     //   }
+/
+/     //   var cols = test_screen.find('.problems_column');
+/     //   $.each(cols, function(index, value){
+/     //     $(this).css({transform: 'translateY(-' + (ch * index) + 'px)'})
+/     //   });
+/
+/     //   var left_icon = $('.problems_header').find('a.ui.icon.button').eq(0);
+/     //   var right_icon = $('.problems_header').find('a.ui.icon.button').eq(1);
+/     //   left_icon.css({cursor: 'w-resize'}).off('click', testFormPrev).on('click', testFormPrev);
+/     //   right_icon.css({cursor: 'e-resize'}).off('click', testFormNext).on('click', testFormNext);
+/     // } else {
+/     //   test_screen.find('.problems_row').css({ transform: '', width: '' });
+/     //   test_screen.find('.problems_column').not(':first').remove();
+/     //   test_screen.find('.problems_row_divider').remove();
+/     // }
+/
+/     $.each($('.exm_seg'), function(p_index, seg){
+/       var problem_order = $(seg).data('problem-order');
+/       $.each($(seg).find('.item'), function(e_index, item) {
+/         var exm_order = $(item).data('exm-order');
+/         $(item).off('click').on('click', function(e){
+/           var list = $('.item[data-problem-order=' + problem_order + ']');
+/           var item = $('.item[data-problem-order=' + problem_order + '][data-exm-order=' + exm_order + ']');
+/           list.removeClass('active');
+/           list.find('.ui.label').removeClass('black').addClass('basic');
+/           item.addClass('active');
+/           item.find('.ui.label').addClass('black').removeClass('basic');
+/
+/           var tr = $('.answers_seg').find('tr')[problem_order - 1];
+/           var td = $(tr).find('td')[exm_order];
+/
+/           $(tr).find('.ui.button').removeClass('black').addClass('basic');
+/           $(td).find('.ui.button').addClass('black').removeClass('basic');
+/
+/           var input = $('#problem_collection_history_problem_histories_attributes_' + (problem_order - 1) + '_users_answer');
+/           input.val(exm_order);
+/
+/           checkAnswerForm();
+/         });
+/       });
+/       $(seg).find('input').off('input').on('input', function(e){
+/         var problem_order = $(e.target).data('problem-order');
+/         var answer_tr = test_screen.find('.answers_seg').find('tr')[problem_order - 1];
+/         var answer_input = $(answer_tr).find('input');
+/         answer_input.val($(e.target).val());
+/       });
+/     });
+/
+/     $('.test_wrapper').removeClass('loading');
+/   }
+/
+/   function not_enough() {
+/     var test_screen = $('#test_screen');
+/     var form = test_screen.find('form');
+/     var submit_btn = form.find('[type=submit]');
+/     submit_btn.addClass('not-ready');
+/     setTimeout(function(){
+/       submit_btn.removeClass('not-ready');
+/     }, 1000);
+/     return false;
+/   }
+/
+/   function checkAnswerForm(){
+/     var test_screen = $('#test_screen');
+/     var form = test_screen.find('form');
+/     var submit_btn = form.find('[type=submit]');
+/     var fields = $.map(form.find('input'), function(value, index) { return [value]; });
+/
+/     form.off('ajax:beforeSend', not_enough);
+/
+/     if (fields.every(function (field, index) { return field.value.length > 0; })) {
+/       submit_btn.addClass('positive');
+/       form.on('ajax:beforeSend', function(){
+/         submit_btn.addClass('loading');
+/       });
+/     } else {
+/       submit_btn.removeClass('positive');
+/       form.on('ajax:beforeSend', not_enough);
+/     }
+/   }
+/
+/   function answerSegInit(){
+/     checkAnswerForm();
+/     $.each($('.answers_seg').find('tr'), function(p_index, tr){
+/       var problem_order = p_index + 1;
+/       $.each($(tr).find('td'), function(e_index, td) {
+/         var exm_order = e_index;
+/         $(td).on('click', function(e){
+/           if (e.target.tagName == 'INPUT' || $(e.target).hasClass('answer_input')) return;
+/           if (exm_order == 0) return;
+/
+/           var list = $('.item[data-problem-order=' + problem_order + ']');
+/           var item = $('.item[data-problem-order=' + problem_order + '][data-exm-order=' + exm_order + ']');
+/           list.removeClass('active');
+/           list.find('.ui.label').removeClass('black').addClass('basic');
+/           item.addClass('active');
+/           item.find('.ui.label').addClass('black').removeClass('basic');
+/
+/           $(tr).find('.ui.button').removeClass('black').addClass('basic');
+/           $(td).find('.ui.button').addClass('black').removeClass('basic');
+/
+/           var input = $('#problem_collection_history_problem_histories_attributes_' + (problem_order - 1) + '_users_answer');
+/           input.val(exm_order);
+/
+/           checkAnswerForm();
+/         })
+/       });
+/       $(tr).find('input').on('input', function(e){
+/         var exm_input = $('input[data-problem-order=' + problem_order + ']');
+/         exm_input.val($(e.target).val());
+/       });
+/     });
+/   }
+/
+/   function testFormNext(){
+/     var test_screen = $('#test_screen');
+/     var seg = test_screen.find('.problems_seg');
+/     var row = test_screen.find('.problems_row');
+/     var cols = test_screen.find('.problems_column');
+/     if (cols.length == 1) return;
+/     var ch = seg.outerHeight();
+/     var mh = cols.outerHeight();
+/     var mp = Math.ceil(mh/ch);
+/     var cp = Math.ceil((-parseInt(row.css('transform').split(',')[4]) || 0)/540);
+/     if (cp >= mp -2) {
+/       row.css({transform: 'translateX(-' + (540 * (mp - 2) + 10) + 'px)'});
+/       setTimeout(function() { row.css({transform: 'translateX(-' + (540 * (mp - 2)) + 'px)'}); }, 250);
+/     } else {
+/       row.css({transform: 'translateX(-' + (540 * (cp + 1)) + 'px)'});
+/     }
+/   };
+/
+/   function testFormPrev(){
+/     var test_screen = $('#test_screen');
+/     var seg = test_screen.find('.problems_seg');
+/     var row = test_screen.find('.problems_row');
+/     var cols = test_screen.find('.problems_column');
+/     if (cols.length == 1) return;
+/     var ch = seg.outerHeight();
+/     var mh = cols.outerHeight();
+/     var mp = Math.ceil(mh/ch);
+/     var cp = Math.ceil((-parseInt(row.css('transform').split(',')[4]) || 0)/540);
+/     if (cp == 0) {
+/       row.css({transform: 'translateX(10px)'});
+/       setTimeout(function() { row.css({transform: 'translateX(0px)'}); }, 250);
+/     } else {
+/       row.css({transform: 'translateX(-' + (540 * (cp - 1)) + 'px)'});
+/     }
+/   };
+/
+/   function audioInit(){
+/     var test_screen = $('#test_screen');
+/     var audio_seg = test_screen.find('.audio_seg');
+/     if (audio_seg.length == 0) return;
+/
+/     var playBtn = audio_seg.find('.playBtn')[0];
+/     var pauseBtn = audio_seg.find('.pauseBtn')[0];
+/     var startBtn = audio_seg.find('.startBtn')[0];
+/
+/     var timer = audio_seg.find('.durationCurrent')[0];
+/     var duration = audio_seg.find('.durationMax')[0];
+/     var progress = audio_seg.find('.progress_bar')[0];
+/     var speedLabel = audio_seg.find('.rateBtn')[0];
+/
+/     var volBtn = audio_seg.find('.volBtn')[0];
+/     var volIcon = $(volBtn).find('.icon');
+/     var volSlider = audio_seg.find('.volSlider')[0];
+/     var volBar = audio_seg.find('.volBar')[0];
+/
+/     var Player = function(playlist) {
+/       this.playlist = playlist;
+/       this.index = 0;
+/       this.speed = 1.0;
+/       this.sound = 0.95;
+/       this.muted = false;
+/     };
+/
+/     Player.prototype = {
+/       play: function(index) {
+/         var self = this;
+/         var sound;
+/
+/         index = typeof index === 'number' ? index : self.index;
+/         var data = self.playlist[index];
+/
+/         if (data.howl) {
+/           sound = data.howl;
+/         } else {
+/           sound = data.howl = new Howl({
+/             src: [data.src],
+/             html5: true,
+/             onplay: function() {
+/               duration.innerHTML = self.formatTime(Math.round(sound.duration()));
+/               pauseBtn.style.display = 'inline-block';
+/               playBtn.style.display = 'none';
+/               requestAnimationFrame(self.step.bind(self)); // Start upating the progress of the track.
+/               audio_seg.addClass('started');
+/               if (bowser.tablet || bowser.mobile) $('.problems_seg').animate({scrollTop : $('.problem_container').eq(index).position().top - 20}, 250);
+/             },
+/             onend: function() {
+/               self.skip('right');
+/             }
+/           });
+/         }
+/
+/         // Begin playing the sound.
+/         sound.play();
+/         sound.rate(self.speed);
+/         sound.volume(self.sound);
+/         if (self.muted) sound.mute(self.muted);
+/
+/         // Keep track of the index we are currently playing.
+/         self.index = index;
+/
+/         test_screen.find('.listening').removeClass('listening');
+/         $.each(test_screen.find('.problems_column'), function(i, col){
+/           $(col).find('.problem_container').eq(index).addClass('listening');
+/         });
+/       },
+/       pause: function() {
+/         var self = this;
+/         var sound = self.playlist[self.index].howl;
+/         sound.pause();
+/         playBtn.style.display = 'inline-block';
+/         pauseBtn.style.display = 'none';
+/
+/         test_screen.find('.listening').removeClass('listening');
+/       },
+/       stop: function() {
+/         var self = this;
+/         var sound = self.playlist[self.index].howl;
+/         sound.stop();
+/         self.index = 0;
+/         playBtn.style.display = 'inline-block';
+/         pauseBtn.style.display = 'none';
+/         test_screen.find('.listening').removeClass('listening');
+/         audio_seg.addClass('ended');
+/         self.destroy();
+/       },
+/       step: function() {
+/         var self = this;
+/         var sound = self.playlist[self.index].howl;
+/         if (!sound) return;
+/         var seek = sound.seek() || 0;
+/         timer.innerHTML = self.formatTime(Math.round(seek));
+/         progress.style.width = (((seek / sound.duration()) * 100) || 0) + '%';
+/         // If the sound is still playing, continue stepping.
+/         if (sound.playing()) requestAnimationFrame(self.step.bind(self));
+/       },
+/       rate: function(speed) {
+/         var self = this;
+/         var sound = self.playlist[self.index].howl;
+/         sound.rate(speed);
+/         self.speed = speed;
+/         speedLabel.innerHTML = self.speed.toFixed(1) + '배속';
+/       },
+/       skip: function(direction) {
+/         var self = this;
+/         var index = 0;
+/         if (direction === 'prev') {
+/           index = self.index - 1;
+/           if (index < 0) index = self.playlist.length - 1;
+/         } else {
+/           index = self.index + 1;
+/           if (index >= self.playlist.length) index = 0;
+/         }
+/         index == 0 ? self.stop() : self.skipTo(index);
+/       },
+/       skipTo: function(index) {
+/         var self = this;
+/         if (self.playlist[self.index].howl) self.playlist[self.index].howl.stop();
+/         if (index > 0 && (bowser.tablet || bowser.mobile)) {
+/           self.pause();
+/           self.index = index;
+/           audio_seg.removeClass('started');
+/           startBtn.lastChild.textContent = (self.index + 1) + '번 문제를 재생합니다'
+/         } else {
+/           self.play(index);
+/         }
+/         progress.style.width = '0%';
+/       },
+/       volume: function(val) {
+/         var self = this;
+/         Howler.volume(val);
+/         self.sound = val;
+/
+/         // Update the display on the slider.
+/         volBar.style.width = (val * 100) + '%';
+/         if (val == 0) {
+/           volIcon.addClass('off').removeClass('up');
+/         } else {
+/           volIcon.addClass('up').removeClass('off');
+/         }
+/       },
+/       mute: function() {
+/         var self = this;
+/         var sound = self.playlist[self.index].howl;
+/         if (!sound || !sound.playing()) return;
+/         var muted = sound.mute();
+/         sound.mute(!muted);
+/         self.muted = !muted;
+/         volIcon.toggleClass('off up');
+/       },
+/       formatTime: function(secs) {
+/         var minutes = Math.floor(secs / 60) || 0;
+/         var seconds = (secs - minutes * 60) || 0;
+/         return minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+/       },
+/       destroy: function() {
+/         var self = this;
+/         var sound = self.playlist[self.index].howl;
+/         if (sound && sound.playing()) sound.fade(1, 0, 500);
+/         keyboardJS.withContext('test_screen', function(){
+/           keyboardJS.off('space');
+/         });
+/       }
+/     };
+/
+/     var audio_src = [];
+/     $.each(audio_seg.find('audio'), function(index, audio){
+/       var hash = {};
+/       hash.src = $(audio).attr('src');
+/       hash.howl = null;
+/       audio_src.push(hash);
+/     });
+/
+/     var player = new Player(audio_src);
+/
+/     // Bind our player controls.
+/     startBtn.addEventListener('click', function() {
+/       player.play();
+/     });
+/     playBtn.addEventListener('click', function() {
+/       player.play();
+/     });
+/     pauseBtn.addEventListener('click', function() {
+/       player.pause();
+/     });
+/     volBtn.addEventListener('click', function() {
+/       // player.mute();
+/       $(volSlider).toggleClass('adjusting');
+/     });
+/
+/     volSlider.addEventListener('click', function(event) {
+/       var per = event.layerX / parseFloat(volSlider.scrollWidth);
+/       player.volume(per);
+/     });
+/     volSlider.addEventListener('mousedown', function() {
+/       window.sliderDown = true;
+/     });
+/     volSlider.addEventListener('touchstart', function() {
+/       window.sliderDown = true;
+/     });
+/     document.addEventListener('mouseup', function() {
+/       window.sliderDown = false;
+/     });
+/     document.addEventListener('touchend', function() {
+/       window.sliderDown = false;
+/     });
+/
+/     var move = function(event) {
+/       if (window.sliderDown) {
+/         var x = event.clientX || event.touches[0].clientX;
+/         var startX = $(volSlider).offset().left;
+/         var layerX = x - startX;
+/         var per = Math.min(1, Math.max(0, layerX / parseFloat(volSlider.scrollWidth)));
+/         player.volume(per);
+/
+/         // var per = event.layerX / parseFloat(volSlider.scrollWidth);
+/         // player.volume(per);
+/       }
+/     };
+/
+/     volSlider.addEventListener('mousemove', move);
+/     volSlider.addEventListener('touchmove', move);
+/
+/     var rateBtnDown = audio_seg.find('.rateBtnDown')[0];
+/     rateBtnDown.addEventListener('click', function() {
+/       if (player.speed == 0.5) return;
+/       var speed = parseFloat((player.speed - 0.1).toFixed(1));
+/       var sound = player.playlist[player.index].howl;
+/       if (sound) player.rate(speed);
+/     });
+/     var rateBtn = audio_seg.find('.rateBtn')[0];
+/     rateBtn.addEventListener('click', function() {
+/       var sound = player.playlist[player.index].howl;
+/       if (sound) player.rate(1.0);
+/     });
+/     var rateBtnUp = audio_seg.find('.rateBtnUp')[0];
+/     rateBtnUp.addEventListener('click', function() {
+/       if (player.speed == 3.0) return;
+/       var speed = parseFloat((player.speed + 0.1).toFixed(1));
+/       var sound = player.playlist[player.index].howl;
+/       if (sound) player.rate(speed);
+/     });
+/
+/     keyboardJS.withContext('test_screen', function(){
+/       keyboardJS.off('space');
+/       keyboardJS.on('space', function(e){
+/         e.preventDefault();
+/         var sound = player.playlist[player.index].howl;
+/         (sound && sound.playing()) ? player.pause() : player.play();
+/       });
+/       keyboardJS.on('-', function(e){
+/         e.preventDefault();
+/         if (player.speed == 0.5) return;
+/         var speed = parseFloat((player.speed - 0.1).toFixed(1));
+/         var sound = player.playlist[player.index].howl;
+/         if (sound) player.rate(speed);
+/       });
+/       keyboardJS.on('=', function(e){
+/         e.preventDefault();
+/         if (player.speed == 3.0) return;
+/         var speed = parseFloat((player.speed + 0.1).toFixed(1));
+/         var sound = player.playlist[player.index].howl;
+/         if (sound) player.rate(speed);
+/       });
+/       keyboardJS.on('0', function(e){
+/         e.preventDefault();
+/         var sound = player.playlist[player.index].howl;
+/         if (sound) player.rate(1.0);
+/       });
+/       keyboardJS.on('down', function(e){
+/         e.preventDefault();
+/         if (player.sound == 0) return;
+/         var val = parseFloat((player.sound - 0.1).toFixed(1));
+/         var sound = player.playlist[player.index].howl;
+/         if (sound) player.volume(val);
+/       });
+/       keyboardJS.on('up', function(e){
+/         e.preventDefault();
+/         if (player.sound == 1.0) return;
+/         var val = parseFloat((player.sound + 0.1).toFixed(1));
+/         var sound = player.playlist[player.index].howl;
+/         if (sound) player.volume(val);
+/       });
+/     });
+/
+/     return player;
+/   }

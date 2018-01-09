@@ -5,7 +5,11 @@
     thead.thead-default
       tr
         th.text-center 연도
-        th.text-center 구분
+        th.text-center 시기
+        th.text-center 과목
+        th.text-center 과정
+        th.text-center 학년
+        th.text-center 명칭
         th.text-center 분류
         th.text-center 수정
         th.text-center 문항
@@ -13,7 +17,11 @@
     tbody
       - @problem_sources.each do |problem_source|
         tr.cursor-pointer onclick='location.href="#{test_admin_problems_path(problem_source_id: problem_source.id)}"'
-          td.text-center == problem_source.problems.first.year
+          td.text-center == problem_source.year
+          td.text-center == problem_source.time == 11 ? '수능' : "#{problem_source.time}월"
+          td.text-center == problem_source.subject_id == 3 ? '수학' : '기타'
+          td.text-center == problem_source.curriculum == 1 ? '이과' : problem_source.curriculum == 2 ? '문과' : '공통'
+          td.text-center == "고#{problem_source.grade}"
           td == problem_source.name
           td.text-center == "#{problem_source.problems.to_a.count{ |problem| problem.subject_id }}문항"
           td.text-center == "#{problem_source.problems.to_a.count{ |problem| problem.updated? }}문항"

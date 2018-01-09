@@ -19,6 +19,12 @@ class Admin::ProblemsController < AdminController
   # GET /admin/problems/1
   # GET /admin/problems/1.json
   def show
+    respond_to do |format|
+      format.html
+      format.json do
+        render json: @admin_problem
+      end
+    end
   end
 
   # GET /admin/problems/new
@@ -59,6 +65,14 @@ class Admin::ProblemsController < AdminController
     redirect_to admin_problems_path
   end
 
+  def source
+    data = params[:source]
+    problem_source = Standard::ProblemSource.find_or_create_by(year: data[:year], time: data[:time], subject_id: data[:subject_id], curriculum: data[:curriculum], grade: data[:grade])
+    source_problems = Admin::Problem.where(problem_source_id: problem_source.id)
+    source_problems = source_problems.where.not(id: params[:problem_id]) unless params[:problem_id].blank?
+    render json: { source: problem_source, occupied_orders: source_problems.pluck(:problem_source_order) }
+  end
+
   def list
     subject_id = params[:admin_problem][:subject_id]
     if subject_id == '0'
@@ -74,11 +88,12 @@ class Admin::ProblemsController < AdminController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_admin_problem
-    @admin_problem = Admin::Problem.includes(:subject, :problem_tags, :problem_source).find(params[:id])
+    @admin_problem = Admin::Problem.includes(:subject, :problem_images, :problem_tags, :problem_source).find(params[:id])
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def admin_problem_params
+    params[:admin_problem][:problem_image_ids] = params[:admin_problem][:problem_image_ids].split(',') if params[:admin_problem][:problem_image_ids]
     params[:admin_problem][:problem_tag_ids] = params[:admin_problem][:problem_tag_ids].split(',') if params[:admin_problem][:problem_tag_ids]
     params
       .require(:admin_problem)
@@ -96,6 +111,14 @@ class Admin::ProblemsController < AdminController
               :year,
               :problem_source_id,
               :problem_source_order,
+              :is_objective,
+              :correct_ratio,
+              :exm_1_ratio,
+              :exm_2_ratio,
+              :exm_3_ratio,
+              :exm_4_ratio,
+              :exm_5_ratio,
+              problem_image_ids: [],
               problem_tag_ids: [])
   end
 end

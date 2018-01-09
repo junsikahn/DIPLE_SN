@@ -59,6 +59,9 @@ group :development do
   gem 'better_errors'
   gem 'letter_opener'
   gem 'awesome_print'
+
+  gem 'guard'
+  gem 'guard-livereload', '~> 2.5', require: false
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
@@ -132,6 +135,8 @@ source 'https://rails-assets.org' do
   # gem 'rails-assets-js-beautify'
   # Sortable — is a JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery. Supports Meteor, AngularJS, React, Polymer, Knockout and any CSS library, e.g. Bootstrap. http://rubaxa.github.io/Sortable/
   gem 'rails-assets-sortablejs'
+  # Beautiful, functional dialogs in vanilla Javascript http://github.hubspot.com/vex/docs/welcome/
+  gem 'rails-assets-vex'
 end
 
 # Rails engine with helpers and JavaScript for displaying times and dates to users in their local time
