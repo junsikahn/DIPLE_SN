@@ -1,0 +1,18 @@
+= simple_nested_form_for @admin_problem_source do |f|
+  div.jumbotron.p-4.mb-3.text-right
+    h1.text-left 기출문제 추가
+    = f.button :button, '저장', class: 'btn-success', data: { disable_with: "<i class='fa spinner spin'/>" }
+  = f.error_notification
+  table.table.table-bordered
+    thead.thead-default
+      tr
+        th 입력해주세요
+    tbody
+      tr
+        td
+          div.row
+            div.col = f.input :year, label: '연도', collection: 1990..Date.today.year
+            div.col = f.input :time, as: :select, label: '시기', collection: [ ['6월', 6], ['9월', 9], ['수능', 11] ]
+            div.col = f.input :subject_id, as: :select, label: '과목', collection: [ ['수학', 3] ], selected: 3, disabled: true
+            div.col = f.input :curriculum, as: :select, label: '과정', collection: [ ['이과', 1], ['문과', 2], ['공통', 0] ]
+            div.col = f.input :grade, label: '학년', disabled: true, input_html: { value: 3 }

@@ -56,10 +56,6 @@ class Admin::SubjectsController < AdminController
     end
   end
 
-  def list
-    render json: { results: Admin::Subject.where('depth > 1').where('name LIKE ?', "%#{params[:q]}%").select(:id, :path, :name) }
-  end
-
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_admin_subject

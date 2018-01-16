@@ -15,20 +15,19 @@ Rails.application.routes.draw do
           get :list, on: :collection
         end
       end
+      resources :problem_sources
       resources :problems do
-        get :test, on: :collection
         get :source, on: :collection
         get :list, on: :collection
-      end
-      resources :tmp_problems do
-        post :upload, on: :collection
       end
       resources :problem_images, only: [:show, :create]
       resources :problem_tags do
         get :search, on: :collection
       end
-      resources :subjects do
-        get :list, on: :collection
+      resources :subjects
+
+      resources :tmp_problems do
+        post :upload, on: :collection
       end
       resources :users do
         get :report, on: :collection

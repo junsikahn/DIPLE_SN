@@ -7,15 +7,6 @@ class Admin::ProblemsController < AdminController
     @admin_problems = Admin::Problem.includes(:subject, :problem_tags).page(params[:page]).per(params[:per])
   end
 
-  def test
-    if params[:problem_source_id]
-      @problem_source = Standard::ProblemSource.find(params[:problem_source_id])
-      @admin_problems = Admin::Problem.includes(:subject, :problem_tags, :problem_source).where(problem_source_id: params[:problem_source_id])
-    else
-      @problem_sources = Standard::ProblemSource.includes(:problems).all.order(:name)
-    end
-  end
-
   # GET /admin/problems/1
   # GET /admin/problems/1.json
   def show
@@ -29,12 +20,12 @@ class Admin::ProblemsController < AdminController
 
   # GET /admin/problems/new
   def new
-    @admin_problem = Admin::Problem.new(subject: Admin::Subject.new)
+    @admin_problem = Admin::Problem.new
+    params.each { |key, value| @admin_problem[key] = value if @admin_problem.has_attribute?(key) }
   end
 
   # GET /admin/problems/1/edit
   def edit
-    @admin_problem.subject = Admin::Subject.new if @admin_problem.subject_id.nil?
   end
 
   # POST /admin/problems
@@ -67,7 +58,7 @@ class Admin::ProblemsController < AdminController
 
   def source
     data = params[:source]
-    problem_source = Standard::ProblemSource.find_or_create_by(year: data[:year], time: data[:time], subject_id: data[:subject_id], curriculum: data[:curriculum], grade: data[:grade])
+    problem_source = Admin::ProblemSource.find_or_create_by(year: data[:year], time: data[:time], subject_id: data[:subject_id], curriculum: data[:curriculum], grade: data[:grade])
     source_problems = Admin::Problem.where(problem_source_id: problem_source.id)
     source_problems = source_problems.where.not(id: params[:problem_id]) unless params[:problem_id].blank?
     render json: { source: problem_source, occupied_orders: source_problems.pluck(:problem_source_order) }
