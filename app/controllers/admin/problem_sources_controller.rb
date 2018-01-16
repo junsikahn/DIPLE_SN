@@ -65,6 +65,8 @@ class Admin::ProblemSourcesController < AdminController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def admin_problem_source_params
+    params[:admin_problem_source][:subject_id] = 3 unless params[:admin_problem_source][:subject_id]
+    params[:admin_problem_source][:grade] = 3 unless params[:admin_problem_source][:grade]
     params
       .require(:admin_problem_source)
       .permit(:year,
