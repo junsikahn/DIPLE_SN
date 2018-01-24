@@ -111,9 +111,7 @@ class Admin::ProblemSourcesController < AdminController
     }
     problem_source = Admin::ProblemSource.find_or_create_by(source_params)
     if problem_source.new_record? || problem_source.problems.length.zero?
-      datas = ConvertHwp.convert_hwp(params[:file])
-      puts datas
-      datas.each do |data|
+      ConvertHwp.convert_hwp(params[:file]).each do |data|
         problem_source.problems.new(data)
       end
       is_new_file = true
