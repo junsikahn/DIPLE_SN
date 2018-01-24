@@ -77,7 +77,6 @@ class Admin::ProblemSourcesController < AdminController
 
   def preview
     # 2018_04_경기_학력평가_수학_가형_고3.hwp
-    params.permit(:file)
     name = params[:file].original_filename.sub('.xml', '')
     parts = name.split('_')
     year = parts[0][0..3].to_i
@@ -114,8 +113,8 @@ class Admin::ProblemSourcesController < AdminController
     if problem_source.new_record? || problem_source.problems.length.zero?
       datas = ConvertHwp.convert_hwp(params[:file])
       datas.each do |data|
-        problem_source.problems.new(score: data[:score],
-                                    year: data[:year],
+        problem_source.problems.new(score: data[:score].to_i,
+                                    year: data[:year].to_i,
                                     content: data[:content],
                                     exm_1: data[:exm_1],
                                     exm_2: data[:exm_2],
