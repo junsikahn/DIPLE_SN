@@ -7,7 +7,7 @@ div.jumbotron.p-4.mb-3.text-right
   div.p-3.border.border-secondary.border-rounded.mt-3
     h3 == "#{year}"
     - year_problem_sources.group_by{ |s| s.institute }.each do |institute, institute_problem_sources|
-      h4 == "#{institute == 0 ? '평가원' : '교육청'}"
+      h4 == "#{institute == 0 ? '평가원' : institute == 1 ? '교육청' : '기타'}"
       - institute_problem_sources.group_by{ |s| s.curriculum }.each do |curriculum, problem_sources|
         h5 == "#{curriculum == 1 ? '나형' : curriculum == 2 ? '가형' : '공통'}"
         table.table.table-hover.table-bordered

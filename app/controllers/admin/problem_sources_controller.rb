@@ -6,7 +6,7 @@ class Admin::ProblemSourcesController < AdminController
   # GET /admin/problem_sources
   # GET /admin/problem_sources.json
   def index
-    @admin_problem_sources = Admin::ProblemSource.includes(:problems).all.order(:name)
+    @admin_problem_sources = Admin::ProblemSource.includes(:problems).all.order(:year, :time, curriculum: :desc)
   end
 
   # GET /admin/problem_sources/1
