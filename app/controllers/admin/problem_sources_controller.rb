@@ -1,4 +1,6 @@
 class Admin::ProblemSourcesController < AdminController
+  require 'convert_hwp'
+
   before_action :set_admin_problem_source, only: [:show, :edit, :update, :destroy, :publish]
 
   # GET /admin/problem_sources
