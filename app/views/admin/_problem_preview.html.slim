@@ -1,0 +1,78 @@
+script#problem-preview type="text/x-template"
+  div.problem-container ref="problemPreview"
+    div.problem-info.d-flex.justify-content-between.align-items-end
+      div.d-inline-flex.mb-1
+        span.problem-order.text-nowrap v-text='show_id ? (problem.id ? "ID " + problem.id  : "NEW") : order + "번"'
+        span.problem-score.text-nowrap v-text='problem.score + "점"'
+      div.d-inline-flex.mb-1.justify-content-end.align-items-end
+        span.problem-subject :class='{ "text-danger": !problem.subject }' v-text='problem.subject ? problem.subject.path : "미분류"'
+        span.problem-level.d-flex.bg-light.text-warning
+          i.fa :class='[ problem.level >= 1 ? "fa-star" : "fa-star-o" ]'
+          i.fa :class='[ problem.level >= 2 ? "fa-star" : "fa-star-o" ]'
+          i.fa :class='[ problem.level == 3 ? "fa-star" : "fa-star-o" ]'
+    div.problem-wrapper
+      div.problem-content v-html="problem.content"
+      div.problem-exm v-if="problem.is_objective"
+        div.problem-exm-wrapper v-for="(exm, index) in [problem.exm_1, problem.exm_2, problem.exm_3, problem.exm_4, problem.exm_5]" :key="index" :class='[ { "active": problem.answer == index + 1 }, exm_arrangement ]'
+          span.problem-exm-index :class='{ "active": problem.answer == index + 1 }' {{ index + 1 }}
+          span.problem-exm-content v-html="exm" ref="problemExmContent"
+      div.problem-answer-input v-else="!problem.is_objective"
+        input.form-control type="text" readonly="true" :value="problem.answer"
+      div.problem-explanation v-html="problem.explanation"
+      div.problem-answer :class='[{ "is-objective": problem.is_objective }]'
+        i.fa.fa-caret-right.mr-1
+        span.problem-answer-wrapper
+          span.problem-answer-seg.align-bottom v-text="problem.answer"
+        div.problem-ratio v-if="problem.is_objective && problem.exm_1_ratio && problem.exm_2_ratio && problem.exm_3_ratio && problem.exm_4_ratio && problem.exm_5_ratio"
+          span<> v-html='"① " + problem.exm_1_ratio + "<small>%</small>"' :class='{ "font-weight-bold text-dark under-border": problem.answer == 1 }'
+          span<> v-html='"② " + problem.exm_2_ratio + "<small>%</small>"' :class='{ "font-weight-bold text-dark under-border": problem.answer == 2 }'
+          span<> v-html='"③ " + problem.exm_3_ratio + "<small>%</small>"' :class='{ "font-weight-bold text-dark under-border": problem.answer == 3 }'
+          span<> v-html='"④ " + problem.exm_4_ratio + "<small>%</small>"' :class='{ "font-weight-bold text-dark under-border": problem.answer == 4 }'
+          span<> v-html='"⑤ " + problem.exm_5_ratio + "<small>%</small>"' :class='{ "font-weight-bold text-dark under-border": problem.answer == 5 }'
+        div.problem-ratio v-if="!problem.is_objective && problem.correct_ratio"
+          span v-html='problem.correct_ratio + "<small>%</small>"'
+    div.problem-info.d-flex.justify-content-between.align-items-start
+      div.problem-source
+        div.text-muted.mt-1.pl-2.pr-2 v-if="problem.problem_source"
+          i.fa.fa-caret-right.mr-1
+          span v-text='problem.problem_source ? "출처 : " + problem.problem_source.name : ""'
+          span v-text='problem.problem_source_order ? " - " + problem.problem_source_order + "번" : ""'
+    div.problem-tags v-if="problem.problem_tags"
+      a.badge.badge-secondary.mt-1.mr-1 v-for="tag in problem.problem_tags" :key="tag.id" href="#" {{ tag.name }}
+
+javascript:
+  Vue.component('problem-preview', {
+    template: '#problem-preview',
+    props: ['problem', 'order', 'show_id'],
+    data: function() {
+      return {
+        exm_arrangement: 'w-20',
+      }
+    },
+    computed: {
+      exm_ratio_sum: function() { return 100 === _.reduce([this.problem.exm_1_ratio, this.problem.exm_2_ratio, this.problem.exm_3_ratio, this.problem.exm_4_ratio, this.problem.exm_5_ratio], function(acc, ratio){ return acc + Math.abs(ratio); }, 0); },
+    },
+    methods: {
+      exmRearrange: function() {
+        var w = 'w-100';
+        if (_.every(_.map(this.$refs.problemExmContent, function(span) { return span.clientWidth <= 190; }))) w = 'w-50';
+        if (_.every(_.map(this.$refs.problemExmContent, function(span) { return span.clientWidth <= 100; }))) w = 'w-33';
+        if (_.every(_.map(this.$refs.problemExmContent, function(span) { return span.clientWidth <= 45; }))) w = 'w-20';
+        return this.exm_arrangement = w;
+      },
+      renderMath: function() {
+        var self = this;
+        var div = this.$refs.problemPreview;
+        renderMathInElement(div, {
+          delimiters: [ { left: "$",  right: "$",  display: false } ],
+          errorCallback: function(msg) {
+            $(div).highlight('$' + msg.split('`')[1] + '$', { element: 'mark', className: 'bg-danger text-light' });
+          }
+        });
+      }
+    },
+    mounted: function() {
+      this.exmRearrange();
+      this.renderMath();
+    }
+  });

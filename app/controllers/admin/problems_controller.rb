@@ -4,7 +4,7 @@ class Admin::ProblemsController < AdminController
   # GET /admin/problems
   # GET /admin/problems.json
   def index
-    @admin_problems = Admin::Problem.includes(:subject, :problem_tags).page(params[:page]).per(params[:per])
+    @admin_problems = Admin::Problem.includes(:subject, :problem_images, :problem_tags, :problem_source).page(params[:page]).per(params[:per])
   end
 
   # GET /admin/problems/1

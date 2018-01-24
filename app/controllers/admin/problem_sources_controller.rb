@@ -28,6 +28,23 @@ class Admin::ProblemSourcesController < AdminController
   def create
     @admin_problem_source = Admin::ProblemSource.find_by(admin_problem_source_params)
     if !@admin_problem_source.nil?
+      if !params[:problems].blank? && @admin_problem_source.problems.length == 0
+        params[:problems].each do |_index, param|
+          @admin_problem_source.problems.create(score: param[:score],
+                                                year: param[:year],
+                                                content: param[:content],
+                                                exm_1: param[:exm_1],
+                                                exm_2: param[:exm_2],
+                                                exm_3: param[:exm_3],
+                                                exm_4: param[:exm_4],
+                                                exm_5: param[:exm_5],
+                                                answer: param[:answer],
+                                                explanation: param[:explanation],
+                                                problem_source_id: param[:problem_source_id],
+                                                problem_source_order: param[:problem_source_order],
+                                                is_objective: param[:is_objective])
+        end
+      end
       redirect_to @admin_problem_source
     else
       @admin_problem_source = Admin::ProblemSource.new(admin_problem_source_params)
@@ -56,6 +73,57 @@ class Admin::ProblemSourcesController < AdminController
     redirect_to admin_problems_path
   end
 
+  def preview
+    # 2018_04_경기_학력평가_수학_가형_고3.hwp
+    name = params[:file].original_filename.sub('.xml', '')
+    parts = name.split('_')
+    year = parts[0][0..3].to_i
+    time = parts[1][0..1].to_i
+    location = case time
+               when 6 then 0
+               when 9 then 0
+               when 11 then 0
+               when 3 then 1
+               when 4 then 2
+               when 7 then 3
+               when 10 then 1
+               end
+    institute = case time
+                when 6 then 0
+                when 9 then 0
+                when 11 then 0
+                when 3 then 1
+                when 4 then 1
+                when 7 then 1
+                when 10 then 1
+                end
+    curriculum = parts[2]
+    source_params = {
+      year: year,
+      time: time,
+      location: location,
+      institute: institute,
+      subject_id: 3,
+      curriculum: curriculum,
+      grade: 3
+    }
+    problem_source = Admin::ProblemSource.find_or_create_by(source_params)
+    if problem_source.new_record? || problem_source.problems.length.zero?
+      datas = ConvertHwp.convert_hwp(params[:file])
+      datas.each do |data|
+        problem_source.problems.build(data)
+      end
+      is_new_file = true
+    else
+      is_new_file = false
+    end
+    render json: {
+      is_new_file: is_new_file,
+      problem_source: problem_source,
+      problems: problem_source.problems
+    }
+  end
+
   private
 
   # Use callbacks to share common setup or constraints between actions.
@@ -73,6 +141,8 @@ class Admin::ProblemSourcesController < AdminController
               :time,
               :subject_id,
               :curriculum,
-              :grade)
+              :grade,
+              :location,
+              :institute)
   end
 end

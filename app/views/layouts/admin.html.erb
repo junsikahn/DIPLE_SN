@@ -9,19 +9,6 @@
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
     <script>
       $(document).on('turbolinks:load', function() {
-        // $('.file-upload.button').on('click', function() {
-        //   var field = $(this).parentsUntil('.field.file', this);
-        //   var file_input = field.find('input[type="file"]');
-        //   var img = field.find('img');
-        //   file_input.click().off('change').on('change', function() {
-        //     var reader = new FileReader();
-        //     reader.onload = function(e) {
-        //       img[0].src = e.target.result;
-        //     };
-        //     reader.readAsDataURL(file_input[0].files[0]);
-        //   });
-        // });
-
         var err_vue = new Vue({
           data: { msgs: [] },
           watch: {
@@ -54,6 +41,7 @@
         });
       });
     </script>
+    <%= render '/admin/problem_preview' %>
   </head>
   <body>
     <nav id="nav" class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">

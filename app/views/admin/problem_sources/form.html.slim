@@ -1,18 +1,150 @@
-= simple_nested_form_for @admin_problem_source do |f|
-  div.jumbotron.p-4.mb-3.text-right
-    h1.text-left 기출문제 추가
-    = f.button :button, '저장', class: 'btn-success', data: { disable_with: "<i class='fa spinner spin'/>" }
-  = f.error_notification
-  table.table.table-bordered
-    thead.thead-default
-      tr
-        th 입력해주세요
-    tbody
-      tr
-        td
-          div.row
-            div.col = f.input :year, label: '연도', collection: 1990..Date.today.year
-            div.col = f.input :time, as: :select, label: '시기', collection: [ ['6월', 6], ['9월', 9], ['수능', 11] ]
-            div.col = f.input :subject_id, as: :select, label: '과목', collection: [ ['수학', 3] ], selected: 3, disabled: true
-            div.col = f.input :curriculum, as: :select, label: '과정', collection: [ ['이과', 1], ['문과', 2], ['공통', 0] ]
-            div.col = f.input :grade, label: '학년', disabled: true, input_html: { value: 3 }
+div#upload
+  = simple_nested_form_for @admin_problem_source do |f|
+    = f.error_notification
+    div.jumbotron.p-4.mb-3.text-right
+      h1.text-left 기출문제 추가
+      button.btn :class="[ is_new_file ? 'btn-success' : 'btn-danger' ]" @click.prevent="submitForm" :disabled="is_submitting || !is_new_file || validation.errors.length > 0"
+        span v-text="is_submitting ? '제출중...' : is_new_file ? '저장' : '이미 업로드된 기출문제입니다'"
+    table.table.table-bordered
+      thead.thead-default
+        tr
+          th.d-flex.justify-content-between
+            span 내용을 선택 또는 파일을 업로드해주세요
+            button.btn.btn-outline-secondary.mr-2 @click.prevent="preview" :disabled="is_uploading || file"
+              span.badge.mr-2 v-if="file" :class="[ problem_count == 30 ? 'badge-success' : 'badge-danger' ]" v-text="problem_count + '문항'"
+              span.badge.mr-2 v-if="file" :class="[ total_score == 100 ? 'badge-success' : 'badge-danger' ]" v-text="total_score + '점 만점'"
+              span v-text="is_uploading ? '업로드중...' : file ? problem_source.name : '파일업로드'"
+      tbody
+        tr
+          td
+            div.row
+              div.col
+                = f.input :year, label: '연도',
+                          input_html: { 'v-model.number': 'problem_source.year', ':class': "{ 'border-danger': validation.hasError('problem_source.year') }", ':disabled': 'file', '@input': 'year_check' }
+              div.col
+                = f.input :time, as: :select, label: '시기',
+                          collection: [ ['3월 - 학평(서울)', 3], ['4월 - 학평(경기)', 4], ['6월 - 모평(전국)', 6], ['7월 - 학평(인천)', 7], ['9월 - 모평(전국)', 9], ['10월 - 학평(서울)', 10], ['대학수학능력시험', 11] ],
+                          input_html: { 'v-model.number': 'problem_source.time', ':class': "{ 'border-danger': validation.hasError('problem_source.time') }", ':disabled': 'file', '@change': 'time_check' }
+              div.col
+                = f.input :institute, as: :select, label: '기관', collection: [ ['평가원', 0], ['교육청', 1] ], disabled: true,
+                          input_html: { 'v-model.number': 'problem_source.institute', ':class': "{ 'border-danger': validation.hasError('problem_source.institute') }" }
+              div.col
+                = f.input :location, as: :select, label: '지역', collection: [ ['전국', 0], ['서울', 1], ['경기', 2], ['인천', 3] ], disabled: true,
+                          input_html: { 'v-model.number': 'problem_source.location', ':class': "{ 'border-danger': validation.hasError('problem_source.location') }" }
+              div.col
+                = f.input :subject_id, as: :select, label: '과목', collection: [ ['수학', 3] ], selected: 3, disabled: true,
+                          input_html: { 'v-model.number': 'problem_source.subject_id', ':class': "{ 'border-danger': validation.hasError('problem_source.subject_id') }" }
+              div.col
+                = f.input :curriculum, as: :select, label: '과정', collection: [ ['이과(나형)', 1], ['문과(가형)', 2], ['공통', 0] ],
+                          input_html: { 'v-model.number': 'problem_source.curriculum', ':class': "{ 'border-danger': validation.hasError('problem_source.curriculum') }", ':disabled': 'file' }
+              div.col
+                = f.input :grade, label: '학년', disabled: true,
+                          input_html: { 'v-model.number': 'problem_source.grade', ':class': "{ 'border-danger': validation.hasError('problem_source.grade') }" }
+        tr v-if="is_uploading"
+          td.text-muted.text-center.p-5
+            i.fa.fa-circle-o-notch.fa-spin
+        tr v-for="(problem, order) in problems" :key="problem.order"
+          td
+            problem-preview :problem="problem" :order="order + 1"
+
+javascript:
+  var vm = new Vue({
+    el: '#upload',
+    data: {
+      problem_source: #{{ @admin_problem_source.as_json.to_json.html_safe }},
+      problems: [],
+      file: null,
+      is_new_file: true,
+      is_uploading: false,
+      is_submitting: false
+    },
+    computed: {
+      problem_count: function() { return this.problems.length; },
+      total_score: function() { return this.problem_count > 0 ? _.pluck(this.problems, 'score').reduce(function(a, b) { return a + b }) : 0 ; }
+    },
+    methods: {
+      year_check: function() {
+        var a = this.problem_source.year.toString();
+        if (a.length > 4) {
+          this.problem_source.year = a[0] + a[1] + a[2] + a[3];
+          return false;
+        }
+      },
+      time_check: function() {
+        var a = this.problem_source.time;
+        if (_.contains([6, 9, 11], a)) {
+          this.problem_source.institute = 0;
+          this.problem_source.location = 0;
+        } else if (_.contains([3, 4, 7, 10], a)) {
+          this.problem_source.institute = 1;
+          if (a == 3 || a == 10) this.problem_source.location = 1;
+          else if (a == 4) this.problem_source.location = 2;
+          else if (a == 7) this.problem_source.location = 3;
+        }
+      },
+      preview: function() {
+        var self = this;
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.addEventListener('change', function(e) {
+          var file = FileAPI.getFiles(this)[0];
+          if (file.type !== 'text/xml') return alert('XML 파일만 업로드할 수 있습니다');
+          var formData = new FormData();
+          formData.append('file', file);
+          FileAPI.readAsDataURL(file, function(evt){
+            if (evt.type == 'load') {
+              $.ajax({
+                url: '/admin/problem_sources/preview.json',
+                type: 'POST',
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function(data) {
+                  self.file = file;
+                  self.is_new_file = data.is_new_file;
+                  self.problem_source = data.problem_source;
+                  self.problems = data.problems;
+                  _.each(self.problems, function(problem) {
+                    problem.problem_source = self.problem_source;
+                  });
+                  self.is_uploading = false;
+                },
+                beforeSend: function() { self.is_uploading = true; },
+              });
+            }
+          });
+        }, false);
+        input.click();
+      },
+      submitForm: function() {
+        if (this.validation.errors.length > 0) return false;
+        this.is_submitting = true;
+        var problem_source = this.problem_source;
+        var problems = this.problems;
+        $.post({
+          url: '/admin/problem_sources',
+          type: 'POST',
+          data: {
+            admin_problem_source: problem_source,
+            problems: problems
+          }
+        });
+      }
+    },
+    created: function () {
+      this.problem_source.subject_id = 3;
+      this.problem_source.grade = 3;
+    },
+    mounted: function() {
+      this.$validate();
+    },
+    validators: {
+      'problem_source.year': function(value) { return Validator.value(value).required(); },
+      'problem_source.time': function(value) { return Validator.value(value).required(); },
+      'problem_source.institute': function(value) { return Validator.value(value).required(); },
+      'problem_source.location': function(value) { return Validator.value(value).required(); },
+      'problem_source.subject_id': function(value) { return Validator.value(value).required(); },
+      'problem_source.curriculum': function(value) { return Validator.value(value).required(); },
+      'problem_source.grade': function(value) { return Validator.value(value).required(); },
+    }
+  });

@@ -15,7 +15,9 @@ Rails.application.routes.draw do
           get :list, on: :collection
         end
       end
-      resources :problem_sources
+      resources :problem_sources do
+        post :preview, on: :collection
+      end
       resources :problems do
         get :source, on: :collection
         get :list, on: :collection

@@ -90,8 +90,7 @@ module ConvertHwp
     end
     units.push(text)
 
-    order = 0
-    units.each do |unit|
+    units.each_with_index do |unit, index|
       answer_set = nil
       unit = unit.gsub(/\n[ ]+/, "\n")
 
@@ -125,15 +124,18 @@ module ConvertHwp
 
       explanation = split_5[1]
 
-      units[order] = { year: year,
-                       title: title,
-                       order: order + 1,
+      units[index] = { year: year,
+                       problem_source_order: index += 1,
                        content: to_html(question.strip),
-                       exms: answer_set,
+                       exm_1: answer_set ? answer_set[0] : nil,
+                       exm_2: answer_set ? answer_set[1] : nil,
+                       exm_3: answer_set ? answer_set[2] : nil,
+                       exm_4: answer_set ? answer_set[3] : nil,
+                       exm_5: answer_set ? answer_set[4] : nil,
                        answer: answer,
                        score: score,
-                       explanation: to_html(explanation.strip) }
-      order += 1
+                       explanation: to_html(explanation.strip),
+                       is_objective: answer_set ? true : false }
     end
 
     return units
@@ -329,7 +331,7 @@ module ConvertHwp
 
     # OVERBRACE, UNDERBRACE
     arrow =
-      [["larrow", "leftarrow"], ["<->", "leftrightarrow"], ["->", "rightarrow"], ["uparrow", "uparrow"],
+      [["larrow", "leftarrow"], ["<->", "leftrightarrow"], ["->", "to"], ["uparrow", "uparrow"],
        ["downarrow", "downarrow"], ["LARROW", "Leftarrow"], ["RARROW", "Rightarrow"], ["UPARROW", "Uparrow"],
        ["DOWNARROW", "Downarrow"], ["udarrow", "updownarrow"], ["UDARROW", "Updownarrow"],
        ["LRARROW", "Leftrightarrow"], ["NWARROW", "nwarrow"], ["SEARROW", "searrow"], ["NEARROW", "nearrow"],

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171215071301) do
+ActiveRecord::Schema.define(version: 20180124111925) do
 
   create_table "problem_collection_histories", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer  "user_id",               null: false
@@ -90,6 +90,8 @@ ActiveRecord::Schema.define(version: 20171215071301) do
     t.integer "subject_id"
     t.integer "curriculum"
     t.integer "grade"
+    t.integer "location"
+    t.integer "institute"
   end
 
   create_table "problem_tags", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
