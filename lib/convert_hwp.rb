@@ -124,8 +124,8 @@ module ConvertHwp
 
       explanation = split_5[1]
 
-      units[index] = { year: year,
-                       problem_source_order: index += 1,
+      units[index] = { score: score,
+                       year: year,
                        content: to_html(question.strip),
                        exm_1: answer_set ? answer_set[0] : nil,
                        exm_2: answer_set ? answer_set[1] : nil,
@@ -133,8 +133,8 @@ module ConvertHwp
                        exm_4: answer_set ? answer_set[3] : nil,
                        exm_5: answer_set ? answer_set[4] : nil,
                        answer: answer,
-                       score: score,
                        explanation: to_html(explanation.strip),
+                       problem_source_order: index += 1,
                        is_objective: answer_set ? true : false }
     end
 

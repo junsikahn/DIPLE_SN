@@ -113,7 +113,18 @@ class Admin::ProblemSourcesController < AdminController
     if problem_source.new_record? || problem_source.problems.length.zero?
       datas = ConvertHwp.convert_hwp(params[:file])
       datas.each do |data|
-        problem_source.problems.build(data)
+        problem_source.problems.build(score: data[:score],
+                                      year: data[:year],
+                                      content: data[:content],
+                                      exm_1: data[:exm_1],
+                                      exm_2: data[:exm_2],
+                                      exm_3: data[:exm_3],
+                                      exm_4: data[:exm_4],
+                                      exm_5: data[:exm_5],
+                                      answer: data[:answer],
+                                      explanation: data[:explanation],
+                                      problem_source_order: data[:problem_source_order],
+                                      is_objective: data[:is_objective])
       end
       is_new_file = true
     else
