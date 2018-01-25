@@ -144,7 +144,9 @@
 //   }
 // }
 
-.problem-container { width: 540px; max-width: 100%; padding: 20px; max-height: 100%; display: inline-flex; flex-direction: column; flex: 0 1 auto; word-break: break-all;
+.problem-container {
+  width: 540px; max-width: 100%; padding: 20px; max-height: 100%; text-align: left;
+  display: inline-flex; flex-direction: column; flex: 0 1 auto; word-break: break-all;
   img { display: inline-block; max-width: 100%; }
   blockquote { margin: 0; padding: .75rem; border: 1px solid #e9ecef; background: #fff; }
   .problem-info { font-size: 0.8em;

@@ -32,8 +32,8 @@ class Admin::ProblemSource < Standard::ProblemSource
     case location
     when 0 then '전국'
     when 1 then '서울'
-    when 2 then '인천'
-    when 3 then '경기'
+    when 2 then '경기'
+    when 3 then '인천'
     end
   end
 

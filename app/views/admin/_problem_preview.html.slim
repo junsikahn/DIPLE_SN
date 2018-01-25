@@ -1,5 +1,5 @@
 script#problem-preview type="text/x-template"
-  div.problem-container ref="problemPreview"
+  div.problem-container :class='{ "active loader" : problem.is_loading }' ref="problemPreview"
     div.problem-info.d-flex.justify-content-between.align-items-end
       div.d-inline-flex.mb-1
         span.problem-order.text-nowrap v-text='show_id ? (problem.id ? "ID " + problem.id  : "NEW") : order + "번"'
@@ -49,9 +49,6 @@ javascript:
         exm_arrangement: 'w-20',
       }
     },
-    computed: {
-      exm_ratio_sum: function() { return 100 === _.reduce([this.problem.exm_1_ratio, this.problem.exm_2_ratio, this.problem.exm_3_ratio, this.problem.exm_4_ratio, this.problem.exm_5_ratio], function(acc, ratio){ return acc + Math.abs(ratio); }, 0); },
-    },
     methods: {
       exmRearrange: function() {
         var w = 'w-100';
@@ -69,10 +66,10 @@ javascript:
             $(div).highlight('$' + msg.split('`')[1] + '$', { element: 'mark', className: 'bg-danger text-light' });
           }
         });
+        this.exmRearrange();
       }
     },
     mounted: function() {
-      this.exmRearrange();
       this.renderMath();
     }
   });
