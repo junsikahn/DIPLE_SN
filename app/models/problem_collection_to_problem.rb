@@ -1,4 +1,4 @@
-class Standard::ProblemCollectionToProblem < ApplicationRecord
+class ProblemCollectionToProblem < ApplicationRecord
   default_scope { order(order: :asc) }
 
   belongs_to :problem_collection
@@ -8,6 +8,6 @@ class Standard::ProblemCollectionToProblem < ApplicationRecord
   validate :ordering
 
   def ordering
-    self[:order] = Standard::ProblemCollectionToProblem.where(problem_collection_id: problem_collection_id).count
+    self[:order] = ProblemCollectionToProblem.where(problem_collection_id: problem_collection_id).count
   end
 end

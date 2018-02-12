@@ -1,2 +1,2 @@
-class Admin::ProblemTag < Standard::ProblemTag
+class Admin::ProblemTag < ProblemTag
 end

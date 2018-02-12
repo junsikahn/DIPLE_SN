@@ -2,14 +2,14 @@ class App::HomeController < ApplicationController
   # GET /
   def index
     if params[:problem_source_id]
-      @problem_source = Standard::ProblemSource.find(params[:problem_source_id])
-      @problems = Standard::Problem.includes(:subject, :problem_tags, :problem_source).where(problem_source_id: params[:problem_source_id])
+      @problem_source = ProblemSource.find(params[:problem_source_id])
+      @problems = Problem.includes(:subject, :problem_tags, :problem_source).where(problem_source_id: params[:problem_source_id])
     else
-      @problem_sources = Standard::ProblemSource.includes(:problems).all.order(:name)
+      @problem_sources = ProblemSource.includes(:problems).all.order(:name)
     end
 
     # @problem_collections =
-    #   Standard::ProblemCollection
+    #   ProblemCollection
     #     .joins("LEFT JOIN problem_collection_histories ON problem_collection_histories.problem_collection_id = problem_collections.id AND problem_collection_histories.user_id = #{current_user.id}")
     #     .select('problem_collections.*, problem_collection_histories.score')
     #     .where(published: true)

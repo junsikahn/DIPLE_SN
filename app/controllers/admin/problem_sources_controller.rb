@@ -6,7 +6,7 @@ class Admin::ProblemSourcesController < AdminController
   # GET /admin/problem_sources
   # GET /admin/problem_sources.json
   def index
-    @admin_problem_sources = Admin::ProblemSource.includes(:problems).all.order(:year, :time, curriculum: :desc)
+    @admin_problem_sources = Admin::ProblemSource.includes(problems: :subjects).all.order(:year, :time, curriculum: :desc)
   end
 
   # GET /admin/problem_sources/1
@@ -32,19 +32,21 @@ class Admin::ProblemSourcesController < AdminController
     if !@admin_problem_source.nil?
       if !params[:problems].blank? && @admin_problem_source.problems.length == 0
         params[:problems].each do |_index, param|
-          @admin_problem_source.problems.create(score: param[:score],
-                                                year: param[:year],
-                                                content: param[:content],
-                                                exm_1: param[:exm_1],
-                                                exm_2: param[:exm_2],
-                                                exm_3: param[:exm_3],
-                                                exm_4: param[:exm_4],
-                                                exm_5: param[:exm_5],
-                                                answer: param[:answer],
-                                                explanation: param[:explanation],
-                                                problem_source_id: param[:problem_source_id],
-                                                problem_source_order: param[:problem_source_order],
-                                                is_objective: param[:is_objective])
+          problem = Admin::Problem.create(score: param[:score],
+                                          year: param[:year],
+                                          content: param[:content],
+                                          exm_1: param[:exm_1],
+                                          exm_2: param[:exm_2],
+                                          exm_3: param[:exm_3],
+                                          exm_4: param[:exm_4],
+                                          exm_5: param[:exm_5],
+                                          answer: param[:answer],
+                                          explanation: param[:explanation],
+                                          is_objective: param[:is_objective])
+          order = ProblemSourceOrder.new(order: param[:problem_source_order])
+          order.problem = problem
+          order.problem_source = @admin_problem_source
+          order.save
         end
       end
       redirect_to @admin_problem_source
@@ -114,7 +116,8 @@ class Admin::ProblemSourcesController < AdminController
       datas = ConvertHwp.convert_hwp(params[:file])
       datas.each do |data|
         next if data.class != Hash
-        problem_source.problems.new(data)
+        problem = problem_source.problems.new(data)
+        problem.problem_source_orders.new(problem_source_id: problem_source.id, order: data[:problem_source_order])
       end
       is_new_file = true
     else
@@ -123,7 +126,7 @@ class Admin::ProblemSourcesController < AdminController
     render json: {
       is_new_file: is_new_file,
       problem_source: problem_source,
-      problems: problem_source.problems
+      problems: problem_source.problems_with_details_as_json
     }
   end
 
@@ -131,7 +134,10 @@ class Admin::ProblemSourcesController < AdminController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_admin_problem_source
-    @admin_problem_source = Admin::ProblemSource.includes(problems: [:subject, :problem_tags, :problem_source]).find(params[:id])
+    @admin_problem_source = Admin::ProblemSource.includes(problems: [:subject,
+                                                                     {problem_source_orders: [:problem_source]},
+                                                                     :problem_images,
+                                                                     :problem_tags]).find(params[:id])
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

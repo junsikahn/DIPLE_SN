@@ -1,4 +1,4 @@
-class Admin::Problem < Standard::Problem
+class Admin::Problem < Problem
   def scoring(problem_collection)
     problems = problem_collection.problems.reload
     problem_count = problems.size

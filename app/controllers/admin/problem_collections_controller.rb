@@ -4,7 +4,7 @@ class Admin::ProblemCollectionsController < AdminController
   # GET /admin/problem_collections
   # GET /admin/problem_collections.json
   def index
-    @admin_problem_collections = Admin::ProblemCollection.includes(:subject, :problem_source).page(params[:page]).per(params[:per])
+    @admin_problem_collections = Admin::ProblemCollection.includes(:subject).page(params[:page]).per(params[:per])
   end
 
   # GET /admin/problem_collections/1
@@ -68,7 +68,11 @@ class Admin::ProblemCollectionsController < AdminController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_admin_problem_collection
-      @admin_problem_collection = Admin::ProblemCollection.includes(:subject, :problem_source, problems: :subject).find(params[:id])
+      @admin_problem_collection = Admin::ProblemCollection.includes(:subject,
+                                                                    problems: [:subject,
+                                                                               {problem_source_orders: [:problem_source]},
+                                                                               :problem_images,
+                                                                               :problem_tags]).find(params[:id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

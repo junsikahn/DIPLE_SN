@@ -1,11 +1,15 @@
-class Standard::Problem < ApplicationRecord
+class Problem < ApplicationRecord
   belongs_to :subject, optional: true
-  belongs_to :problem_source, optional: true
+
+  has_many :problem_subjects
+  has_many :subjects, through: :problem_subjects
+  has_many :problem_source_orders
+  has_many :problem_sources, through: :problem_source_orders
   has_many :problem_collection_to_problems
   has_many :problem_collections, through: :problem_collection_to_problems
 
-  belongs_to :problem_set, class_name: 'Standard::Problem', foreign_key: 'problem_id', optional: true
-  has_many   :set_problems, class_name: 'Standard::Problem', foreign_key: 'problem_id', dependent: :destroy
+  belongs_to :problem_set, class_name: 'Problem', foreign_key: 'problem_id', optional: true
+  has_many   :set_problems, class_name: 'Problem', foreign_key: 'problem_id', dependent: :destroy
   accepts_nested_attributes_for :set_problems
 
   has_many :problem_histories, dependent: :destroy
@@ -29,5 +33,12 @@ class Standard::Problem < ApplicationRecord
   def ready?
     return false if subject_id.nil? || content.blank? || explanation.blank?
     true
+  end
+
+  def with_details_as_json
+    as_json(include: [{problem_subjects: {include: :subject}},
+                      {problem_source_orders: {include: :problem_source}},
+                      {problem_images: {methods: :image_url}},
+                      :problem_tags])
   end
 end

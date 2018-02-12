@@ -1,4 +1,4 @@
-class Admin::ProblemSource < Standard::ProblemSource
+class Admin::ProblemSource < ProblemSource
   before_create :naming
 
   # 파일명
@@ -17,7 +17,7 @@ class Admin::ProblemSource < Standard::ProblemSource
     case time
     when 11 then '대학수학능력시험'
     else
-      "#{time}월#{institute_to_s}(#{location_to_s})"
+      "#{time}월/#{institute_to_s}(#{location_to_s})"
     end
   end
 
@@ -44,9 +44,10 @@ class Admin::ProblemSource < Standard::ProblemSource
           when 2 then '가형'
           else        '공통'
           end
-      return '수학' + s
+      s += curriculum == 1 ? '(A형)' : '(B형)' if year == 2014 || year == 2015
+      return '수학_' + s
     else
-      Standard::Subject.find(subject_id).name
+      Subject.find(subject_id).name
     end
   end
 

@@ -6,11 +6,6 @@ class Admin::ProblemCollectionProblemsController < AdminController
     redirect_to @admin_problem_collection
   end
 
-  def list
-    target = Admin::Subject.find(params[:admin_problem][:subject_id])
-    render json: { details: target.details.select(:id, :path).to_json }
-  end
-
   # GET /admin/problems/new
   def new
     @admin_problem = @admin_problem_collection.admin_problems.new(subject_id: params[:subject_id])

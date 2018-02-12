@@ -1,4 +1,4 @@
-class Standard::ProblemImage < ActiveRecord::Base
+class ProblemImage < ActiveRecord::Base
   belongs_to :problem, optional: true
 
   before_destroy :image_clear

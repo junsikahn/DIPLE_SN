@@ -12,7 +12,7 @@ class Admin::ProblemImagesController < AdminController
   def create
     respond_to do |format|
       format.json do
-        admin_problem_image = Standard::ProblemImage.new
+        admin_problem_image = Admin::ProblemImage.new
         admin_problem_image.image = params[:File]
         if admin_problem_image.save
           render json: { status: 200, image: admin_problem_image, url: admin_problem_image.image.url }
@@ -27,6 +27,6 @@ class Admin::ProblemImagesController < AdminController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_admin_problem_image
-    @admin_problem_image = Standard::ProblemImage.find(params[:id])
+    @admin_problem_image = Admin::ProblemImage.find(params[:id])
   end
 end

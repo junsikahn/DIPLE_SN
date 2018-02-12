@@ -1,2 +1,2 @@
-class Admin::Subject < Standard::Subject
+class Admin::Subject < Subject
 end

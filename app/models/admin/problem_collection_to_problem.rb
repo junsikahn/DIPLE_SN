@@ -1,2 +1,2 @@
-class Admin::ProblemCollectionToProblem < Standard::ProblemCollectionToProblem
+class Admin::ProblemCollectionToProblem < ProblemCollectionToProblem
 end

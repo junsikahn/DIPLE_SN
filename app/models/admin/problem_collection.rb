@@ -1,4 +1,4 @@
-class Admin::ProblemCollection < Standard::ProblemCollection
+class Admin::ProblemCollection < ProblemCollection
   attr_accessor :excel
 
   has_many :admin_problems, class_name: 'Admin::Problem', through: :problem_collection_to_problems, source: :problem

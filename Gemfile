@@ -113,6 +113,8 @@ gem 'vuejs-rails'
 gem 'font-awesome-sass'
 
 source 'https://rails-assets.org' do
+  # Promise based HTTP client for the browser and node.js
+  gem 'rails-assets-axios'
   # Rails asset-pipeline gem to provide underscore.js
   gem 'rails-assets-underscore'
   # A browser detector https://github.com/lancedikson/bowser

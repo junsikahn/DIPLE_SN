@@ -13,6 +13,5 @@ div.jumbotron.p-4.mb-3.text-right
         td.text-center == "#{@admin_problem_source.problems.to_a.count{ |problem| problem.updated? }}문항"
         td.text-center == "#{@admin_problem_source.problems.size}문항"
         td.text-center == "#{@admin_problem_source.problems.sum{ |problem| problem.score }}점"
-
-== render '/admin/problems', problems: @admin_problem_source.problems, show_id: false
-= link_to "<i class='fa fa-plus-square'></i> #{@admin_problem_source.problems.size + 1}번 문제 추가".html_safe, new_admin_problem_path(problem_source_id: @admin_problem_source.id, problem_source_order: @admin_problem_source.problems.size + 1), class: 'btn btn-success btn-block'
+== render '/admin/problems', problems: @admin_problem_source.problems_with_details_as_json, show_id: false
+== link_to "<i class='fa fa-plus-square'></i> #{@admin_problem_source.problems.size + 1}번 문제 추가".html_safe, new_admin_problem_path(problem_source_id: @admin_problem_source.id, problem_source_order: @admin_problem_source.problems.size + 1), class: 'btn btn-success btn-block'

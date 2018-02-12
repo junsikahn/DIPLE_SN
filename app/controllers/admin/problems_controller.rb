@@ -4,7 +4,10 @@ class Admin::ProblemsController < AdminController
   # GET /admin/problems
   # GET /admin/problems.json
   def index
-    @admin_problems = Admin::Problem.includes(:subject, :problem_images, :problem_tags, :problem_source).page(params[:page]).per(params[:per])
+    @admin_problems = Admin::Problem.includes({problem_subjects: [:subject]},
+                                              {problem_source_orders: [:problem_source]},
+                                              :problem_images,
+                                              :problem_tags).page(params[:page]).per(params[:per])
   end
 
   # GET /admin/problems/1
@@ -13,7 +16,7 @@ class Admin::ProblemsController < AdminController
     respond_to do |format|
       format.html
       format.json do
-        render json: @admin_problem
+        render json: @admin_problem.with_details_as_json
       end
     end
   end
@@ -79,7 +82,10 @@ class Admin::ProblemsController < AdminController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_admin_problem
-    @admin_problem = Admin::Problem.includes(:subject, :problem_images, :problem_tags, :problem_source).find(params[:id])
+    @admin_problem = Admin::Problem.includes({problem_subjects: [:subject]},
+                                             {problem_source_orders: [:problem_source]},
+                                             :problem_images,
+                                             :problem_tags).find(params[:id])
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

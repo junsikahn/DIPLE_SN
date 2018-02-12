@@ -8,12 +8,8 @@ Rails.application.routes.draw do
     namespace :admin do
       resources :problem_collections do
         patch :publish, on: :member
-        resources :problems, controller: :problem_collection_problems do
-          get :list, on: :collection
-        end
-        resources :problem_sets, controller: :problem_collection_problem_sets do
-          get :list, on: :collection
-        end
+        resources :problems, controller: :problem_collection_problems
+        resources :problem_sets, controller: :problem_collection_problem_sets
       end
       resources :problem_sources do
         post :preview, on: :collection
@@ -28,9 +24,6 @@ Rails.application.routes.draw do
       end
       resources :subjects
 
-      resources :tmp_problems do
-        post :upload, on: :collection
-      end
       resources :users do
         get :report, on: :collection
         get :report_user, on: :member

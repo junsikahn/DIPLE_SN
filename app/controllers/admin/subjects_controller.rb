@@ -1,10 +1,19 @@
 class Admin::SubjectsController < AdminController
-  before_action :set_admin_subject, only: [:edit, :update, :destroy]
+  before_action :set_admin_subject, only: [:show, :edit, :update, :destroy]
 
   # GET /admin/subjects
   # GET /admin/subjects.json
   def index
-    @admin_subjects = Admin::Subject.includes(details: [details: :details]).main_subjects
+    @admin_subjects = Admin::Subject.includes(:problems, details: [
+                                                :problems, details: [
+                                                  :problems, details: [
+                                                    :problems
+                                                  ]
+                                                ]
+                                              ]).main_subjects
+  end
+
+  def show
   end
 
   # GET /admin/subjects/new
@@ -59,7 +68,7 @@ class Admin::SubjectsController < AdminController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_admin_subject
-      @admin_subject = Admin::Subject.find(params[:id])
+      @admin_subject = Admin::Subject.includes(:problems).find(params[:id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

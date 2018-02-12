@@ -158,8 +158,7 @@
     }
     .problem-order { padding: 0.25em 0.7em; background: #000; border: 1px solid #fff; color: #fff; font-weight: bold; }
     .problem-score { padding: 0.25em 0.7em; background: #fff; border: 1px solid lightgrey; }
-    .problem-subject { padding: 0.25em; color: lightgrey; text-align: right; }
-    .problem-level { padding: 0.5em; }
+    .problem-level { padding: 0.25em 0.5em; }
   }
   .problem-wrapper {
     & > div { background: #fff; border: 1px solid lightgrey; border-top: 0; padding: 16px; position: relative; zoom: 1;
@@ -182,9 +181,19 @@
         }
       }
     }
+
+    .problem-subject, .problem-explanation, .problem-answer {
+      &::before { display: block; font-weight: bold; color: grey; text-align: left; margin-bottom: 0.25em; margin-top: -0.25em; }
+    }
     .problem-answer-input { padding: 10px; }
-    .problem-explanation { background: #f1f1f1; }
+    .problem-subject { background: #f1f1f1;
+      &::before { content: '분류'; }
+    }
+    .problem-explanation { background: #f1f1f1;
+      &::before { content: '해설'; }
+    }
     .problem-answer { background: #f1f1f1; padding: 10px 16px; text-align: right;
+      &::before { content: '정답'; margin-top: 0; margin-bottom: -1.5em; }
       .problem-answer-wrapper {
         &::before { content: '정답은 ' } &::after { content: ' 입니다' }
         .problem-answer-seg { display: inline-block; font-weight: bold; min-width: 10px;
@@ -201,27 +210,16 @@
       }
     }
   }
+  .problem-sources { font-size: 0.8em; font-style: italic; }
   .problem-tags { text-align: right; }
 }
 
 .problem-preview {
   .problem-score, .problem-subject, .problem-level i, .problem-answer-wrapper, .problem-answer-input > input { cursor: pointer; }
   .problem-wrapper {
-    .problem-content, .problem-exm-content, .problem-explanation {
-      &:empty::after { content: '내용을 입력해주세요!'; color: lightgrey; }
-    }
     .problem-score, .problem-subject, .problem-content, .problem-exm-wrapper, .problem-answer-input, .problem-explanation, .problem-answer {
       position: relative; cursor: pointer; outline: none; transition: background .25s;
       &:hover, &.is-editing { background-color: rgba(0, 123, 255, .1) !important; }
-      &::before {
-        content: '*';
-        color: red;
-        position: absolute;
-        top: 0;
-        left: 0;
-        padding: 3px;
-        line-height: 1;
-      }
     }
   }
 }
@@ -231,10 +229,7 @@
   blockquote { margin: 0; padding: .75rem; border: 1px solid #e9ecef; background: #fff; }
   .preview-wrapper { max-width: 500px; border: 1px solid lightgrey; border-radius: 5px;
     .preview-header { height: 43px; line-height: 43px; text-align: center; background-color: rgba(0, 0, 0, .03); border-bottom: 1px solid rgba(0, 0, 0, 0.125); }
-    .preview-content { padding: 10px 16px; height: calc(100% - 80px);
-      &:empty::before { content: '내용을 입력해주세요'; color: #ccc; }
-      &:empty::after { content: '*'; color: red; float: right; }
-    }
+    .preview-content { padding: 10px 16px; height: calc(100% - 80px); }
   }
 }
 

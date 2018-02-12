@@ -1,6 +1,6 @@
 class ProblemCollectionHistory < ApplicationRecord
   belongs_to :user
-  belongs_to :problem_collection, class_name: 'Standard::ProblemCollection', counter_cache: :solved_count
+  belongs_to :problem_collection, class_name: 'ProblemCollection', counter_cache: :solved_count
 
   has_many :problem_histories, dependent: :destroy
   accepts_nested_attributes_for :problem_histories

@@ -1,39 +1,108 @@
-table.table.table-hover.table-bordered
-  thead.thead-default
-    tr
-      th.text-center 주요 과목 구분
-      th.text-center colspan="3" 상세 과목 구분
-  - @admin_subjects.each do |admin_subject|
-    tbody onclick='//location.href="#{edit_admin_subject_path(admin_subject.id)}"' style="cursor: pointer;"
-      tr
-        - row_count = admin_subject.details.size + 1
-        - admin_subject.details.each do |depth1|
-          - row_count += depth1.details.size
-          - depth1.details.each do |depth2|
-            - row_count += depth2.details.size
-        td rowspan="#{row_count}" colspan="#{row_count == 1 ? 4 : 1}" style="width: 15%;"
-          span.badge.badge-secondary style="margin-right: 0.5em;" = admin_subject.order
-          = admin_subject.name
-          small.text-muted.float-right = admin_subject.path
-      - admin_subject.details.each do |depth1|
-        tr
-          - row_count = depth1.details.size + 1
-          - depth1.details.each do |depth2|
-            - row_count += depth2.details.size
-          td rowspan="#{row_count}" colspan="#{row_count == 1 ? 3 : 1}" style="width: 20%;"
-            span.badge.badge-secondary style="margin-right: 0.5em;" = depth1.order
-            = depth1.name
-            small.text-muted.float-right = depth1.path
-        - depth1.details.each do |depth2|
+div.jumbotron.p-4.mb-3.text-right
+  h1.text-left.mb-0 과목 목록
+  p.lead.mb-0 =="미분류된 문제수 : #{Problem.where(subject_id: nil).count}개"
+  / = link_to "<i class='fa fa-plus-square'></i> 과목 추가".html_safe, new_admin_subject_path, class: 'btn btn-success'
+
+ul.nav.nav-pills.nav-fill#tab-list role="tablist" aria-orientation="vertical"
+  - @admin_subjects.each do |depth0|
+    - depth0_problems_size = depth0.problems.size
+    - depth0.details.each do |depth1|
+      - depth0_problems_size += depth1.problems.size
+      - depth1.details.each do |depth2|
+        - depth0_problems_size += depth2.problems.size
+        - depth2.details.each do |depth3|
+          - depth0_problems_size += depth3.problems.size
+    li.nav-item
+      a.nav-link data-toggle="tab" role="tab" href="#tab-#{depth0.id}" == "#{depth0.name}(#{depth0_problems_size}문제)"
+div.tab-content.mt-3
+  - @admin_subjects.each do |depth0|
+    div.tab-pane.fade id="tab-#{depth0.id}" role="tabpanel"
+      table.table.table-hover.table-bordered.cursor-pointer
+        thead.thead-default
           tr
-            - row_count = depth2.details.size + 1
-            td rowspan="#{row_count}" colspan="#{row_count == 1 ? 2 : 1}" style="width: 25%;"
-              span.badge.badge-secondary style="margin-right: 0.5em;" = depth2.order
-              = depth2.name
-              small.text-muted.float-right = depth2.path
-          - depth2.details.each do |depth3|
-            tr
-              td style="width: 40%;"
-                span.badge.badge-secondary style="margin-right: 0.5em;" = depth3.order
-                = depth3.name
-                small.text-muted.float-right = depth3.path
+            th.text-center 과목 구분
+            th.text-center.text-nowrap 문제
+            th.text-center.text-nowrap
+              i.fa.fa-exclamation
+        tbody
+          - depth0.details.each do |depth1|
+            tr.rowlink.bg-secondary data-href="#{admin_subject_path(depth1)}"
+              td
+                div.d-flex.justify-content-between.align-items-center.pr-1.pl-1
+                  div
+                    span.badge.badge-dark.mr-1 1
+                    span.badge.badge-secondary.mr-1 = depth1.order
+                    = depth1.name
+                  small.text-muted = depth1.path
+              - depth1_problems_size = depth1.problems.size
+              - depth1.details.each do |depth2|
+                - depth1_problems_size += depth2.problems.size
+                - depth2.details.each do |depth3|
+                  - depth1_problems_size += depth3.problems.size
+              td.text-center.text-nowrap = "#{depth1_problems_size}문제"
+              td.text-center.text-nowrap = "#{depth1.problems.size.zero? ? '' : 'X'}"
+            - depth1.details.each do |depth2|
+              tr.rowlink.bg-light data-href="#{admin_subject_path(depth2)}"
+                td
+                  div.d-flex.justify-content-between.align-items-center.pr-1.pl-4
+                    div
+                      span.badge.badge-dark.mr-1 2
+                      span.badge.badge-secondary.mr-1 = depth2.order
+                      = depth2.name
+                    small.text-muted = depth2.path
+                - depth2_problems_size = depth2.problems.size
+                - depth2.details.each do |depth3|
+                  - depth2_problems_size += depth3.problems.size
+                td.text-center.text-nowrap = "#{depth2_problems_size}문제"
+                td.text-center.text-nowrap = "#{depth2.problems.size.zero? ? '' : 'X'}"
+              - depth2.details.each do |depth3|
+                tr.rowlink data-href="#{admin_subject_path(depth3)}"
+                  td
+                    div.d-flex.justify-content-between.align-items-center.pr-1.pl-5
+                      div
+                        span.badge.badge-dark.mr-1 3
+                        span.badge.badge-secondary.mr-1 = depth3.order
+                        = depth3.name
+                      small.text-muted = depth3.path
+                  td.text-center.text-nowrap = "#{depth3.problems.size}문제"
+                  td
+            / tr
+            /   - row_count = depth0.details.size + 1
+            /   - depth0.details.each do |depth1|
+            /     - row_count += depth1.details.size
+            /     - depth1.details.each do |depth2|
+            /       - row_count += depth2.details.size
+            /   td rowspan="#{row_count}" colspan="#{row_count == 1 ? 4 : 1}" style="width: 15%;"
+            /     span.badge.badge-secondary style="margin-right: 0.5em;" = depth0.order
+            /     = depth0.name
+            /     small.text-muted.float-right = depth0.path
+            / - depth0.details.each do |depth1|
+            /   tr
+            /     - row_count = depth1.details.size + 1
+            /     - depth1.details.each do |depth2|
+            /       - row_count += depth2.details.size
+            /     td rowspan="#{row_count}" colspan="#{row_count == 1 ? 3 : 1}" style="width: 20%;"
+            /       span.badge.badge-secondary style="margin-right: 0.5em;" = depth1.order
+            /       = depth1.name
+            /       small.text-muted.float-right = depth1.path
+            /   - depth1.details.each do |depth2|
+            /     tr
+            /       - row_count = depth2.details.size + 1
+            /       td rowspan="#{row_count}" colspan="#{row_count == 1 ? 2 : 1}" style="width: 25%;"
+            /         span.badge.badge-secondary style="margin-right: 0.5em;" = depth2.order
+            /         = depth2.name
+            /         small.text-muted.float-right = depth2.path
+            /     - depth2.details.each do |depth3|
+            /       tr
+            /         td style="width: 40%;"
+            /           span.badge.badge-secondary style="margin-right: 0.5em;" = depth3.order
+            /           = depth3.name
+            /           small.text-muted.float-right = depth3.path
+
+javascript:
+  $(document).ready(function() {
+    $('#tab-list li:last-child a').tab('show');
+    $('.rowlink').on('click', function() {
+      window.location = $(this).data('href');
+    });
+  });

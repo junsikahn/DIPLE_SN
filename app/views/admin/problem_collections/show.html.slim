@@ -32,7 +32,9 @@ table.table.table-hover.table-bordered
           = link_to "발행".html_safe, publish_admin_problem_collection_path(@admin_problem_collection), class: 'btn btn-block btn-success', method: :patch
 
 h3 포함 문제
-== render '/admin/problems', problems: @admin_problem_collection.problems, show_id: false
+- problems = []
+- @admin_problem_collection.problems.each { |admin_problem| problems << admin_problem.with_details_as_json }
+== render '/admin/problems', problems: problems, show_id: false
 /
 / - solved_users = @users.select{|u| !u.score.nil? }
 / - unsolved_users = @users.select{|u| u.score.nil? }

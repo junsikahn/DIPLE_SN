@@ -89,8 +89,10 @@ module ConvertHwp
       end
     end
     units.push(text)
+    result = []
+    order = 0
 
-    units.each_with_index do |unit, index|
+    units.each do |unit|
       answer_set = nil
       unit = unit.gsub(/\n[ ]+/, "\n")
 
@@ -100,6 +102,7 @@ module ConvertHwp
       split_3 = split_2[1].split('[문항코드]')
       split_4 = split_3[1].split('[분류체계]')
       split_5 = split_4[1].split('[해설]')
+      split_5 = split_4[1].split('[해석]') if split_5.length == 1
 
       if split_2[0] =~ /[①②③④⑤]/
         question = ''
@@ -111,6 +114,7 @@ module ConvertHwp
         tmp_set = split_1[0].split("\n")
         answer_set = tmp_set[(tmp_set.length - 5)..(tmp_set.length - 1)]
         for i in 0..(tmp_set.length - 6) do
+          next if tmp_set[i].blank?
           question += tmp_set[i] + "\n"
         end
       else
@@ -124,21 +128,21 @@ module ConvertHwp
 
       explanation = split_5[1]
 
-      units[index] = { score: score,
-                       year: year,
-                       content: to_html(question.strip),
-                       exm_1: answer_set ? answer_set[0] : nil,
-                       exm_2: answer_set ? answer_set[1] : nil,
-                       exm_3: answer_set ? answer_set[2] : nil,
-                       exm_4: answer_set ? answer_set[3] : nil,
-                       exm_5: answer_set ? answer_set[4] : nil,
-                       answer: answer,
-                       explanation: to_html(explanation.strip),
-                       problem_source_order: index += 1,
-                       is_objective: answer_set ? true : false }
+      result.push({ score: score,
+                    year: year,
+                    content: to_html(question.strip),
+                    exm_1: answer_set ? answer_set[0] : nil,
+                    exm_2: answer_set ? answer_set[1] : nil,
+                    exm_3: answer_set ? answer_set[2] : nil,
+                    exm_4: answer_set ? answer_set[3] : nil,
+                    exm_5: answer_set ? answer_set[4] : nil,
+                    answer: answer,
+                    explanation: to_html(explanation.strip),
+                    problem_source_order: order += 1,
+                    is_objective: answer_set ? true : false })
     end
 
-    return units
+    return result
   end
 
   def self.convert_table(doc, table_node)

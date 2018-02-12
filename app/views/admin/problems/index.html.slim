@@ -2,6 +2,8 @@ div.jumbotron.p-4.mb-3.text-right
   h1.text-left 문제 목록
   = link_to "<i class='fa fa-plus-square'></i> 문제 추가".html_safe, new_admin_problem_path, class: 'btn btn-success'
 
-== render '/admin/problems', problems: @admin_problems, show_id: true
+- problems = []
+- @admin_problems.each { |admin_problem| problems << admin_problem.with_details_as_json }
+== render '/admin/problems', problems: problems, show_id: true
 
 = paginate @admin_problems, views_prefix: 'admin'

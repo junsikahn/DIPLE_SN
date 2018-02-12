@@ -10,11 +10,11 @@ class CreateProblemTag < ActiveRecord::Migration[5.0]
 
     change_column :problem_collections, :problem_source_id, :integer, null: true
     # 문/이과 구분 - 공통과정 0, 이과 1, 문과 2
-    add_column :problem_collections, :curriculum, :integer
-    e = Standard::ProblemCollection.where('name LIKE ?', "%나형%")
-    e.update_all(curriculum: 1)
-    m = Standard::ProblemCollection.where('name LIKE ?', "%가형%")
-    m.update_all(curriculum: 2)
+    # add_column :problem_collections, :curriculum, :integer
+    # e = ProblemCollection.where('name LIKE ?', "%나형%")
+    # e.update_all(curriculum: 1)
+    # m = ProblemCollection.where('name LIKE ?', "%가형%")
+    # m.update_all(curriculum: 2)
 
     remove_attachment :problems, :audio
     change_column :problems, :subject_id, :integer, null: true
@@ -27,10 +27,10 @@ class CreateProblemTag < ActiveRecord::Migration[5.0]
     add_column :tmp_problems, :level, :integer
     add_column :tmp_problems, :problem_id, :integer
     add_column :tmp_problems, :problem_source_id, :integer
-    sources = Standard::ProblemSource.all
-    sources.each do |source|
-      Admin::TmpProblem.where(title: source.name).update_all(problem_source_id: source.id)
-    end
+    # sources = ProblemSource.all
+    # sources.each do |source|
+    #   Admin::TmpProblem.where(title: source.name).update_all(problem_source_id: source.id)
+    # end
   end
 
   def down

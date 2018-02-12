@@ -22,9 +22,9 @@ class CreateProblemImage < ActiveRecord::Migration[5.0]
     add_column :problem_sources, :grade, :integer
 
 
-    # Standard::Problem.where('exm_1 = "" OR exm_1 IS NULL').update_all(is_objective: false)
+    # Problem.where('exm_1 = "" OR exm_1 IS NULL').update_all(is_objective: false)
     #
-    # Standard::ProblemSource.all.each do |source|
+    # ProblemSource.all.each do |source|
     #   info = source.name.split('_')
     #   source.year = info[0][0..3].to_i
     #   source.time = info[1] == '대학수학능력시험' ? 11 : info[1][0].to_i
@@ -34,7 +34,7 @@ class CreateProblemImage < ActiveRecord::Migration[5.0]
     #   source.save
     # end
 
-    # Standard::ProblemSource.all.each do |source|
+    # ProblemSource.all.each do |source|
     #   new_name = []
     #   new_name.push "#{source.year}학년도"
     #   new_name.push source.time == 11 ? '대학수학능력시험' : "#{source.time}월"

@@ -1,8 +1,8 @@
 class ProblemHistory < ApplicationRecord
   belongs_to :user
-  belongs_to :subject, class_name: 'Standard::Subject'
-  belongs_to :problem, class_name: 'Standard::Problem', counter_cache: :total_count
-  belongs_to :problem_collection, class_name: 'Standard::ProblemCollection'
+  belongs_to :subject, class_name: 'Subject'
+  belongs_to :problem, class_name: 'Problem', counter_cache: :total_count
+  belongs_to :problem_collection, class_name: 'ProblemCollection'
   belongs_to :problem_collection_history, optional: true
 
   validate :check_answer

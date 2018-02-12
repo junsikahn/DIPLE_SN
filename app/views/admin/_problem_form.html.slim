@@ -27,13 +27,12 @@ div#problem-edit v-cloak=true
             tr
               td.p-0
                 div.problem-container.problem-preview
-                  div.problem-info.d-flex.justify-content-between.align-items-end
-                    div.d-inline-flex.mb-1
+                  div.problem-info.d-flex.justify-content-between.align-items-center.mb-1
+                    div.d-inline-flex
                       span.problem-order.text-nowrap v-text="problem.order == undefined ? (problem.id ? 'ID ' + problem.id  : 'NEW') : problem.order + '번'"
+                    div.d-inline-flex
                       span.problem-score.text-nowrap @click="inputScore()" v-text="problem.score + '점'"
-                    div.d-inline-flex.mb-1.justify-content-end.align-items-end
-                      span.problem-subject @click="openSubjectModal" :class='{ "text-danger": !problem.subject_id }' v-text="problem.subject_id ? problem.subject.path : '미분류'"
-                      span.problem-level.d-flex.bg-light.text-warning
+                      span.problem-level.bg-light.text-warning.d-inline-flex.align-items-center
                         i.fa :class="[ problem.level >= 1 ? 'fa-star' : 'fa-star-o' ]" @mousedown.prevent="inputLevel($event, 1)" @mousemove="inputLevel($event, 1)"
                         i.fa :class="[ problem.level >= 2 ? 'fa-star' : 'fa-star-o' ]" @mousedown.prevent="inputLevel($event, 2)" @mousemove="inputLevel($event, 2)"
                         i.fa :class="[ problem.level == 3 ? 'fa-star' : 'fa-star-o' ]" @mousedown.prevent="inputLevel($event, 3)" @mousemove="inputLevel($event, 3)"
@@ -41,10 +40,15 @@ div#problem-edit v-cloak=true
                     div.problem-content v-html="problem.content" @click="openEditorModal('content')" :class="{ 'is-editing': focusInput == 'content' }"
                     div.problem-exm v-if="problem.is_objective"
                       div.problem-exm-wrapper v-for="(exm, index) in [problem.exm_1, problem.exm_2, problem.exm_3, problem.exm_4, problem.exm_5]" :key="index" @click="openEditorModal('exm_' + (index + 1))" :class="[ { 'is-editing': focusInput == 'exm_' + (index + 1) }, { 'active': problem.answer == index + 1 }, exm_arrangement ]"
-                        span.problem-exm-index :class="{ 'active': problem.answer == index + 1 }" @click.stop="inputAnswer(index + 1)" {{ index + 1 }}
+                        span.problem-exm-index :class="{ 'active': problem.answer == index + 1 }" @click.stop="inputAnswer(index + 1)" v-text="index + 1"
                         span.problem-exm-content v-html="exm" ref="problemExmContent"
                     div.problem-answer-input v-else="!problem.is_objective"
                       input.form-control type="text" readonly="true" :value="problem.answer" @click="inputAnswer()"
+                    div.problem-subject @click="openSubjectModal" v-if="show_explanation"
+                      div v-if="problem.problem_subjects.length == 0"
+                        span.text-danger 분류정보 없음
+                      div v-else="" v-for="problem_subject in problem.problem_subjects" :key="problem_subject.subject_id"
+                        span v-text='problem_subject.subject.path'
                     div.problem-explanation v-html="problem.explanation" @click="openEditorModal('explanation')" :class="{ 'is-editing': focusInput == 'explanation' }" v-if="show_explanation"
                     div.problem-answer :class="[{ 'is-editing': focusInput == 'answer' }, { 'is-objective': problem.is_objective }]" @click="inputAnswer()" v-if="show_explanation"
                       i.fa.fa-caret-right.mr-1
@@ -58,16 +62,18 @@ div#problem-edit v-cloak=true
                         span<> v-html="'⑤ ' + problem.exm_5_ratio + '<small>%</small>'" :class="{ 'font-weight-bold text-dark under-border': problem.answer == 5 }"
                       div.problem-ratio v-if="!problem.is_objective && !validation.hasError('problem.correct_ratio')"
                         span v-html="problem.correct_ratio + '<small>%</small>'"
-                  div.problem-info.d-flex.justify-content-between.align-items-start
-                    div.problem-source
-                      div.text-muted.mt-1.pl-2.pr-2 v-if="!validation.hasError('problem.problem_source_id')"
-                        i.fa.fa-caret-right.mr-1
-                        span v-text="problem.problem_source ? '출처 : ' + problem.problem_source.name : ''"
-                        span v-text="problem.problem_source_order ? ' - ' + problem.problem_source_order + '번' : ''"
-                    div.text-muted.mt-1.pl-2.pr-2
+                  div.problem-sources.d-flex.justify-content-start.align-items-start.text-muted.mt-1.pl-3.pr-3 v-if="problem.problem_source_orders"
+                    div.mr-2.text-nowrap
+                      i.fa.fa-caret-right.mr-1
+                      b 출제이력
+                    div.w-100
+                      div v-if="problem.problem_source_orders.length == 0"
+                        span 없음
+                      div v-else="" v-for="problem_source_order in problem.problem_source_orders" :key="problem_source_order.id"
+                        span v-text='problem_source_order.problem_source.name + " / " + problem_source_order.order + "번"'
                   tag-input inline-template="true" :problem="problem" ref="tagInputComponent"
                     div.problem-tags v-if="problem.problem_tags"
-                      a.badge.badge-secondary.mt-1.mr-1 v-for="tag in problem.problem_tags" :key="tag.id" href="#" @click.prevent="remove(tag)" {{ tag.name }}
+                      a.badge.badge-secondary.mt-1.mr-1 v-for="tag in problem.problem_tags" :key="tag.id" href="#" @click.prevent="remove(tag)" v-text="tag.name"
                       div.text-right
                         a.badge.badge-success.mt-1.mr-1 href="#" @click.prevent="open" v-show="!is_opened" == "#{icon 'plus'} 추가"
                         a.badge.badge-light.mt-1.mr-1 href="#" @click.prevent="close" v-show="is_opened" == "닫기 #{icon 'remove'}"
@@ -77,12 +83,12 @@ div#problem-edit v-cloak=true
                             span.input-group-addon.text-muted: i.fa :class="[ is_loading ? 'fa-spinner fa-spin' : 'fa-plus' ]"
                           div.dropdown-menu.w-100.p-0 ref="tagSearchResult"
                             a.dropdown-item.pl-3.pr-3.text-info v-if="keyword.length == 0" href="#" @click.prevent="" 추가할 태그를 입력해주세요
-                            a.dropdown-item.pl-3.pr-3.text-muted v-else-if="is_loading" href="#" @click.prevent="" {{ '[' + keyword + '] 를 DB에서 검색중...' }}
+                            a.dropdown-item.pl-3.pr-3.text-muted v-else-if="is_loading" href="#" @click.prevent="" v-text="'[' + keyword + '] 를 DB에서 검색중...'"
                             a.dropdown-item.pl-3.pr-3.text-danger v-else-if="search_results.length == 0" href="#" @click.prevent="" 이미 추가된 태그 키워드입니다
                             a.dropdown-item.pl-3.pr-3 v-else="" v-for="(tag, index) in search_results" :key="tag.name" href="#" @click.prevent="save(tag)" :class="{ 'bg-hover font-weight-bold': index == selected }"
                               div.d-flex.align-items-center.justify-content-between
-                                span {} {{ tag.name }}
-                                span.badge.badge-info.ml-2 style="font-size: 0.5em;" v-if="tag.id" {{ tag.refer_count + '회' }}
+                                span v-text="tag.name"
+                                span.badge.badge-info.ml-2 style="font-size: 0.5em;" v-if="tag.id" v-text="tag.refer_count + '회'"
                                 span.badge.badge-danger.ml-2 style="font-size: 0.5em;" v-else="" NEW
       div.col
         table.table.table-bordered
@@ -100,11 +106,10 @@ div#problem-edit v-cloak=true
             tr
               td
                 div.row
-                  div.col.mb-0.pr-0
-                    = f.input :subject_id, label: '과목', wrapper_html: { class: 'mb-0' }, input_html: { class: 'd-none', 'v-model': 'problem.subject_id' }
-                    div.input-group.cursor-pointer @click.stop="openSubjectModal"
-                      input.form-control.bg-white.cursor-pointer type="text" placeholder="과목 검색" :value="problem.subject_id ? problem.subject.name : null" :class="{ 'border-danger': validation.hasError('problem.subject_id') }" @focus.stop="openSubjectModal"
-                  div.col.mb-0.pl-2.pr-2
+                  div.col.mb-0.pr-2
+                    = f.input :year, collection: 1990..Date.today.year,
+                              label: '출제년도', input_html: { 'v-model': 'problem.year' }
+                  div.col.mb-0.pl-0.pr-2
                     = f.input :score, label: '점수', wrapper_html: { class: 'mb-0' }, input_html: { 'v-model.number': 'problem.score', ':class': "{ 'border-danger': validation.hasError('problem.score') }", class: 'text-right', min: 0 }
                   div.col.mb-0.pl-0
                     = f.input :level, label: '난이도', wrapper_html: { class: 'mb-0' }, input_html: { class: 'd-none', 'v-model': 'problem.level' }
@@ -112,6 +117,11 @@ div#problem-edit v-cloak=true
                       button.btn.w-100 :class="[ {'btn-outline-danger': validation.hasError('problem.level') }, problem.level == 1 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.level = 1" 하
                       button.btn.w-100 :class="[ {'btn-outline-danger': validation.hasError('problem.level') }, problem.level == 2 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.level = 2" 중
                       button.btn.w-100 :class="[ {'btn-outline-danger': validation.hasError('problem.level') }, problem.level == 3 ? 'btn-secondary' : 'btn-outline-secondary' ]" @click.prevent="problem.level = 3" 상
+            / tr
+            /   td
+            /     = f.input :subject_id, label: '과목', wrapper_html: { class: 'mb-0' }, input_html: { class: 'd-none', 'v-model': 'problem.subject_id' }
+            /     div.input-group.cursor-pointer @click.stop="openSubjectModal"
+            /       input.form-control.bg-white.cursor-pointer type="text" placeholder="과목 검색" :value="problem.subject_id ? problem.subject.name : null" :class="{ 'border-danger': validation.hasError('problem.subject_id') }" @focus.stop="openSubjectModal"
             tr
               td
                 = f.input :content,
@@ -142,11 +152,11 @@ div#problem-edit v-cloak=true
               td
                 label 문항별 선택률
                 div.input-group
-                  = f.input :exm_1_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_1_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_1_ratio') }, { 'font-weight-bold': problem.answer == 1 }]", min: 0, max: 100, step: 1, class: 'text-right border-right-0', '@input': 'inputExmRatio' }
-                  = f.input :exm_2_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_2_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_2_ratio') }, { 'font-weight-bold': problem.answer == 2 }]", min: 0, max: 100, step: 1, class: 'text-right border-right-0', '@input': 'inputExmRatio' }
-                  = f.input :exm_3_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_3_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_3_ratio') }, { 'font-weight-bold': problem.answer == 3 }]", min: 0, max: 100, step: 1, class: 'text-right border-right-0', '@input': 'inputExmRatio' }
-                  = f.input :exm_4_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_4_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_4_ratio') }, { 'font-weight-bold': problem.answer == 4 }]", min: 0, max: 100, step: 1, class: 'text-right border-right-0', '@input': 'inputExmRatio' }
-                  = f.input :exm_5_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_5_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_5_ratio') }, { 'font-weight-bold': problem.answer == 5 }]", min: 0, max: 100, step: 1, class: 'text-right' }
+                  = f.input :exm_1_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_1_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_1_ratio') }, { 'font-weight-bold border-secondary' : problem.answer == 1 }, { 'border-right-0' : problem.answer > 1 }, { 'border-left-0' : problem.answer < 1 } ]", min: 0, max: 100, step: 1, class: 'text-right', '@input': 'inputExmRatio' }
+                  = f.input :exm_2_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_2_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_2_ratio') }, { 'font-weight-bold border-secondary' : problem.answer == 2 }, { 'border-right-0' : problem.answer > 2 }, { 'border-left-0' : problem.answer < 2 } ]", min: 0, max: 100, step: 1, class: 'text-right', '@input': 'inputExmRatio' }
+                  = f.input :exm_3_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_3_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_3_ratio') }, { 'font-weight-bold border-secondary' : problem.answer == 3 }, { 'border-right-0' : problem.answer > 3 }, { 'border-left-0' : problem.answer < 3 } ]", min: 0, max: 100, step: 1, class: 'text-right', '@input': 'inputExmRatio' }
+                  = f.input :exm_4_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_4_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_4_ratio') }, { 'font-weight-bold border-secondary' : problem.answer == 4 }, { 'border-right-0' : problem.answer > 4 }, { 'border-left-0' : problem.answer < 4 } ]", min: 0, max: 100, step: 1, class: 'text-right', '@input': 'inputExmRatio' }
+                  = f.input :exm_5_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_5_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_5_ratio') }, { 'font-weight-bold border-secondary' : problem.answer == 5 }, { 'border-right-0' : problem.answer > 5 }, { 'border-left-0' : problem.answer < 5 } ]", min: 0, max: 100, step: 1, class: 'text-right', '@input': 'inputExmRatio' }
             tr v-show="!problem.is_objective"
               td
                 = f.input :correct_ratio, label: '정답률', input_html: { 'v-model.number': 'problem.correct_ratio', placeholder: '%', ':class': "{ 'border-danger': validation.hasError('problem.correct_ratio') }", min: 0, max: 100, step: 1, class: 'text-right' }
@@ -156,56 +166,164 @@ div#problem-edit v-cloak=true
                           input_html: { rows: '1', 'v-model.trim': 'problem.explanation', ':class': "{ 'border-danger': validation.hasError('problem.explanation') }", '@focus': 'focusInput = "explanation"', '@blur': 'focusInput = null' }
             tr
               td
-                div.row
-                  div.col-9
-                    = f.input :problem_source_id, label: '출처 / 출처번호', wrapper_html: { class: 'mb-0' }, input_html: { class: 'd-none', 'v-model': 'problem.problem_source_id' }
-                    = f.input :problem_source_order, wrapper_html: { class: 'd-none mb-0' }, input_html: { 'v-model': 'problem.problem_source_order' }
-                    div.input-group.cursor-pointer @click.stop="openSourceModal"
-                      input.form-control.bg-white.cursor-pointer type="text" placeholder="출처 검색" :value="problem.problem_source_id ? problem.problem_source.name + ' / ' + problem.problem_source_order + '번' : ''" :class="{ 'border-danger': validation.hasError('problem.problem_source_id') }" @focus.stop="openSourceModal"
-                  div.col-3.pl-0
-                    = f.input :year, collection: 1990..Date.today.year,
-                              label: '출제년도', input_html: { 'v-model': 'problem.year' }
+                source-modal inline-template="true" :problem="problem" ref="sourceModalComponent"
+                  div
+                    label 문제 출처
+                    ul.list-group.text-muted
+                      li.list-group-item.d-flex.justify-content-between.align-items-center.p-2.pl-3.pr-3 v-for="problem_source_order in problem.problem_source_orders" :key="problem_source_order.id"
+                        span v-text='problem_source_order.problem_source.name + " / " + problem_source_order.order + "번"'
+                      li.list-group-item.p-2.pl-3.pr-3.text-center.list-group-item-action.list-group-item-secondary.cursor-pointer @click="openModal"
+                        span v-text='"+ 출처 추가/변경/삭제"'
+                    div.modal role="dialog" data-backdrop="static" ref="sourceModal"
+                      div.modal-dialog.modal-lg role="document"
+                        div.modal-content
+                          div.modal-header
+                            h5.modal-title 출처 입력하기
+                            button.close type="button" data-dismiss="modal" aria-label="Close"
+                              span aria-hidden="true" &times;
+                          div.modal-body
+                            ul.list-group.text-muted.w-100
+                              li.list-group-item.d-flex.justify-content-between.align-items-center.p-2.pl-3.pr-3 v-for="problem_source_order in added" :key="problem_source_order.id"
+                                span v-text='problem_source_order.problem_source.name + " / " + problem_source_order.order + "번"'
+                                a.badge.badge-danger.cursor-pointer href="#" @click.prevent="remove(problem_source_order)"
+                                  i.fa.fa-trash
+                              li.list-group-item.list-group-item-secondary.list-group-item-action.p-2.pl-3.pr-3.text-center.cursor-pointer @click="step = 1" :key="'add'" v-if="step == 0"
+                                span v-text='"+ 출처 추가"'
+                              li.list-group-item.list-group-item-secondary.p-3 :key="'adding'" v-if="step > 0"
+                                div.d-flex.justify-content-between.align-items-center
+                                  h6.pl-1.mb-0
+                                    i.fa> :class="[ tmp_source.problem_source_id ? 'fa-check text-success' : 'fa-exclamation-triangle text-danger' ]"
+                                    span< v-text='tmp_source.problem_source_id ? tmp_source.problem_source.name : "STEP 1. 출처 선택"'
+                                  div.d-inline-flex
+                                    a.badge.badge-secondary href="#" @click.prevent="tmp_source.problem_source_id = null, tmp_source.problem_source = {}, step = 1" v-show="step != 1 && tmp_source.problem_source_id"
+                                      span> 다시 선택
+                                      i.fa.fa-refresh
+                                div.row.mt-2 v-show="step == 1"
+                                  div.col-8
+                                    div.border.border-dark.rounded style="max-height: 180px; overflow: hidden"
+                                      div style="max-height: 178px; overflow: scroll"
+                                        table.table.table-sm.table-hover.cursor-pointer
+                                          tr v-show="filtered.length == 0"
+                                            td.text-center.text-muted 검색결과가 없습니다
+                                          tr v-for="(source, index) in filtered" :key="source.id" @click="selectSource(source)" :class="[ tmp_source.problem_source_id == source.id ? 'bg-dark text-white' : '' ]"
+                                            td
+                                              div.d-flex.align-items-center.justify-content-between.pl-2.pr-2
+                                                span v-text="source.name"
+                                    div.d-flex.justify-content-between
+                                      div
+                                        span.badge.badge-secondary
+                                          i.fa.fa-filter
+                                          span< v-text='filtered.length + "개"'
+                                      div
+                                        a.badge.badge-secondary.ml-2 href="#" @click.prevent="filter.year = null" v-show="filter.year"
+                                          span> v-text='filter.year + "학년도"'
+                                          i.fa.fa-remove
+                                        a.badge.badge-secondary.ml-2 href="#" @click.prevent="filter.time = null" v-show="filter.time"
+                                          span> v-text='filter.time == 11 ? "대학수학능력시험" : filter.time + "월"'
+                                          i.fa.fa-remove
+                                        a.badge.badge-secondary.ml-2 href="#" @click.prevent="filter.curriculum = null" v-show="filter.curriculum"
+                                          span> v-text='filter.curriculum == 1 ? "나형" : "가형"'
+                                          i.fa.fa-remove
+                                        a.badge.badge-dark.ml-2 href="#" @click.prevent="initFilter" v-show="filtered.length < sources.length"
+                                          span> v-text='"필터 해제"'
+                                          i.fa.fa-remove
+                                  div.col-4.pl-0
+                                    div.form-inline.mb-1
+                                      label.col-3.m-0 연도
+                                      select.col-9.form-control v-model="filter.year"
+                                        option value="" disabled=true selected=true 연도
+                                        option v-for="year in years" :key="year" :value="year" v-text="year + '학년도'"
+                                    div.form-inline.mb-1
+                                      label.col-3.m-0 시기
+                                      select.col-9.form-control v-model="filter.time"
+                                        option value="" disabled=true selected=true 시기
+                                        option v-for="time in times" :key="time" :value="time" v-text="time == 11 ? '대학수학능력시험' : time + '월'"
+                                    div.form-inline.mb-1
+                                      label.col-3.m-0 과목
+                                      select.col-9.form-control disabled=true v-model="filter.subject_id"
+                                        option value="3" selected=true 수학
+                                    div.form-inline.mb-1
+                                      label.col-3.m-0 과정
+                                      select.col-9.form-control v-model="filter.curriculum"
+                                        option value="" disabled=true selected=true 과정
+                                        option value="2" 가형
+                                        option value="1" 나형
+                                    div.form-inline
+                                      label.col-3.m-0 학년
+                                      select.col-9.form-control disabled=true v-model="filter.grade"
+                                        option value="3" selected=true 고3
+                                hr
+                                div.d-flex.justify-content-between.align-items-center
+                                  h6.pl-1.mb-0
+                                    i.fa> :class="[ tmp_source.order ? 'fa-check text-success' : 'fa-exclamation-triangle text-danger' ]"
+                                    span< v-text='tmp_source.order ? tmp_source.order + "번" : "STEP 2. 문제번호 선택"'
+                                  div.d-inline-flex
+                                    a.badge.badge-secondary href="#" @click.prevent="step = 2" v-show="step != 2 && tmp_source.order"
+                                      span> 다시 선택
+                                      i.fa.fa-refresh
+                                div.border.border-dark.rounded.mt-2 style="overflow: hidden" v-show="step == 2"
+                                  table.table.table-sm
+                                    tr v-for="rowIndex in _.range(0, 3)" :key="rowIndex"
+                                      td v-for="colIndex in _.range(rowIndex * 10 + 1, (rowIndex + 1) * 10 + 1)" :key="colIndex"
+                                        div.btn.btn-block :class="[ tmp_source.order == colIndex ? 'btn-dark' : 'btn-outline-dark' ]" @click.prevent="selectOrder(colIndex)" v-text="colIndex + '번'"
+                                hr
+                                div.d-flex.justify-content-between.align-items-center
+                                  h6.pl-1.mb-0
+                                    i.fa> :class="[ step == 3 ? 'fa-check text-success' : 'fa-exclamation-triangle text-danger' ]"
+                                    span> v-text='tmp_source.problem_source_id ? tmp_source.problem_source.name : "출처를 선택해주세요"'
+                                    | /
+                                    span< v-text='tmp_source.order ? tmp_source.order + "번" : "문제번호를 선택해주세요"'
+                                  div.d-inline-flex
+                                    a.badge.badge-success.mr-2 href="#" @click.prevent="add"
+                                      span> 추가
+                                      i.fa.fa-plus
+                                    a.badge.badge-secondary href="#" @click.prevent="step = 0"
+                                      span> 취소
+                                      i.fa.fa-remove
+                          div.modal-footer
+                            button.btn.btn-block.btn-secondary type="button" data-dismiss="modal" 취소
+                            button.btn.btn-block.btn-primary.mt-0 type="button" @click="save" 저장
             tr
               td
                 = f.hidden_field :problem_image_ids, ':value': 'problem_image_ids'
                 = f.hidden_field :problem_tag_ids, ':value': 'problem_tag_ids'
                 = f.button :button, '저장', class: 'btn-block', ':class': '[ readySubmit ? "btn-success" : readySave ? "text-light btn-warning" : "btn-secondary" ]', '@click.prevent': 'saveProblem', data: { disable_with: "<i class='fa fa-spinner fa-spin'/>" }
-  subject-modal inline-template="true" :problem="problem" ref="subjectModalComponent"
-    div.modal role="dialog" data-backdrop="static" ref="subjectModal"
-      div.modal-dialog.modal-lg role="document" style="min-width: 1050px; max-width: 90%;"
-        div.modal-content
-          div.modal-header
-            h5.modal-title 과목 입력하기
-            button.close type="button" data-dismiss="modal" aria-label="Close"
-              span aria-hidden="true" &times;
-          div.modal-body
-            div.border.border-info.rounded.pt-2.pb-2.pl-3.pr-3.mb-2
-              div.text-muted v-if="!problem.subject_id" 현재 설정된 과목이 없습니다
-              div v-else=""
-                span.badge.badge-dark.mr-1 {} {{ problem.subject.depth }}
-                span.badge.badge-info.mr-2 {} {{ problem.subject.order }}
-                span.font-weight-bold.text-info {} {{ problem.subject.name }}
-                br
-                small.text-muted {} {{ problem.subject.path }}
-            div.input-group.mt-2
-              span.input-group-addon.text-muted: i.fa.fa-search
-              input.form-control ref="subjectModalInput" placeholder="과목 검색하기" autofocus="true" :value="keyword" @input="typing" @keydown.esc.stop="reset" @keydown.enter.prevent="enter" @keydown.up.prevent="move(false)" @keydown.down.prevent="move(true)"
-              div style="position: absolute; top: 50%; margin-top: -7px; right: 7px; z-index: 100; font-size: 0.5em;"
-                kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length > 0 && filtered.length == 0 }" == "#{icon 'caret-up'}"
-                kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length > 0 && filtered.length == 0 }" == "#{icon 'caret-down'}"
-                kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length > 0 && filtered.length == 0 }" Enter:저장
-                kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length == 0 }" ESC:리셋
-            div.mt-2 style="max-height: calc(100vh - 280px); overflow-y: scroll;"
-              div.jumbotron.mb-0.text-center.text-muted v-show="filtered.length == 0" 검색결과가 없습니다
-              table.table.table-sm.table-bordered.mb-0.cursor-pointer
-                tr v-for="(subject, index) in filtered" :key="subject.id" :class="[ subject.depth == 1 ? 'bg-secondary' : (subject.depth == 2 ? 'bg-light' : '') ]"
-                  td @click="save(subject)" @mouseover="selected = index" :class='{ "bg-hover font-weight-bold": index == selected }'
-                    div.d-flex.align-items-center.justify-content-between.pr-1 :class="[ subject.depth == 1 ? 'pl-1' : (subject.depth == 2) ? 'pl-4' : 'pl-5' ]"
-                      div
-                        span.badge.badge-dark.mr-1 {} {{ subject.depth }}
-                        span.badge.badge-secondary.mr-2 :class='{ "badge-info": problem.subject_id == subject.id }' {{ subject.order }}
-                        span :class='{ "text-info": problem.subject_id == subject.id }' {{ subject.name }}
-                      small.text-muted {} {{ subject.path }}
+  / subject-modal inline-template="true" :problem="problem" ref="subjectModalComponent"
+  /   div.modal role="dialog" data-backdrop="static" ref="subjectModal"
+  /     div.modal-dialog.modal-lg role="document" style="min-width: 1050px; max-width: 90%;"
+  /       div.modal-content
+  /         div.modal-header
+  /           h5.modal-title 과목 입력하기
+  /           button.close type="button" data-dismiss="modal" aria-label="Close"
+  /             span aria-hidden="true" &times;
+  /         div.modal-body
+  /           div.border.border-info.rounded.pt-2.pb-2.pl-3.pr-3.mb-2
+  /             div.text-muted v-if="!problem.subject_id" 현재 설정된 과목이 없습니다
+  /             div v-else=""
+  /               span.badge.badge-dark.mr-1 v-text="problem.subject.depth"
+  /               span.badge.badge-info.mr-2 v-text="problem.subject.order"
+  /               span.font-weight-bold.text-info v-text="problem.subject.name"
+  /               br
+  /               small.text-muted v-text="problem.subject.path"
+  /           div.input-group.mt-2
+  /             span.input-group-addon.text-muted: i.fa.fa-search
+  /             input.form-control ref="subjectModalInput" placeholder="과목 검색하기" autofocus="true" :value="keyword" @input="typing" @keydown.esc.stop="reset" @keydown.enter.prevent="enter" @keydown.up.prevent="move(false)" @keydown.down.prevent="move(true)"
+  /             div style="position: absolute; top: 50%; margin-top: -7px; right: 7px; z-index: 100; font-size: 0.5em;"
+  /               kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length > 0 && filtered.length == 0 }" == "#{icon 'caret-up'}"
+  /               kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length > 0 && filtered.length == 0 }" == "#{icon 'caret-down'}"
+  /               kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length > 0 && filtered.length == 0 }" Enter:저장
+  /               kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length == 0 }" ESC:리셋
+  /           div.mt-2 style="max-height: calc(100vh - 280px); overflow-y: scroll;"
+  /             div.jumbotron.mb-0.text-center.text-muted v-show="filtered.length == 0" 검색결과가 없습니다
+  /             table.table.table-sm.table-bordered.mb-0.cursor-pointer
+  /               tr v-for="(subject, index) in filtered" :key="subject.id" :class="[ subject.depth == 1 ? 'bg-secondary' : (subject.depth == 2 ? 'bg-light' : '') ]"
+  /                 td @click="save(subject)" @mouseover="selected = index" :class='{ "bg-hover font-weight-bold": index == selected }'
+  /                   div.d-flex.align-items-center.justify-content-between.pr-1 :class="[ subject.depth == 1 ? 'pl-1' : (subject.depth == 2) ? 'pl-4' : 'pl-5' ]"
+  /                     div
+  /                       span.badge.badge-dark.mr-1 v-text="subject.depth"
+  /                       span.badge.badge-secondary.mr-2 :class='{ "badge-info": problem.subject_id == subject.id }' v-text="subject.order"
+  /                       span :class='{ "text-info": problem.subject_id == subject.id }' v-text="subject.name"
+  /                     small.text-muted v-text="subject.path"
   editor-modal inline-template="true" :problem="problem" ref="editorModalComponent"
     div.modal role="dialog" data-backdrop="static" ref="editorModal"
       div.modal-dialog.modal-fullscreen role="document"
@@ -241,124 +359,65 @@ div#problem-edit v-cloak=true
           div.modal-footer
             button.btn.btn-block.btn-secondary type="button" data-dismiss="modal" 취소
             button.btn.btn-block.btn-primary.mt-0 type="button" @click="saveGraph" 저장
-  source-modal inline-template="true" :problem="problem" ref="sourceModalComponent"
-    div.modal role="dialog" data-backdrop="static" ref="sourceModal"
-      div.modal-dialog.modal-lg role="document"
-        div.modal-content
-          div.modal-header
-            h5.modal-title 출처 입력하기
-            button.close type="button" data-dismiss="modal" aria-label="Close"
-              span aria-hidden="true" &times;
-          div.modal-body
-            div.row.mb-3
-              div.col.pr-0
-                label 연도
-                select.form-control autofocus="true" v-model="keyword.year" :class="{ 'border-danger': validation.hasError('keyword.year') }"
-                  option value="" disabled=true selected=true 연도
-                  option v-for="year in _.range(2012, 2019)" :key="year" :value="year" {{ year + '학년도' }}
-              div.col.pr-0.pl-2
-                label 시기
-                select.form-control v-model="keyword.time" :class="{ 'border-danger': validation.hasError('keyword.time') }"
-                  option value="" disabled=true selected=true 시기
-                  option value="6" 6월
-                  option value="9" 9월
-                  option value="11" 대학수학능력시험
-              div.col.pr-0.pl-2
-                label 과목
-                select.form-control disabled=true v-model="keyword.subject_id" :class="{ 'border-danger': validation.hasError('keyword.subject_id') }"
-                  option value="3" selected=true 수학
-              div.col.pr-0.pl-2
-                label 과정
-                select.form-control v-model="keyword.curriculum" :class="{ 'border-danger': validation.hasError('keyword.curriculum') }"
-                  option value="" disabled=true selected=true 과정
-                  option value="2" 가형
-                  option value="1" 나형
-              div.col.pl-2
-                label 학년
-                select.form-control disabled=true v-model="keyword.grade" :class="{ 'border-danger': validation.hasError('keyword.grade') }"
-                  option value="3" selected=true 고3
-            div.mt-3
-              label 문제번호
-              label.text-muted.font-weight-normal v-text="new_title"
-            table.table
-              tr v-for="rowIndex in _.range(0, 3)" :key="rowIndex"
-                td.p-1.border-0 style="width: 10%;" v-for="i in _.range(rowIndex * 10 + 1, (rowIndex + 1) * 10 + 1)" :key="i"
-                  div.btn.btn-block.btn-secondary                  v-if="problem.problem_source_id == source.id && problem.problem_source_order == i" {{ i + '번' }}
-                  div.btn.btn-block.btn-success                    v-else-if="order == i" {{ i + '번' }}
-                  div.btn.btn-block.btn-outline-secondary.disabled v-else-if="_.contains(occupied_orders, i)" {{ i + '번' }}
-                  div.btn.btn-block.btn-outline-success            v-else="" @click="order = i" {{ i + '번' }}
-          div.modal-footer.text-center
-            transition name="fade" mode="out-in"
-              div.w-100.text-muted   v-if="is_loading" key="state_0" 로딩중...
-              div.w-100.text-danger  v-else-if="!readySource" key="state_1" 출처 내용을 선택해주세요
-              div.w-100.text-warning v-else-if="occupied_orders.length == 30" key="state_2" 출처 <b>{{ new_title }}</b> 의 모든 문항이 등록되어 있습니다
-              div.w-100.text-muted   v-else-if="!hasChanged" key="state_3" 변경내역이 없습니다
-              div.w-100.text-success v-else-if="readySource && !readySubmit" key="state_4" 출처 <b>{{ new_title }}</b> 의 문항번호를 선택해주세요
-              div.w-100.text-success v-else-if="readySubmit" key="state_5"
-                span.text-muted v-text="origin_title + (problem.problem_source_order ? ' / ' + problem.problem_source_order + '번' : '')"
-                span<> →
-                span.font-weight-bold v-text="new_title + ' / ' + order + '번'"
-          div.modal-footer
-            button.btn.btn-block.btn-secondary type="button" data-dismiss="modal" 취소
-            button.btn.btn-block.btn-primary.mt-0 type="button" @click="save" :disabled="!hasChanged || !readySubmit" 저장
 
 javascript:
   var data = {
-    problem: #{{ problem.as_json(include: [:subject, {problem_images: {methods: :image_url}}, :problem_tags, :problem_source]).to_json.html_safe }},
-    subjects: #{{ Standard::Subject.where('subjects.order > 3000000 AND subjects.order < 4000000').to_json.html_safe }}
+    problem: #{{ problem.with_details_as_json.to_json.html_safe }},
+    subjects: #{{ Subject.where('subjects.order > 3000000 AND subjects.order < 4000000').to_json.html_safe }},
+    sources: #{{ Admin::ProblemSource.all.to_json.html_safe }}
   };
 
-  var subjectModalComponent = {
-    props: ['problem'],
-    data: function() {
-      return {
-        subjects: data.subjects,
-        keyword: '',
-        selected: 0
-      }
-    },
-    watch: {
-      keyword: function(keyword) {
-        this.selected = 0;
-        this.filtered = _.filter(this.subjects, function(obj){ return obj['path'].match(new RegExp(keyword)); });
-      }
-    },
-    methods: {
-      typing: function(e) { return this.keyword = e.target.value; },
-      reset: function() { return this.keyword = ''; },
-      move: function(is_down) {
-        if (is_down) {
-          if (this.selected == this.filtered.length - 1) return this.selected = 0;
-          return this.selected += 1;
-        } else {
-          if (this.selected == 0) return this.selected = this.filtered.length - 1;
-          return this.selected -= 1;
-        }
-      },
-      enter: function() {
-        if (this.filtered.length == 0) {
-          return this.reset();
-        } else {
-          return this.save(this.filtered[this.selected]);
-        }
-      },
-      open: function() {
-        this.keyword = '';
-        $(this.$refs.subjectModal).modal();
-        $(this.$refs.subjectModalInput).trigger('focus');
-      },
-      save: function(subject) {
-        if (subject.depth != 3 && !confirm('소과목을 선택하지 않으셨습니다. 맞게 선택했나요?')) return false;
-        this.problem.subject = subject;
-        this.problem.subject_id = subject.id;
-        return $(this.$refs.subjectModal).modal('hide');
-      }
-    },
-    created: function() {
-      this.filtered = this.subjects;
-      this.selected = _.findIndex(this.filtered, {id: this.problem.subject_id});
-    }
-  }
+  // var subjectModalComponent = {
+  //   props: ['problem'],
+  //   data: function() {
+  //     return {
+  //       subjects: data.subjects,
+  //       keyword: '',
+  //       selected: 0
+  //     }
+  //   },
+  //   watch: {
+  //     keyword: function(keyword) {
+  //       this.selected = 0;
+  //       this.filtered = _.filter(this.subjects, function(obj){ return obj['path'].match(new RegExp(keyword)); });
+  //     }
+  //   },
+  //   methods: {
+  //     typing: function(e) { return this.keyword = e.target.value; },
+  //     reset: function() { return this.keyword = ''; },
+  //     move: function(is_down) {
+  //       if (is_down) {
+  //         if (this.selected == this.filtered.length - 1) return this.selected = 0;
+  //         return this.selected += 1;
+  //       } else {
+  //         if (this.selected == 0) return this.selected = this.filtered.length - 1;
+  //         return this.selected -= 1;
+  //       }
+  //     },
+  //     enter: function() {
+  //       if (this.filtered.length == 0) {
+  //         return this.reset();
+  //       } else {
+  //         return this.save(this.filtered[this.selected]);
+  //       }
+  //     },
+  //     open: function() {
+  //       this.keyword = '';
+  //       $(this.$refs.subjectModal).modal();
+  //       $(this.$refs.subjectModalInput).trigger('focus');
+  //     },
+  //     save: function(subject) {
+  //       if (subject.depth != 3 && !confirm('소과목을 선택하지 않으셨습니다. 맞게 선택했나요?')) return false;
+  //       this.problem.subject = subject;
+  //       this.problem.subject_id = subject.id;
+  //       return $(this.$refs.subjectModal).modal('hide');
+  //     }
+  //   },
+  //   created: function() {
+  //     this.filtered = this.subjects;
+  //     this.selected = _.findIndex(this.filtered, {id: this.problem.subject_id});
+  //   }
+  // }
 
   var tagInputComponent = {
     props: ['problem'],
@@ -465,6 +524,110 @@ javascript:
       }
     }
   }
+
+  var sourceModalComponent = {
+    props: ['problem'],
+    data: function() {
+      return {
+        sources: data.sources,
+        added: [],
+        tmp_source: {
+          id: null,
+          order: null,
+          problem_id: null,
+          problem_source: {},
+          problem_source_id: null
+        },
+        step: 0,
+        filtered: [],
+        filter: {
+          year: null,
+          time: null,
+          subject_id: 3,
+          curriculum: null,
+          grade: 3
+        }
+      }
+    },
+    computed: {
+      years: function() { return _.sortBy(_.uniq(_.pluck(this.sources, 'year'))); },
+      times: function() { return _.sortBy(_.uniq(_.pluck(this.sources, 'time'))); }
+    },
+    watch: {
+      step: function() {
+        if (this.step == 0) return this.tmp_source = {
+          id: null,
+          order: null,
+          problem_id: this.problem.id,
+          problem_source: {},
+          problem_source_id: null
+        }
+      },
+      filter: {
+        deep: true,
+        handler: function() {
+          this.filtered = this.sources;
+          if (this.filter.year) this.filtered = _.filter(this.filtered, function(obj){ return obj['year'] == this.filter.year; }.bind(this));
+          if (this.filter.time) this.filtered = _.filter(this.filtered, function(obj){ return obj['time'] == this.filter.time; }.bind(this));
+          if (this.filter.curriculum) this.filtered = _.filter(this.filtered, function(obj){ return obj['curriculum'] == this.filter.curriculum; }.bind(this));
+        }
+      }
+    },
+    methods: {
+      openModal: function() {
+        this.step = 0;
+        this.initFilter();
+        this.added = _.clone(this.problem.problem_source_orders);
+        return $(this.$refs.sourceModal).modal();
+      },
+      remove: function(source) {
+        return this.added = _.without(this.added, source);
+      },
+      initFilter: function() {
+        this.filter = {
+          year: null,
+          time: null,
+          subject_id: 3,
+          curriculum: null,
+          grade: 3
+        };
+        this.filtered = this.sources;
+      },
+      selectSource: function(source) {
+        this.tmp_source.problem_source_id = source.id;
+        this.tmp_source.problem_source = source;
+        return this.step = 2;
+      },
+      selectOrder: function(order) {
+        this.tmp_source.order = order;
+        return this.step = 3;
+      },
+      add: function(order) {
+        if (!this.tmp_source.problem_source_id || !this.tmp_source.order) {
+          console.log('선택해주세요');
+          return false;
+        } else if (_.contains(_.pluck(this.added, 'problem_source_id'), this.tmp_source.problem_source_id) && _.contains(_.pluck(this.added, 'order'), this.tmp_source.order)) {
+          console.log('이미 존재하는 번호');
+        } else {
+          this.added.push(this.tmp_source);
+          return this.step = 0;
+        }
+      },
+      save: function() {
+        // this.problem.problem_source_orders.push(order);
+        return $(this.$refs.sourceModal).modal('hide');
+      }
+    },
+    mounted: function() { this.$validate(); },
+    validators: {
+      'filter.year': function(value) { return Validator.value(value).required(); },
+      'filter.time': function(value) { return Validator.value(value).required(); },
+      'filter.subject_id': function(value) { return Validator.value(value).required(); },
+      'filter.curriculum': function(value) { return Validator.value(value).required(); },
+      'filter.grade': function(value) { return Validator.value(value).required(); },
+    }
+  }
+
 
   var editorModalComponent = {
     props: ['problem'],
@@ -724,109 +887,109 @@ javascript:
     }
   };
 
-  var sourceModalComponent = {
-    props: ['problem'],
-    data: function() {
-      return {
-        prev: null,
-        source: null,
-        order: null,
-        keyword: null,
-        occupied_orders: null,
-        is_loading: null
-      }
-    },
-    computed: {
-      origin_title: function() { return this.naming(this.prev); },
-      new_title: function() { return this.readySource ? this.naming(this.keyword) : '출처 내용을 선택해주세요'; },
-      readySource: function() { return !!this.keyword.year && !!this.keyword.time && !!this.keyword.subject_id && !!this.keyword.curriculum && !!this.keyword.grade; },
-      hasChanged: function() { return !!this.order && (this.origin_title !== this.new_title || this.order !== this.problem.problem_source_order); },
-      readySubmit: function() { return !!this.order && this.readySource; }
-    },
-    watch: {
-      keyword: {
-        deep: true,
-        handler: function() {
-          if (!this.keyword.year || !this.keyword.time || !this.keyword.subject_id || !this.keyword.curriculum || !this.keyword.grade) return;
-          var self = this;
-          $.ajax({
-            url: '#{{ source_admin_problems_path }}',
-            type: 'GET',
-            dataType: 'json',
-            data: { problem_id: self.problem.id, source: self.keyword },
-            beforeSend: function() {
-              self.is_loading = true;
-            },
-            success: function(data) {
-              self.is_loading = false;
-              if (self.problem.problem_source_id == data.source.id) {
-                self.order = self.problem.problem_source_order;
-              } else {
-                self.order = null;
-              }
-              self.source = data.source;
-              self.occupied_orders = data.occupied_orders;
-            }
-          });
-        }
-      }
-    },
-    methods: {
-      naming: function (source) {
-        if (!source) return '현재 설정된 출처가 없습니다';
-        var title = ['(연도)', '(시기)', '(과목)', '(과정)', '(학년)'];
-        title[0] = source.year + '학년도';
-        title[1] = source.time == 11 ? '대학수학능력시험' : source.time + '월';
-        title[2] = source.subject_id == 3 ? '수학' : '기타';
-        if (source.year == '2014' || source.year == '2015') {
-          title[3] = source.curriculum == 1 ? '나형(A형)' : source.curriculum == 2 ? '가형(B형)' : '공통';
-        } else {
-          title[3] = source.curriculum == 1 ? '나형' : source.curriculum == 2 ? '가형' : '공통';
-        }
-        title[4] = '고' + source.grade;
-        return title.join('_');
-      },
-      init: function() {
-        this.prev = _.clone(this.problem.problem_source);
-        this.source = _.clone(this.prev) || {
-          year: null,
-          time: null,
-          subject_id: 3,
-          curriculum: null,
-          grade: 3
-        };
-        this.order = _.clone(this.problem.problem_source_order);
-        this.keyword = _.clone(this.source);
-        this.occupied_orders = _.range(1, 31);
-      },
-      open: function() {
-        return $(this.$refs.sourceModal).modal();
-      },
-      save: function() {
-        this.problem.problem_source = this.source;
-        this.problem.problem_source_id = this.source.id;
-        this.problem.problem_source_order = this.order;
-        this.problem.year = this.source.year;
-        this.init();
-        return $(this.$refs.sourceModal).modal('hide');
-      }
-    },
-    created: function() { this.init(); },
-    mounted: function() { this.$validate(); },
-    validators: {
-      'keyword.year': function(value) { return Validator.value(value).required(); },
-      'keyword.time': function(value) { return Validator.value(value).required(); },
-      'keyword.subject_id': function(value) { return Validator.value(value).required(); },
-      'keyword.curriculum': function(value) { return Validator.value(value).required(); },
-      'keyword.grade': function(value) { return Validator.value(value).required(); },
-    }
-  }
+  // var sourceModalComponent = {
+  //   props: ['problem'],
+  //   data: function() {
+  //     return {
+  //       prev: null,
+  //       source: null,
+  //       order: null,
+  //       keyword: null,
+  //       occupied_orders: null,
+  //       is_loading: null
+  //     }
+  //   },
+  //   computed: {
+  //     origin_title: function() { return this.naming(this.prev); },
+  //     new_title: function() { return this.readySource ? this.naming(this.keyword) : '출처 내용을 선택해주세요'; },
+  //     readySource: function() { return !!this.keyword.year && !!this.keyword.time && !!this.keyword.subject_id && !!this.keyword.curriculum && !!this.keyword.grade; },
+  //     hasChanged: function() { return !!this.order && (this.origin_title !== this.new_title || this.order !== this.problem.problem_source_order); },
+  //     readySubmit: function() { return !!this.order && this.readySource; }
+  //   },
+  //   watch: {
+  //     keyword: {
+  //       deep: true,
+  //       handler: function() {
+  //         if (!this.keyword.year || !this.keyword.time || !this.keyword.subject_id || !this.keyword.curriculum || !this.keyword.grade) return;
+  //         var self = this;
+  //         $.ajax({
+  //           url: '#{{ source_admin_problems_path }}',
+  //           type: 'GET',
+  //           dataType: 'json',
+  //           data: { problem_id: self.problem.id, source: self.keyword },
+  //           beforeSend: function() {
+  //             self.is_loading = true;
+  //           },
+  //           success: function(data) {
+  //             self.is_loading = false;
+  //             if (self.problem.problem_source_id == data.source.id) {
+  //               self.order = self.problem.problem_source_order;
+  //             } else {
+  //               self.order = null;
+  //             }
+  //             self.source = data.source;
+  //             self.occupied_orders = data.occupied_orders;
+  //           }
+  //         });
+  //       }
+  //     }
+  //   },
+  //   methods: {
+  //     naming: function (source) {
+  //       if (!source) return '현재 설정된 출처가 없습니다';
+  //       var title = ['(연도)', '(시기)', '(과목)', '(과정)', '(학년)'];
+  //       title[0] = source.year + '학년도';
+  //       title[1] = source.time == 11 ? '대학수학능력시험' : source.time + '월';
+  //       title[2] = source.subject_id == 3 ? '수학' : '기타';
+  //       if (source.year == '2014' || source.year == '2015') {
+  //         title[3] = source.curriculum == 1 ? '나형(A형)' : source.curriculum == 2 ? '가형(B형)' : '공통';
+  //       } else {
+  //         title[3] = source.curriculum == 1 ? '나형' : source.curriculum == 2 ? '가형' : '공통';
+  //       }
+  //       title[4] = '고' + source.grade;
+  //       return title.join('_');
+  //     },
+  //     init: function() {
+  //       this.prev = _.clone(this.problem.problem_source);
+  //       this.source = _.clone(this.prev) || {
+  //         year: null,
+  //         time: null,
+  //         subject_id: 3,
+  //         curriculum: null,
+  //         grade: 3
+  //       };
+  //       this.order = _.clone(this.problem.problem_source_order);
+  //       this.keyword = _.clone(this.source);
+  //       this.occupied_orders = _.range(1, 31);
+  //     },
+  //     open: function() {
+  //       return $(this.$refs.sourceModal).modal();
+  //     },
+  //     save: function() {
+  //       this.problem.problem_source = this.source;
+  //       this.problem.problem_source_id = this.source.id;
+  //       this.problem.problem_source_order = this.order;
+  //       this.problem.year = this.source.year;
+  //       this.init();
+  //       return $(this.$refs.sourceModal).modal('hide');
+  //     }
+  //   },
+  //   created: function() { this.init(); },
+  //   mounted: function() { this.$validate(); },
+  //   validators: {
+  //     'keyword.year': function(value) { return Validator.value(value).required(); },
+  //     'keyword.time': function(value) { return Validator.value(value).required(); },
+  //     'keyword.subject_id': function(value) { return Validator.value(value).required(); },
+  //     'keyword.curriculum': function(value) { return Validator.value(value).required(); },
+  //     'keyword.grade': function(value) { return Validator.value(value).required(); },
+  //   }
+  // }
 
-  // const noDelimiter = {replace: () => '(?!x)x'}; // return a non-matching regexp.
-  // delimiters: [noDelimiter, noDelimiter],
+  const noDelimiter = {replace: () => '(?!x)x'}; // return a non-matching regexp.
 
   var vm = new Vue({
     el: '#problem-edit',
+    delimiters: [noDelimiter, noDelimiter],
     data: {
       problem: data.problem,
       show_explanation: true,
@@ -834,7 +997,7 @@ javascript:
       focusInput: null
     },
     components: {
-      'subject-modal' : subjectModalComponent,
+      // 'subject-modal' : subjectModalComponent,
       'tag-input'     : tagInputComponent,
       'editor-modal'  : editorModalComponent,
       'graph-modal'   : graphModalComponent,
@@ -842,6 +1005,7 @@ javascript:
     },
     computed: {
       exm_ratio_sum: function() { return 100 === _.reduce([this.problem.exm_1_ratio, this.problem.exm_2_ratio, this.problem.exm_3_ratio, this.problem.exm_4_ratio, this.problem.exm_5_ratio], function(acc, ratio){ return acc + Math.abs(ratio); }, 0); },
+      problem_source_order_ids: function() { return _.pluck(this.problem.problem_source_orders, 'id'); },
       problem_image_ids: function() { return _.pluck(this.problem.problem_images, 'id'); },
       problem_tag_ids: function() { return _.pluck(this.problem.problem_tags, 'id'); },
       readySubmit: function() { return this.validation.countErrors() === 0; },
@@ -1015,8 +1179,9 @@ javascript:
           return this.problem.answer = Number(answer);
         }
       },
-      inputExmRatio: function() {
-        return this.problem.exm_5_ratio = 100 - this.problem.exm_1_ratio - this.problem.exm_2_ratio - this.problem.exm_3_ratio - this.problem.exm_4_ratio;
+      inputExmRatio: function(e) {
+        if (e.target.nextSibling !== null) this.problem.exm_5_ratio = 100 - this.problem.exm_1_ratio - this.problem.exm_2_ratio - this.problem.exm_3_ratio - this.problem.exm_4_ratio;
+        if (this.problem.answer) this.problem.correct_ratio = [this.problem.exm_1_ratio, this.problem.exm_2_ratio, this.problem.exm_3_ratio, this.problem.exm_4_ratio, this.problem.exm_5_ratio][this.problem.answer - 1];
       },
       renderMath: _.debounce(function() {
         renderMathInElement(this.$refs.problemPreview, {
@@ -1328,8 +1493,8 @@ javascript:
       'problem.exm_4': function(value) { return Validator.value(value).required(); },
       'problem.exm_5': function(value) { return Validator.value(value).required(); },
       'problem.explanation': function(value) { return Validator.value(value).required(); },
-      'problem.subject_id': function(value) { return Validator.value(value).required(); },
-      'problem.problem_source_id': function(value) { return Validator.value(value).required(); },
+      // 'problem.subject_id': function(value) { return Validator.value(value).required(); },
+      // 'problem.problem_source_id': function(value) { return Validator.value(value).required(); },
       'problem.score': function(value) { return Validator.value(value).required().integer().greaterThan(0); },
       'problem.answer': function(value) {
         if (this.problem.is_objective) {

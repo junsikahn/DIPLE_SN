@@ -2,8 +2,10 @@ table.table.table-bordered#problems-list
   thead.thead-default
     tr
       th.text-center 문제
-  tbody
-    tr v-for="(problem, order) in problems" :key="problem.id"
+  tbody v-cloak=""
+    tr v-if="problems.length == 0"
+      td.p-5.text-center.text-muted 포함된 문제가 없습니다
+    tr v-else="" v-for="(problem, order) in problems" :key="problem.id"
       td.p-0.text-center style="position: relative;"
         div.m-auto style="width: 160px;position: absolute;right: 50%;top: 50px;transform: translateX(-270px);"
           button.btn.btn-dark.btn-block
@@ -24,26 +26,21 @@ table.table.table-bordered#problems-list
         problem-preview :problem="problem" :order="order + 1" :show_id="show_id"
 
 javascript:
-  new Vue({
+  var problems_list = new Vue({
     el: '#problems-list',
     data: {
-      problems: #{{ problems.as_json(include: [:subject, {problem_images: {methods: :image_url}}, :problem_tags, :problem_source]).to_json.html_safe }},
+      problems: #{{ problems.to_json.html_safe }},
       show_id: #{{ show_id }}
     },
     methods: {
       reload: function(order) {
-        var self = this;
-        var problem_id = this.problems[order].id;
-        $.ajax({
-          url: '/admin/problems/' + problem_id,
-          type: 'GET',
-          dataType: 'json',
-          success: function(data) { self.problems.splice(order, 1, data); }
-        });
+        axios.get('/admin/problems/' + this.problems[order].id + '.json')
+          .then(function(response) {
+            this.problems.splice(order, 1, response.data);
+          }.bind(this));
       },
       edit: function(id) {
-        var url = '/admin/problems/' + id + '/edit';
-        window.open(url);
+        window.open('/admin/problems/' + id + '/edit');
       }
     }
   });

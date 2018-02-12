@@ -14,6 +14,7 @@
 //= require jquery_ujs
 //= require jquery.remotipart
 //= require jquery_nested_form
+//= require axios
 //= require underscore
 //= require vue
 //= require vue-router

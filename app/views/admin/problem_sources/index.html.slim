@@ -3,41 +3,62 @@ div.jumbotron.p-4.mb-3.text-right
   = link_to "<i class='fa fa-plus-square'></i> 기출문제 추가".html_safe, new_admin_problem_source_path, class: 'btn btn-success'
 
 - year_groups = @admin_problem_sources.group_by{ |s| s.year }
-- year_groups.each do |year, year_problem_sources|
-  div.p-3.border.border-secondary.border-rounded.mt-3
-    h3 == "#{year}"
-    - year_problem_sources.group_by{ |s| s.institute }.each do |institute, institute_problem_sources|
-      h4 == "#{institute == 0 ? '평가원' : institute == 1 ? '교육청' : '기타'}"
-      - institute_problem_sources.group_by{ |s| s.curriculum }.each do |curriculum, problem_sources|
-        h5 == "#{curriculum == 1 ? '나형' : curriculum == 2 ? '가형' : '공통'}"
-        table.table.table-hover.table-bordered
-          thead.thead-default
-            tr
-              th.text-center 시기
-              th.text-center 과목
-              th.text-center 과정
-              th.text-center 학년
-              th.text-center 문항
-              th.text-center 점수
-              th.text-center 명칭
-              th.text-center 분류
-              th.text-center 수정
-          tbody
-            - problem_sources.each do |problem_source|
-              - classified_count = problem_source.problems.to_a.count{ |problem| problem.subject_id }
-              - updated_count = problem_source.problems.to_a.count{ |problem| problem.updated? }
-              - total_count = problem_source.problems.size
-              - total_score = problem_source.problems.sum{ |problem| problem.score }
-              tr.cursor-pointer onclick='location.href="#{admin_problem_source_path(problem_source.id)}"'
-                td.text-center == problem_source.time == 11 ? '수능' : "#{problem_source.time}월"
-                td.text-center == problem_source.subject_id == 3 ? '수학' : '기타'
-                td.text-center == problem_source.curriculum == 1 ? '이과' : problem_source.curriculum == 2 ? '문과' : '공통'
-                td.text-center == "고#{problem_source.grade}"
-                td.text-center == "#{total_count}문항"
-                td.text-center == "#{total_score}점"
-                td
-                  == problem_source.name
-                  - if problem_source.institute == 1
-                    span.badge.badge-danger.ml-2 NEW
-                td.text-center == "#{classified_count}문항"
-                td.text-center == "#{updated_count}문항"
+ul.nav.nav-pills.nav-fill#tab-list role="tablist" aria-orientation="vertical"
+  - year_groups.each do |year, year_problem_sources|
+    li.nav-item
+      a.nav-link data-toggle="tab" role="tab" href="#tab-#{year}" == "#{year}"
+div.tab-content.mt-3
+  - year_groups.each do |year, year_problem_sources|
+    div.tab-pane.fade id="tab-#{year}" role="tabpanel"
+      div.p-3.border.border-secondary.rounded style="overflow: scroll;"
+        h3 == "#{year}"
+        - year_problem_sources.group_by{ |s| s.institute }.each do |institute, institute_problem_sources|
+          h4 == "#{institute == 0 ? '평가원' : institute == 1 ? '교육청' : '기타'}"
+          - institute_problem_sources.group_by{ |s| s.curriculum }.each do |curriculum, problem_sources|
+            h5 == "#{curriculum == 1 ? '나형' : curriculum == 2 ? '가형' : '공통'}"
+            table.table.table-hover.table-bordered.text-nowrap
+              thead.thead-default
+                tr
+                  th.text-center 시기
+                  th.text-center 과목
+                  th.text-center 과정
+                  th.text-center 학년
+                  th.text-center 문항
+                  th.text-center 점수
+                  th.text-center 명칭
+                  th.text-center 분류
+                  th.text-center 수정
+                  th.text-center 구분
+              tbody
+                - problem_sources.each do |problem_source|
+                  - classified_count = problem_source.problems.to_a.count{ |problem| !problem.subjects.length.zero? }
+                  - updated_count = problem_source.problems.to_a.count{ |problem| problem.updated? }
+                  - total_count = problem_source.problems.size
+                  - total_score = problem_source.problems.sum{ |problem| problem.score }
+                  - is_fully_uploaded = total_count == 30 || total_score == 100
+                  - is_new = is_fully_uploaded && classified_count.zero? && updated_count.zero?
+                  - is_completed = is_fully_uploaded && !is_new && classified_count == total_count && updated_count == total_count
+                  tr.cursor-pointer onclick='location.href="#{admin_problem_source_path(problem_source.id)}"' class="#{'text-danger' unless is_fully_uploaded}"
+                    td.text-center == problem_source.time == 11 ? '수능' : "#{problem_source.time}월"
+                    td.text-center == problem_source.subject_id == 3 ? '수학' : '기타'
+                    td.text-center == problem_source.curriculum == 1 ? '이과' : problem_source.curriculum == 2 ? '문과' : '공통'
+                    td.text-center == "고#{problem_source.grade}"
+                    td.text-center == "#{total_count}문항"
+                    td.text-center == "#{total_score}점"
+                    td == problem_source.name
+                    td.text-center == "#{classified_count}문항"
+                    td.text-center == "#{updated_count}문항"
+                    td.text-center
+                      - if !is_fully_uploaded
+                        span.badge.badge-danger ERR!
+                      - elsif is_new
+                        span.badge.badge-primary New
+                      - elsif is_completed
+                        span.badge.badge-success OK
+                      - else
+                        span.badge.badge-warning ~ing
+
+javascript:
+  $(document).ready(function() {
+    $('#tab-list li:last-child a').tab('show');
+  });

@@ -164,7 +164,7 @@
 / /   var myChart = new Chart(ctx1, {
 / /     type: 'radar',
 / /     data: {
-/ /         labels: #{{Standard::Subject.where(main_subject_id: 1, depth: 1).pluck(:name)}},
+/ /         labels: #{{Subject.where(main_subject_id: 1, depth: 1).pluck(:name)}},
 / /         datasets: [{
 / /             label: '전체 푼 문제',
 / /             data: [12, 19, 3, 10, 2, 3, 10],
@@ -218,7 +218,7 @@
 / /   var myChart = new Chart(ctx2, {
 / /     type: 'radar',
 / /     data: {
-/ /         labels: #{{Standard::Subject.where(main_subject_id: 2, depth: 1).pluck(:name)}},
+/ /         labels: #{{Subject.where(main_subject_id: 2, depth: 1).pluck(:name)}},
 / /         datasets: [{
 / /             label: '전체 푼 문제',
 / /             data: [12, 19, 3, 10, 2, 3, 10],
@@ -272,7 +272,7 @@
 / /   var myChart = new Chart(ctx3, {
 / /     type: 'radar',
 / /     data: {
-/ /         labels: #{{Standard::Subject.where(main_subject_id: 3, depth: 1).pluck(:name)}},
+/ /         labels: #{{Subject.where(main_subject_id: 3, depth: 1).pluck(:name)}},
 / /         datasets: [{
 / /             label: '전체 푼 문제',
 / /             data: [12, 19, 3, 10, 2, 3, 10],

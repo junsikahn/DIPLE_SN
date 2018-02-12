@@ -1,8 +1,7 @@
-class Standard::ProblemCollection < ApplicationRecord
+class ProblemCollection < ApplicationRecord
   scope :daily_tests, (->(start_date, end_date) { where(published: true, problem_source_id: 1).where('test_day > ? AND test_day < ?', start_date, end_date) })
 
   belongs_to :subject
-  belongs_to :problem_source, optional: true
 
   has_many :problem_collection_to_problems, dependent: :destroy
   has_many :problems, through: :problem_collection_to_problems

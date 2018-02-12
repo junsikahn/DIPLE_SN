@@ -70,7 +70,7 @@ class Admin::UsersController < AdminController
 
   def report
     # @users = User.includes(:problem_collection_histories, :problem_histories).all
-    @problem_collections = Standard::ProblemCollection.where(published: true).where('test_day <= ?', Date.today)
+    @problem_collections = ProblemCollection.where(published: true).where('test_day <= ?', Date.today)
     @start_date = Time.zone.parse('2017-07-24').beginning_of_day
     @end_date = Time.zone.parse('2017-08-15').beginning_of_day
   end
