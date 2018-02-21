@@ -1,12 +1,12 @@
 class App::HomeController < ApplicationController
   # GET /
   def index
-    if params[:problem_source_id]
-      @problem_source = ProblemSource.find(params[:problem_source_id])
-      @problems = Problem.includes(:subject, :problem_tags, :problem_source).where(problem_source_id: params[:problem_source_id])
-    else
-      @problem_sources = ProblemSource.includes(:problems).all.order(:name)
-    end
+    # if params[:problem_source_id]
+    #   @problem_source = ProblemSource.find(params[:problem_source_id])
+    #   @problems = Problem.includes(:subject, :problem_tags, :problem_source).where(problem_source_id: params[:problem_source_id])
+    # else
+    #   @problem_sources = ProblemSource.includes(:problems).all.order(:name)
+    # end
 
     # @problem_collections =
     #   ProblemCollection

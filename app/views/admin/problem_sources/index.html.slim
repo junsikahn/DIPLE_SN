@@ -6,16 +6,15 @@ div.jumbotron.p-4.mb-3.text-right
 ul.nav.nav-pills.nav-fill#tab-list role="tablist" aria-orientation="vertical"
   - year_groups.each do |year, year_problem_sources|
     li.nav-item
-      a.nav-link data-toggle="tab" role="tab" href="#tab-#{year}" == "#{year}"
+      a.nav-link data-toggle="tab" role="tab" href="#tab-#{year}" == "#{year} 대비"
 div.tab-content.mt-3
   - year_groups.each do |year, year_problem_sources|
     div.tab-pane.fade id="tab-#{year}" role="tabpanel"
-      div.p-3.border.border-secondary.rounded style="overflow: scroll;"
-        h3 == "#{year}"
-        - year_problem_sources.group_by{ |s| s.institute }.each do |institute, institute_problem_sources|
-          h4 == "#{institute == 0 ? '평가원' : institute == 1 ? '교육청' : '기타'}"
-          - institute_problem_sources.group_by{ |s| s.curriculum }.each do |curriculum, problem_sources|
-            h5 == "#{curriculum == 1 ? '나형' : curriculum == 2 ? '가형' : '공통'}"
+      - year_problem_sources.group_by{ |s| s.institute_to_s }.reverse_each do |institute_to_s, institute_problem_sources|
+        div.mt-3.p-3.border.border-secondary.rounded style="overflow: scroll;"
+          h4 == "#{institute_to_s}"
+          - institute_problem_sources.group_by{ |s| s.curriculum_to_s }.each do |curriculum_to_s, problem_sources|
+            h5 == "#{curriculum_to_s}"
             table.table.table-hover.table-bordered.text-nowrap
               thead.thead-default
                 tr
@@ -39,10 +38,10 @@ div.tab-content.mt-3
                   - is_new = is_fully_uploaded && classified_count.zero? && updated_count.zero?
                   - is_completed = is_fully_uploaded && !is_new && classified_count == total_count && updated_count == total_count
                   tr.cursor-pointer onclick='location.href="#{admin_problem_source_path(problem_source.id)}"' class="#{'text-danger' unless is_fully_uploaded}"
-                    td.text-center == problem_source.time == 11 ? '수능' : "#{problem_source.time}월"
-                    td.text-center == problem_source.subject_id == 3 ? '수학' : '기타'
-                    td.text-center == problem_source.curriculum == 1 ? '이과' : problem_source.curriculum == 2 ? '문과' : '공통'
-                    td.text-center == "고#{problem_source.grade}"
+                    td.text-center == problem_source.time_to_s(true)
+                    td.text-center == problem_source.subject_to_s
+                    td.text-center == problem_source.curriculum_to_s(true)
+                    td.text-center == problem_source.grade_to_s
                     td.text-center == "#{total_count}문항"
                     td.text-center == "#{total_score}점"
                     td == problem_source.name

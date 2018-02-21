@@ -34,6 +34,7 @@ Rails.application.routes.draw do
   # end
 
   scope module: :app do
+    resources :problems
     resources :home, path: '/'
   end
 

@@ -1,51 +1,79 @@
 div#upload
-  = simple_nested_form_for @admin_problem_source do |f|
-    = f.error_notification
-    div.jumbotron.p-4.mb-3.text-right
-      h1.text-left 기출문제 추가
-      button.btn :class="[ is_new_file ? 'btn-success' : 'btn-danger' ]" @click.prevent="submitForm" :disabled="is_submitting || !is_new_file || validation.errors.length > 0"
-        span v-text="is_submitting ? '제출중...' : is_new_file ? '저장' : '이미 업로드된 기출문제입니다'"
-    table.table.table-bordered
-      thead.thead-default
-        tr
-          th.d-flex.justify-content-between
-            span 내용을 선택 또는 파일을 업로드해주세요
-            button.btn.btn-outline-secondary.mr-2 @click.prevent="preview" :disabled="is_uploading || file"
-              span.badge.mr-2 v-if="file" :class="[ problem_count == 30 ? 'badge-success' : 'badge-danger' ]" v-text="problem_count + '문항'"
-              span.badge.mr-2 v-if="file" :class="[ total_score == 100 ? 'badge-success' : 'badge-danger' ]" v-text="total_score + '점 만점'"
-              span v-text="is_uploading ? '업로드중...' : file ? problem_source.name : '파일업로드'"
-      tbody
-        tr
-          td
-            div.row
-              div.col
-                = f.input :year, label: '연도',
-                          input_html: { 'v-model.number': 'problem_source.year', ':class': "{ 'border-danger': validation.hasError('problem_source.year') }", ':disabled': 'file', '@input': 'year_check' }
-              div.col
-                = f.input :time, as: :select, label: '시기',
-                          collection: [ ['3월 - 학평(서울)', 3], ['4월 - 학평(경기)', 4], ['6월 - 모평(전국)', 6], ['7월 - 학평(인천)', 7], ['9월 - 모평(전국)', 9], ['10월 - 학평(서울)', 10], ['대학수학능력시험', 11] ],
-                          input_html: { 'v-model.number': 'problem_source.time', ':class': "{ 'border-danger': validation.hasError('problem_source.time') }", ':disabled': 'file', '@change': 'time_check' }
-              div.col
-                = f.input :institute, as: :select, label: '기관', collection: [ ['평가원', 0], ['교육청', 1] ], disabled: true,
-                          input_html: { 'v-model.number': 'problem_source.institute', ':class': "{ 'border-danger': validation.hasError('problem_source.institute') }" }
-              div.col
-                = f.input :location, as: :select, label: '지역', collection: [ ['전국', 0], ['서울', 1], ['경기', 2], ['인천', 3] ], disabled: true,
-                          input_html: { 'v-model.number': 'problem_source.location', ':class': "{ 'border-danger': validation.hasError('problem_source.location') }" }
-              div.col
-                = f.input :subject_id, as: :select, label: '과목', collection: [ ['수학', 3] ], selected: 3, disabled: true,
-                          input_html: { 'v-model.number': 'problem_source.subject_id', ':class': "{ 'border-danger': validation.hasError('problem_source.subject_id') }" }
-              div.col
-                = f.input :curriculum, as: :select, label: '과정', collection: [ ['이과(나형)', 1], ['문과(가형)', 2], ['공통', 0] ],
-                          input_html: { 'v-model.number': 'problem_source.curriculum', ':class': "{ 'border-danger': validation.hasError('problem_source.curriculum') }", ':disabled': 'file' }
-              div.col
-                = f.input :grade, label: '학년', disabled: true,
-                          input_html: { 'v-model.number': 'problem_source.grade', ':class': "{ 'border-danger': validation.hasError('problem_source.grade') }" }
-        tr v-if="is_uploading"
-          td.text-muted.text-center.p-5
-            i.fa.fa-circle-o-notch.fa-spin
-        tr v-for="(problem, order) in problems" :key="problem.order"
-          td
-            problem-preview :problem="problem" :order="order + 1"
+  div.jumbotron.p-4.mb-3.text-right
+    h1.text-left 기출문제 추가
+    button.btn :class="[ is_new_file ? 'btn-success' : 'btn-danger' ]" @click.prevent="submitForm" :disabled="is_submitting || !is_new_file || validation.errors.length > 0"
+      span v-text="is_submitting ? '제출중...' : is_new_file ? '저장' : '이미 업로드된 기출문제입니다'"
+  table.table.table-bordered
+    thead.thead-default
+      tr
+        th.d-flex.justify-content-between
+          span 내용을 선택 또는 파일을 업로드해주세요
+          button.btn.btn-outline-secondary.mr-2 @click.prevent="preview" :disabled="is_uploading || file"
+            span.badge.mr-2 v-if="file" :class="[ problem_count == 30 ? 'badge-success' : 'badge-danger' ]" v-text="problem_count + '문항'"
+            span.badge.mr-2 v-if="file" :class="[ total_score == 100 ? 'badge-success' : 'badge-danger' ]" v-text="total_score + '점 만점'"
+            span v-text="is_uploading ? '업로드중...' : file ? problem_source.name : '파일업로드'"
+    tbody
+      tr
+        td
+          div.row
+            div.col: div.form-group
+              label 연도
+              input.form-control.text-center [v-model.number="problem_source.year"
+                                              :class="{ 'border-danger': validation.hasError('problem_source.year') }"
+                                              :disabled='file'
+                                              @input="year_check"
+                                              type="number"]
+            div.col: div.form-group
+              label 기관
+              select.form-control [v-model.number='problem_source.institute'
+                                  :class="{ 'border-danger': validation.hasError('problem_source.institute') }"
+                                  :disabled='file']
+                option disabled="" 기관을 선택해주세요
+                option v-for="(v, k) in options['time']" :key="k" :value="k" :label="v.inst_name"
+            div.col: div.form-group
+              label 시기
+              select.form-control [v-model.number='problem_source.time'
+                                  :class="{ 'border-danger': validation.hasError('problem_source.time') }"
+                                  :disabled='file']
+                option disabled="" 시기를 선택해주세요
+                optgroup v-for="(v, k) in options['time']" :key="k" :value="k" :label="v.inst_name" v-show="k == problem_source.institute"
+                  option v-for="(month_to_s, month) in v.months" :key="month" :value="month" v-text="month_to_s"
+            div.col: div.form-group
+              label 지역
+              select.form-control [v-model.number='problem_source.location'
+                                  :class="{ 'border-danger': validation.hasError('problem_source.location') }"
+                                  :disabled='file'
+                                  disabled="true"]
+                option disabled="" 지역을 선택해주세요
+                option v-for="(value, key) in options['location']" :key="key" :value="key" v-text="value"
+            div.col: div.form-group
+              label 과목
+              select.form-control [v-model.number='problem_source.subject_id'
+                                  :class="{ 'border-danger': validation.hasError('problem_source.subject_id') }"
+                                  :disabled='file'
+                                  disabled="true"]
+                option disabled="" 과목을 선택해주세요
+                option v-for="(value, key) in options['subject']" :key="key" :value="key" v-text="value"
+            div.col: div.form-group
+              label 과정
+              select.form-control [v-model.number='problem_source.curriculum'
+                                  :class="{ 'border-danger': validation.hasError('problem_source.curriculum') }"
+                                  :disabled='file || problem_source.subject_id != 3']
+                option disabled="" 과정을 선택해주세요
+                option v-for="(value, key) in options['curriculum']" :key="key" :value="key" v-text="value"
+            div.col: div.form-group
+              label 학년
+              select.form-control [v-model.number="problem_source.grade"
+                                  :class="{ 'border-danger': validation.hasError('problem_source.grade') }"
+                                  :disabled='file'
+                                  disabled="true"]
+                option v-for="(value, key) in options['grade']" :key="key" :value="key" v-text="value"
+      tr v-if="is_uploading"
+        td.text-muted.text-center.p-5
+          i.fa.fa-circle-o-notch.fa-spin
+      tr v-for="(problem, order) in problems" :key="problem.order"
+        td
+          problem-preview :problem="problem" :order="order + 1"
 
 javascript:
   var vm = new Vue({
@@ -60,7 +88,82 @@ javascript:
     },
     computed: {
       problem_count: function() { return this.problems.length; },
-      total_score: function() { return this.problem_count > 0 ? _.pluck(this.problems, 'score').reduce(function(a, b) { return a + b }) : 0 ; }
+      total_score: function() { return this.problem_count > 0 ? _.pluck(this.problems, 'score').reduce(function(a, b) { return a + b }) : 0 ; },
+      options: function() {
+        var options = {};
+        options['time'] = {
+          0: {
+            inst_name: '평가원',
+            months: {
+              6: '6월',
+              9: '9월',
+              11: '수능'
+            }
+          },
+          1: {
+            inst_name: '교육청',
+            months: {
+              3: '3월',
+              4: '4월',
+              7: '7월',
+              10: '10월'
+            }
+          },
+          2: {
+            inst_name: '사관학교',
+            months: {
+              0: '1차시험'
+            }
+          },
+          3: {
+            inst_name: '경찰대',
+            months: {
+              0: '1차시험'
+            }
+          }
+        };
+        options['location'] = {
+          0: '전국',
+          1: '서울',
+          2: '경기',
+          3: '인천'
+        };
+
+        options['subject'] = {
+          1: '국어',
+          2: '영어',
+          3: '수학'
+        };
+        options['curriculum'] = {
+          2: '가형(이과)',
+          1: '나형(문과)',
+          0: '공통'
+        };
+        options['grade'] = {
+          1: '고1',
+          2: '고2',
+          3: '고3'
+        };
+
+        return options;
+      }
+    },
+    watch: {
+      'problem_source.institute': function() {
+        return this.problem_source.time = null;
+      },
+      'problem_source.time': function() {
+        var time = this.problem_source.time;
+        if (_.contains([0, 6, 9, 11], time)) {
+          this.problem_source.location = 0;
+        } else if (_.contains([3, 4, 7, 10], time)) {
+          if (time == 3 || time == 10) this.problem_source.location = 1;
+          else if (time == 4) this.problem_source.location = 2;
+          else if (time == 7) this.problem_source.location = 3;
+        } else {
+          this.problem_source.location = null;
+        }
+      },
     },
     methods: {
       year_check: function() {
@@ -68,18 +171,6 @@ javascript:
         if (a.length > 4) {
           this.problem_source.year = a[0] + a[1] + a[2] + a[3];
           return false;
-        }
-      },
-      time_check: function() {
-        var a = this.problem_source.time;
-        if (_.contains([6, 9, 11], a)) {
-          this.problem_source.institute = 0;
-          this.problem_source.location = 0;
-        } else if (_.contains([3, 4, 7, 10], a)) {
-          this.problem_source.institute = 1;
-          if (a == 3 || a == 10) this.problem_source.location = 1;
-          else if (a == 4) this.problem_source.location = 2;
-          else if (a == 7) this.problem_source.location = 3;
         }
       },
       preview: function() {
@@ -132,16 +223,16 @@ javascript:
       }
     },
     created: function () {
-      this.problem_source.subject_id = 3;
-      this.problem_source.grade = 3;
+      this.problem_source.subject_id = this.problem_source.subject_id || 3;
+      this.problem_source.grade = this.problem_source.grade || 3;
     },
     mounted: function() {
       this.$validate();
     },
     validators: {
       'problem_source.year': function(value) { return Validator.value(value).required(); },
-      'problem_source.time': function(value) { return Validator.value(value).required(); },
       'problem_source.institute': function(value) { return Validator.value(value).required(); },
+      'problem_source.time': function(value) { return Validator.value(value).required(); },
       'problem_source.location': function(value) { return Validator.value(value).required(); },
       'problem_source.subject_id': function(value) { return Validator.value(value).required(); },
       'problem_source.curriculum': function(value) { return Validator.value(value).required(); },

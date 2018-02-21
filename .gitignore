@@ -29,6 +29,15 @@ Gemfile.lock
 # Ignore application configuration
 /config/application.yml
 
+# livereload
 Guardfile
 
+# CERT
 diple.pem
+
+# Webpacker
+/public/packs
+/public/packs-test
+/node_modules
+yarn-debug.log*
+.yarn-integrity

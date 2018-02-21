@@ -9,7 +9,7 @@ class CreateProblemTag < ActiveRecord::Migration[5.0]
     create_join_table :problem_tags, :tmp_problems
 
     change_column :problem_collections, :problem_source_id, :integer, null: true
-    # 문/이과 구분 - 공통과정 0, 이과 1, 문과 2
+    # 문/이과 구분 - 공통과정 0, 문과(나형) 1, 이과(가형) 2
     # add_column :problem_collections, :curriculum, :integer
     # e = ProblemCollection.where('name LIKE ?', "%나형%")
     # e.update_all(curriculum: 1)

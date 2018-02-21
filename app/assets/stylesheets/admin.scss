@@ -1,0 +1,293 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require bootstrap.min
+ *= require katex
+ *= require summernote
+ *= require noty
+ *= require vex
+ *= require_tree .
+ *= require_self
+ */
+
+ @import "font-awesome-sprockets";
+ @import "font-awesome";
+
+// .square_seg {
+//   width: 100%; height: 100%; margin: 0 auto;
+//   .square_img {
+//     width: 100%; overflow: hidden;
+//     &::before { content: ''; display: block; width: 100%; padding-top: 100%; }
+//     img { position: absolute; top: 0; width: 100%; height: 100%; }
+//   }
+// }
+
+// #test_screen {
+//   margin: 0 !important;
+//   width: 100% !important;
+//   height: 100% !important;
+//   overflow: hidden;
+// }
+// #test_screen > .content {
+//   height: 100% !important; padding: 20px !important;
+//   .test_wrapper { margin: 0 auto; height: 100%; overflow: hidden; border: 1px solid lightgrey; border-radius: .3em;
+//     .problems_header { height: 50px; overflow: scroll; border-top: 0; }
+//     .problems_wrapper, .answers_wrapper { position: relative; display: inline-block; height: 100%; vertical-align: top; overflow: hidden; }
+//     .problems_wrapper { box-shadow: 1px 0 lightgrey;
+//       .problems_seg { width: 100%; height: calc(100% - 50px); background-color: #fff; }
+//       .problems_row { position: relative; min-width: 100%; max-width: 100%; height: 100%; transition: transform .25s; }
+//       .problems_row::after { content: ''; position: absolute; top: 0; left: 540px; display: inline-block; width: 1px; height: 100%; margin-left: -1px; background: lightgrey; }
+//       .problems_column { position: relative; }
+//     }
+//     .answers_wrapper { box-shadow: -1px 0 lightgrey;
+//       .answers_seg { height: calc(100% - 100px); background-color: #fff; overflow: scroll; -webkit-overflow-scrolling: touch;
+//         & > table { border-radius: 0; box-shadow: 0 1px 0 lightgrey; }
+//       }
+//       .answer_radio .button { margin: 0; padding: 0; width: 18px; height: 30px; line-height: 30px; }
+//       .answer_input { padding-right: 0.8em !important; }
+//       .submit.button, .answers_score { height: 50px; }
+//     }
+//   }
+//
+//   .test_wrapper.with_audio {
+//     .answers_seg { height: calc(100% - 150px) !important; }
+//     .audio_seg { position: relative; width: 100%; height: 50px; background-color: #fff; overflow: hidden; border-bottom: 1px solid lightgrey;
+//       audio { display: none; }
+//       .progress_bar { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background-color: rgba(33, 33, 33, 0.1); }
+//       .basic.button, .basic.buttons { position: relative; background-color: #fff !important; }
+//       .tiny.buttons { float: right; margin: 9px 6px 0 0; overflow: hidden; }
+//       .playBtn { position: relative; display: inline-block; margin: 7px 0 7px 6px; }
+//       .pauseBtn { position: relative; display: none; margin: 7px 0 7px 6px; }
+//       .startBtn { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: crimson; color: white; transition: transform .5s; transform: translateY(0); cursor: pointer; }
+//       .endBtn { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #eee; color: #999; transition: transform .5s; transform: translateY(100%); }
+//       .volSlider { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: lightgrey; overflow: hidden; transition: transform .25s, background-color .25s; transform: translateX(-100%); cursor: pointer; }
+//       .volSlider.adjusting { transform: translateX(0); }
+//       .volSlider:hover,
+//       .volSlider:active { background-color: #999; }
+//       .volSlider .volBar {
+//         position: relative; height: 100%; width: 95%; background: rgba(33, 33, 33, 0.6); border-radius: 3px;
+//         box-shadow: 1px 0 0px rgba(255, 255, 255, 1), 2px 0 0px rgba(99, 99, 99, 1), 3px 0 0px rgba(255, 255, 255, 1), 4px 0 0px rgba(99, 99, 99, 1), 5px 0 0px rgba(255, 255, 255, 1), 6px 0 0px rgba(99, 99, 99, 1);
+//       }
+//       &.started .startBtn { transform: translateY(100%); }
+//       &.ended .endBtn { transform: translateY(0); }
+//     }
+//   }
+// }
+//
+// .problem_container { width: 540px; max-width: 100%; padding: 20px; max-height: 100%; display: inline-flex; flex-direction: column; flex: 0 1 auto; }
+// .problem_container img { max-width: 100%; }
+// .problem_seg { overflow-x: scroll; overflow-y: scroll; }
+// .exm_list { display: flex; flex-wrap: wrap; }
+// .exm_item { min-width: 50%; padding: 10px !important; }
+// .exm_item > .ui.circular.label { margin-top: 1px; }
+// .exm_container { display: inline-block; width: calc(100% - 25px); padding: 3px; float: right; }
+//
+// @media only screen and (min-width: 1481px) {
+//   #test_screen {
+//     .test_wrapper { max-width: 1442px;
+//       .problems_wrapper { width: 75%;
+//         .problems_seg { overflow: hidden; }
+//         .problems_column { display: flex; width: 100%; height: 100%; flex-direction: column; flex-wrap: wrap; justify-content: space-between; overflow: hidden; }
+//       }
+//       .answers_wrapper { width: 25%; }
+//     }
+//   }
+// }
+//
+// @media only screen and (min-width: 942px) and (max-width: 1480px) {
+//   #test_screen {
+//     .test_wrapper { max-width: 902px;
+//       .problems_wrapper { width: 60%;
+//         .problems_seg { overflow-y: scroll; -webkit-overflow-scrolling: touch; }
+//         .problems_header .ui.buttons { display: none; }
+//         .problems_row_divider { display: none; }
+//         .problems_column { display: block; width: 100%; min-height: 100%; }
+//       }
+//       .answers_wrapper { width: 40%; }
+//     }
+//   }
+// }
+//
+// @media only screen and (max-width: 941px) {
+//   #test_screen {
+//     .test_wrapper { max-width: 542px;
+//       .problems_wrapper { width: 100%; height: calc(100% - 50px) !important; border-bottom: 1px solid lightgrey;
+//         .problems_seg { overflow-y: scroll; -webkit-overflow-scrolling: touch; }
+//         .problems_header .ui.labels { display: none; }
+//         .problems_header .ui.buttons { display: none; }
+//         .problems_row_divider { display: none; }
+//         .problems_column { display: block; width: 100%; min-height: 100%; }
+//       }
+//       .answers_wrapper { width: 100%; height: 50px !important;
+//         form { overflow: scroll; -webkit-overflow-scrolling: touch; }
+//         .problems_header { display: none; }
+//         .answers_seg { display: none;
+//           tbody { display: table-row-group !important; }
+//           tr { display: table-row !important; }
+//           td { display: table-cell !important; padding-top: 20px 0 !important; padding-bottom: 20px 0 !important; }
+//         }
+//       }
+//     }
+//     .test_wrapper.with_audio {
+//       .problems_wrapper { height: calc(100% - 100px) !important; }
+//       .answers_wrapper { height: 100px !important; }
+//     }
+//   }
+// }
+
+.problem-container {
+  width: 540px; max-width: 100%; padding: 20px; max-height: 100%; text-align: left;
+  display: inline-flex; flex-direction: column; flex: 0 1 auto; word-break: break-all;
+  img { display: inline-block; max-width: 100%; }
+  blockquote { margin: 0; padding: .75rem; border: 1px solid #e9ecef; background: #fff; }
+  .problem-info { font-size: 0.8em;
+    & > div { margin-right: 0.25em;
+      &:last-of-type { margin-right: 0; }
+    }
+    & > div > span { display: inline-block; border-radius: 0.75em; margin-right: 0.25em;
+      &:last-of-type { margin-right: 0; }
+    }
+    .problem-order { padding: 0.25em 0.7em; background: #000; border: 1px solid #fff; color: #fff; font-weight: bold; }
+    .problem-score { padding: 0.25em 0.7em; background: #fff; border: 1px solid lightgrey; }
+    .problem-level { padding: 0.25em 0.5em; }
+  }
+  .problem-wrapper {
+    & > div { background: #fff; border: 1px solid lightgrey; border-top: 0; padding: 16px; position: relative; zoom: 1;
+      &::after { content: ''; display: block; clear: both; }
+    }
+    & > div:first-of-type { border-top: 3px solid black; border-radius: 5px 5px 0 0; }
+    & > div:last-of-type { border-radius: 0 0 5px 5px; }
+    .problem-content, .problem-exm-content, .problem-explanation {
+      &:empty::after { content: '내용이 없습니다'; color: lightgrey; }
+    }
+    .problem-exm { padding: 10px; display: flex; flex-wrap: wrap;
+      .problem-exm-wrapper { position: relative; display: flex; align-items: center; min-width: 20%; padding: 10px; border-radius: 5px; cursor: pointer; transition: background .25s, width .25s;
+        .problem-exm-index { display: inline-block; margin: 2px; min-width: 20px; width: 20px; height: 20px; line-height: 20px; text-align: center; font-size: 0.75em; background: white; border: 1px solid lightgrey; border-radius: 50%; transition: background .25s, border .25s; cursor: pointer; }
+        .problem-exm-content { margin-left: 5px; line-height: 24px; max-width: 100%; }
+        &:hover { background: #f1f1f1;
+          .problem-exm-index { background: lightgrey; border-color: transparent; }
+        }
+        &.active { background: rgba(40, 167, 69, .25);
+          .problem-exm-index { background: #28a745; border-color: transparent; color: #fff; }
+        }
+      }
+    }
+
+    .problem-subject, .problem-explanation, .problem-answer {
+      &::before { display: block; font-weight: bold; color: grey; text-align: left; margin-bottom: 0.25em; margin-top: -0.25em; }
+    }
+    .problem-answer-input { padding: 10px; }
+    .problem-subject { background: #f1f1f1;
+      &::before { content: '분류'; }
+    }
+    .problem-explanation { background: #f1f1f1;
+      &::before { content: '해설'; }
+    }
+    .problem-answer { background: #f1f1f1; padding: 10px 16px; text-align: right;
+      &::before { content: '정답'; margin-top: 0; margin-bottom: -1.5em; }
+      .problem-answer-wrapper {
+        &::before { content: '정답은 ' } &::after { content: ' 입니다' }
+        .problem-answer-seg { display: inline-block; font-weight: bold; min-width: 10px;
+          &:empty::before { content: '-' }
+        }
+      }
+      .problem-ratio { font-size: 0.8em; color: grey;
+        .under-border { border-bottom: 1px solid; }
+        &::before { content: "정답률: " }
+      }
+      &.is-objective {
+        .problem-answer-seg::after { content: '번' }
+        .problem-ratio::before { content: "문항별 선택률: " }
+      }
+    }
+  }
+  .problem-sources { font-size: 0.8em; font-style: italic; }
+  .problem-tags { text-align: right; }
+}
+
+.problem-preview {
+  .problem-score, .problem-subject, .problem-level i, .problem-answer-wrapper, .problem-answer-input > input { cursor: pointer; }
+  .problem-wrapper {
+    .problem-score, .problem-subject, .problem-content, .problem-exm-wrapper, .problem-answer-input, .problem-explanation, .problem-answer {
+      position: relative; cursor: pointer; outline: none; transition: background .25s;
+      &:hover, &.is-editing { background-color: rgba(0, 123, 255, .1) !important; }
+    }
+  }
+}
+
+.editor-grid { width: 1060px; margin: 0 auto; word-break: break-all;
+  img { display: inline-block; max-width: 100%; }
+  blockquote { margin: 0; padding: .75rem; border: 1px solid #e9ecef; background: #fff; }
+  .preview-wrapper { max-width: 500px; border: 1px solid lightgrey; border-radius: 5px;
+    .preview-header { height: 43px; line-height: 43px; text-align: center; background-color: rgba(0, 0, 0, .03); border-bottom: 1px solid rgba(0, 0, 0, 0.125); }
+    .preview-content { padding: 10px 16px; height: calc(100% - 80px); }
+  }
+}
+
+.cursor-pointer { cursor: pointer !important; }
+.form-group:only-child, .form-group:last-child,
+.table:only-child, .table:last-child { margin-bottom: 0; }
+.btn { cursor: pointer; }
+label { margin-bottom: 0.25em !important; font-size: 0.8em; font-weight: bold; margin-left: 0.5em; }
+.bg-hover { background: rgba(0, 0, 0, .075) !important; }
+
+.katex .hangul_fallback { font-family: initial; font-size: initial; }
+.katex .mfrac .frac-line,
+.katex .overline .overline-line,
+.katex .underline .underline-line { min-height: 1px; }
+
+.modal-fullscreen {
+  width: 100vw; min-width: 100vw; max-width: 100vw;
+  height: 100vh; min-height: 100vh; max-height: 100vh;
+  margin: 0;
+  .modal-content { height: 100vh;
+    .modal-body {
+      max-height: calc(100vh - 128px); overflow: scroll;
+    }
+  }
+}
+
+
+.loader { position: relative; min-height: 120px;
+  &::before, &::after { content: ''; position: absolute; z-index: 999; pointer-events: none; opacity: 0; transition: opacity .5s; }
+  &::before {
+    width: 100%; height: 100%; top: 0; left: 0;
+    background: rgba(0,0,0,.85);
+    border-radius: .25rem !important;
+  }
+  &::after {
+    width: 36px; height: 36px; top: 50%; left: 50%; margin-top: -18px; margin-left: -18px;
+    border-radius: 50%;
+    border: 2px solid white;
+    border-color: white transparent;
+    animation: busybox_kf 1s linear 0s infinite normal none running;
+  }
+  &.active {
+    &::before, &::after { opacity: 1; pointer-events: auto; }
+  }
+}
+@keyframes busybox_kf {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@-webkit-keyframes busybox_kf {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+[v-cloak] { display: none; }
+.fade-enter-active, .fade-leave-active { transition: opacity .25s }
+.fade-enter, .fade-leave-to { opacity: 0 }
+
+.w-20 { width: 20% !important; }
+.w-33 { width: 33% !important; }
+body.vex-open { overflow: hidden; }

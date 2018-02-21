@@ -2,75 +2,15 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>SN일일테스트</title>
+    <title>OMRice</title>
     <%= csrf_meta_tags %>
     <%= action_cable_meta_tag %>
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-    <script type="text/javascript">
-      $(document).on('turbolinks:load', function() {
-        var err_vue = new Vue({
-          data: { msgs: [] },
-          watch: {
-            msgs: function(msgs) {
-              _.each(msgs, function(msg, index) {
-                $('body').highlight('$' + msg + '$', { element: 'mark', className: 'bg-danger text-light' });
-              });
-              new Noty({
-                type: 'error',
-                text: '<div class="text-center pr-2"><i class="fa fa-exclamation-triangle"></i> 현재 페이지에 <b>' + msgs.length + '개</b>의 수식 에러가 있습니다</div>',
-                layout: 'bottomRight',
-                closeWith: ['click', 'button'],
-                timeout: 5000,
-                progressBar: true,
-                animation: {
-                  open: 'noty_effects_open',
-                  close: 'noty_effects_close'
-                }
-              }).show();
-            }
-          }
-        });
-
-        renderMathInElement(document.body, {
-          delimiters: [ { left: "$",  right: "$",  display: false } ],
-          errorCallback: function(msg, err) {
-            err_vue.msgs.push(msg.split('`')[1]);
-            // console.error(err);
-          }
-        });
-      });
-    </script>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
-      <div class="container">
-        <%= link_to 'OMRice', admin_root_path, style: 'position: relative', class: 'navbar-brand' %>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-          </ul>
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <%= link_to '어드민', admin_root_path, class: 'nav-link' %>
-            </li>
-            <li class="nav-item">
-              <% if current_user %>
-                <%= link_to '로그아웃', destroy_user_session_path, class: 'nav-link', method: :delete %>
-              <% else %>
-                <%= link_to '로그인', new_user_session_path, class: 'nav-link' %>
-              <% end %>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-    <main class="container-fluid pt-3 pb-5 d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 58px);">
-      <div class="container">
-        <%= yield %>
-      </div>
-    </main>
+    <App></App>
+    <%= javascript_pack_tag 'application' %>
+    <%= stylesheet_pack_tag 'application' %>
   </body>
 </html>

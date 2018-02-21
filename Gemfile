@@ -40,6 +40,9 @@ gem 'redis', '~> 3.0'
 # gem 'sprockets-es6'
 # gem 'babel-transpiler'
 
+# Use Webpack to manage app-like JavaScript modules in Rails
+gem 'webpacker'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
@@ -105,9 +108,6 @@ gem 'validates_timeliness'
 
 # A simple asset-pipeline wrapper for Vue.js by Evan You https://github.com/adambutler/vuejs-rails
 gem 'vuejs-rails'
-
-# the font-awesome font bundled as an asset for the rails asset pipeline https://github.com/bokmann/font-awesome-rails
-# gem 'font-awesome-rails'
 
 # http://fontawesome.io/get-started/
 gem 'font-awesome-sass'
