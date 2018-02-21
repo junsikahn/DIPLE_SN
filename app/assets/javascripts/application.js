@@ -23,3 +23,4 @@
 //= require katex
 //= require katex/contrib/auto-render.min
 //= require KeyboardJS
+//= require_tree ./application
