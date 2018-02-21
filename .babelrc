@@ -1,0 +1,21 @@
+{
+  "presets": [
+    ["env", {
+      "modules": false,
+      "targets": {
+        "browsers": "> 1%",
+        "IE": 11,
+        "uglify": true
+      },
+      "useBuiltIns": true
+    }]
+  ],
+
+  "plugins": [
+    "syntax-dynamic-import",
+    "transform-object-rest-spread",
+    "transform-es2015-arrow-functions",
+    "transform-runtime",
+    ["transform-class-properties", { "spec": true }]
+  ]
+}
