@@ -7,4 +7,6 @@
 // To reference this file, add <%= javascript_pack_tag 'application' %> to the appropriate
 // layout file, like app/views/layouts/application.html.erb
 
+console.log('어드민.css는 왜 manifest.json에 추가되지 않는걸까?')
+
 /* eslint-disable no-new */
