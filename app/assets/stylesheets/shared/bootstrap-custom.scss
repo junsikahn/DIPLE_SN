@@ -1,0 +1,19 @@
+.cursor-pointer { cursor: pointer !important; }
+.form-group:only-child, .form-group:last-child,
+.table:only-child, .table:last-child { margin-bottom: 0; }
+.btn { cursor: pointer; }
+label { margin-bottom: 0.25em !important; font-size: 0.8em; font-weight: bold; margin-left: 0.5em; }
+.bg-hover { background: rgba(0, 0, 0, .075) !important; }
+.w-20 { width: 20% !important; }
+.w-33 { width: 33% !important; }
+.modal-fullscreen {
+  width: 100vw; min-width: 100vw; max-width: 100vw;
+  height: 100vh; min-height: 100vh; max-height: 100vh;
+  margin: 0;
+  .modal-content { height: 100vh;
+    .modal-body {
+      max-height: calc(100vh - 128px); overflow: scroll;
+    }
+  }
+}
+body.vex-open { overflow: hidden; }
