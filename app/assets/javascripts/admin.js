@@ -37,7 +37,6 @@
 //= require sortablejs
 //= require local_time_ko
 //= require vex
-//= require_tree ./admin
 
 // init underscore.js Template
 _.templateSettings = {
