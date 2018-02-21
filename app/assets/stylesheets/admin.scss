@@ -15,6 +15,10 @@
  *= require summernote
  *= require noty
  *= require vex
+ *= require_tree ./shared
  *= require_tree ./admin
  *= require_self
  */
+
+ @import "font-awesome-sprockets";
+ @import "font-awesome";
