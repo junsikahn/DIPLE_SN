@@ -5,7 +5,7 @@
 </template>
 <script>
 export default {
-  name: 'ViewPort'
+  name: 'App'
 }
 </script>
 <style lang="scss" scoped>
