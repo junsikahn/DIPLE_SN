@@ -31,10 +31,10 @@ Rails.application.routes.draw do
   devise_for :users, skip: :all
   devise_scope :user do
     namespace :api do
-      get    'api/me',       to: 'api/users/sessions#show'
-      post   'api/sign_in',  to: 'api/users/sessions#create'
-      delete 'api/sign_out', to: 'api/users/sessions#destroy'
-      post   'api/sign_up',  to: 'api/users/registrations#create'
+      get    'me',       to: 'users/sessions#show'
+      post   'sign_in',  to: 'users/sessions#create'
+      delete 'sign_out', to: 'users/sessions#destroy'
+      post   'sign_up',  to: 'users/registrations#create'
       resources :problems, only: [:index, :show]
     end
   end
