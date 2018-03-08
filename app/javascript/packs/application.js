@@ -1,26 +1,39 @@
-/* eslint no-console:0 */
-// This file is automatically compiled by Webpack, along with any other files
-// present in this directory. You're encouraged to place your actual application logic in
-// a relevant structure within app/javascript and only use these pack files to reference
-// that code so it'll be compiled.
-//
-// To reference this file, add <%= javascript_pack_tag 'application' %> to the appropriate
-// layout file, like app/views/layouts/application.html.erb
+import Vue from 'vue'
+import 'babel-polyfill'
 
-import Vue from 'vue/dist/vue.js'
-import Router from 'vue-router'
-import App from '../App'
+// Vuex
+import store from '../store'
+
+// Vue Router
 import router from '../router'
 
-Vue.use(Router)
-Vue.config.productionTip = false
+// Axios & Vue Axios
+import VueAxios from 'vue-axios'
+import axios from 'axios'
+axios.defaults.headers.common['X-CSRF-Token'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+Vue.use(VueAxios, axios)
 
-/* eslint-disable no-new */
-new Vue({
-  router,
-  template: '<App/>',
-  components: { App }
-}).$mount('App')
+// Vuefity
+import 'vuetify/dist/vuetify.min.css'
+import Vuetify from 'vuetify'
+Vue.use(Vuetify)
+
+// Bootstrap
+// import 'expose-loader?$!expose-loader?jQuery!jquery'
+// import 'bootstrap'
+// import 'bootstrap/dist/css/bootstrap.min.css'
+// import BootstrapVue from 'bootstrap-vue'
+// Vue.use(BootstrapVue)
+
+import App from '../App'
+
+document.addEventListener('DOMContentLoaded', () => {
+  new Vue({
+    router,
+    store,
+    render: h => h(App)
+  }).$mount('App')
+})
 
 // $(document).on('turbolinks:load', function() {
 //   var err_vue = new Vue({

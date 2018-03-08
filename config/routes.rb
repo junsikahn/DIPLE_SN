@@ -1,9 +1,4 @@
 Rails.application.routes.draw do
-  devise_for :users, controllers: {
-    registrations: 'users/registrations',
-    sessions: 'users/sessions'
-  }
-
   # constraints(ip: /120\.142\.\d+\.\d+/) do # 특정 IP주소 외의 접근을 차단함
     namespace :admin do
       resources :problem_collections do
@@ -33,11 +28,17 @@ Rails.application.routes.draw do
     end
   # end
 
-  scope module: :app do
-    resources :problems
-    resources :home, path: '/'
+  devise_scope :user do
+    namespace :api do
+      get    'me',       to: 'users/sessions#show'
+      post   'sign_in',  to: 'users/sessions#create'
+      delete 'sign_out', to: 'users/sessions#destroy'
+      post   'sign_up',  to: 'users/registrations#create'
+      resources :problems, only: [:index, :show]
+    end
   end
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
-  root 'home#index'
+  root 'application#index'
+  match '*path', to: 'application#index', format: false, via: :get
 end

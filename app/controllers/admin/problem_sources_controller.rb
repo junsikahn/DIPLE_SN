@@ -134,7 +134,7 @@ class Admin::ProblemSourcesController < AdminController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_admin_problem_source
-    @admin_problem_source = Admin::ProblemSource.includes(problems: [:subject,
+    @admin_problem_source = Admin::ProblemSource.includes(problems: [{problem_subjects: [:subject]},
                                                                      {problem_source_orders: [:problem_source]},
                                                                      :problem_images,
                                                                      :problem_tags]).find(params[:id])

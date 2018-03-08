@@ -172,7 +172,6 @@ ActiveRecord::Schema.define(version: 20180129161103) do
     t.datetime "last_seen"
     t.datetime "created_at",                       null: false
     t.datetime "updated_at",                       null: false
-    t.index ["uid"], name: "index_users_on_uid", unique: true, using: :btree
   end
 
 end

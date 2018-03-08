@@ -16,14 +16,15 @@ class Admin::ProblemSource < ProblemSource
   end
 
   def time_to_s(abbr = false)
-    return '-' unless institute == 0 || institute == 1
     if abbr
       case time
+      when 0  then '-'
       when 11 then '수능'
       else "#{time}월"
       end
     else
       case time
+      when 0  then "#{institute_to_s}(1차시험)"
       when 11 then '대학수학능력시험'
       else
         i = case institute

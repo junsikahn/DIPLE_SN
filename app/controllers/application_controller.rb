@@ -1,13 +1,7 @@
 class ApplicationController < ActionController::Base
-  protect_from_forgery with: :exception
+  protect_from_forgery with: :exception, unless: -> { request.format.json? }
 
-  # before_action :authenticate_user!
-  before_action :default_paginate!, only: :index
-
-  private
-
-  def default_paginate!
-    params[:page] = params[:page] || 1
-    params[:per] = params[:per] || 10
+  def index
+    render text: nil, layout: 'application'
   end
 end

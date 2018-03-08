@@ -32,13 +32,11 @@ export default {
   components: {
     Problem
   },
-  data () {
-    return {
-      loading: false,
-      error: null,
-      problems: []
-    }
-  },
+  data: () => ({
+    loading: false,
+    error: null,
+    problems: []
+  }),
   created () {
     this.fetchData()
   },
@@ -50,12 +48,12 @@ export default {
       this.error = null
       this.loading = true
       this.problems = []
-      axios.get(`${this.$route.path}.json`)
-        .then((response) => {
+      this.axios.get(`api${this.$route.path}.json`)
+        .then((res) => {
           this.loading = false
-          this.problems = response.data
-        }).catch((error) => {
-          this.error = error.toString()
+          this.problems = res.data
+        }).catch((err) => {
+          this.error = err.toString()
         })
     }
   }

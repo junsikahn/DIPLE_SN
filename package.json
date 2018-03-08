@@ -1,14 +1,28 @@
 {
+  "name": "DIPLE",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "private": true,
   "dependencies": {
     "@rails/webpacker": "^3.2.2",
+    "axios": "^0.18.0",
     "babel-plugin-transform-runtime": "^6.23.0",
+    "bootstrap": "^4.0.0",
+    "bootstrap-vue": "^2.0.0-rc.1",
     "es6-promise": "^4.2.4",
+    "jquery": "^3.3.1",
     "vue": "^2.5.13",
+    "vue-axios": "^2.0.2",
     "vue-loader": "^14.1.1",
     "vue-router": "^3.0.1",
-    "vue-template-compiler": "^2.5.13"
+    "vue-template-compiler": "^2.5.13",
+    "vuetify": "^1.0.3",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "expose-loader": "^0.7.4",
     "webpack-dev-server": "^2.11.1"
   }
 }

@@ -10,15 +10,7 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require jquery
-//= require jquery_ujs
-//= require jquery.remotipart
-//= require jquery_nested_form
-//= require axios
 //= require underscore
-//= require turbolinks
-//= require popper.min
-//= require bootstrap.min
 //= require bowser
 //= require katex
 //= require katex/contrib/auto-render.min

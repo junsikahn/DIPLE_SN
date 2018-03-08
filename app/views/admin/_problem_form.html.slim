@@ -152,11 +152,11 @@ div#problem-edit v-cloak=true
               td
                 label 문항별 선택률
                 div.input-group
-                  = f.input :exm_1_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_1_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_1_ratio') }, { 'font-weight-bold border-secondary' : problem.answer == 1 }, { 'border-right-0' : problem.answer > 1 }, { 'border-left-0' : problem.answer < 1 } ]", min: 0, max: 100, step: 1, class: 'text-right', '@input': 'inputExmRatio' }
+                  = f.input :exm_1_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_1_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_1_ratio') }, { 'font-weight-bold border-secondary' : problem.answer == 1 }, { 'border-right-0' : problem.answer > 1 } ]", min: 0, max: 100, step: 1, class: 'text-right', '@input': 'inputExmRatio' }
                   = f.input :exm_2_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_2_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_2_ratio') }, { 'font-weight-bold border-secondary' : problem.answer == 2 }, { 'border-right-0' : problem.answer > 2 }, { 'border-left-0' : problem.answer < 2 } ]", min: 0, max: 100, step: 1, class: 'text-right', '@input': 'inputExmRatio' }
                   = f.input :exm_3_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_3_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_3_ratio') }, { 'font-weight-bold border-secondary' : problem.answer == 3 }, { 'border-right-0' : problem.answer > 3 }, { 'border-left-0' : problem.answer < 3 } ]", min: 0, max: 100, step: 1, class: 'text-right', '@input': 'inputExmRatio' }
                   = f.input :exm_4_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_4_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_4_ratio') }, { 'font-weight-bold border-secondary' : problem.answer == 4 }, { 'border-right-0' : problem.answer > 4 }, { 'border-left-0' : problem.answer < 4 } ]", min: 0, max: 100, step: 1, class: 'text-right', '@input': 'inputExmRatio' }
-                  = f.input :exm_5_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_5_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_5_ratio') }, { 'font-weight-bold border-secondary' : problem.answer == 5 }, { 'border-right-0' : problem.answer > 5 }, { 'border-left-0' : problem.answer < 5 } ]", min: 0, max: 100, step: 1, class: 'text-right', '@input': 'inputExmRatio' }
+                  = f.input :exm_5_ratio, label: false, wrapper: false, input_html: { 'v-model.number': 'problem.exm_5_ratio', placeholder: '%', ':class': "[{ 'border-danger': validation.hasError('problem.exm_5_ratio') }, { 'font-weight-bold border-secondary' : problem.answer == 5 }, { 'border-left-0' : problem.answer < 5 } ]", min: 0, max: 100, step: 1, class: 'text-right', '@input': 'inputExmRatio' }
             tr v-show="!problem.is_objective"
               td
                 = f.input :correct_ratio, label: '정답률', input_html: { 'v-model.number': 'problem.correct_ratio', placeholder: '%', ':class': "{ 'border-danger': validation.hasError('problem.correct_ratio') }", min: 0, max: 100, step: 1, class: 'text-right' }
@@ -273,14 +273,16 @@ div#problem-edit v-cloak=true
                                     span> v-text='tmp_source.problem_source_id ? tmp_source.problem_source.name : "출처를 선택해주세요"'
                                     | /
                                     span< v-text='tmp_source.order ? tmp_source.order + "번" : "문제번호를 선택해주세요"'
+                                hr
+                                div.d-flex.justify-content-between.align-items-center
                                   div.d-inline-flex
-                                    a.badge.badge-success.mr-2 href="#" @click.prevent="add"
-                                      span> 추가
-                                      i.fa.fa-plus
                                     a.badge.badge-secondary href="#" @click.prevent="step = 0"
                                       span> 취소
                                       i.fa.fa-remove
-                          div.modal-footer
+                                    a.badge.badge-success.mr-2 href="#" @click.prevent="add" :disabled="step < 3"
+                                      span> 추가
+                                      i.fa.fa-plus
+                          div.modal-footer v-show="step == 0"
                             button.btn.btn-block.btn-secondary type="button" data-dismiss="modal" 취소
                             button.btn.btn-block.btn-primary.mt-0 type="button" @click="save" 저장
             tr
