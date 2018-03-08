@@ -7,7 +7,7 @@ div#problem-edit v-cloak=true
   = simple_form_for problem, html: { 'ref': 'problemForm' } do |f|
     div.row
       div.col style="width: calc(540px + 2rem); min-width: calc(540px + 2rem); max-width: calc(540px + 2rem)"
-        a.btn.btn-light href="#{request.referer}" == "#{icon 'caret-left', class: 'mr-2'}목록으로"
+        a.btn.btn-light href="#{request.referer}" == "#{icon 'far', 'caret-left', class: 'mr-2'}목록으로"
       div.col
         = f.button :button, '저장', class: 'btn-block', ':class': '[ readySubmit ? "btn-success" : readySave ? "text-light btn-warning" : "btn-secondary" ]', '@click.prevent': 'saveProblem', data: { disable_with: "<i class='fa fa-spinner fa-spin'/>" }
     hr
@@ -17,7 +17,7 @@ div#problem-edit v-cloak=true
           thead.thead-default
             tr
               th.d-flex.justify-content-between.align-items-center
-                span == "#{icon 'caret-down', class: 'p-1'} 미리보기"
+                span == "#{icon 'far', 'caret-down', class: 'p-1'} 미리보기"
                 div
                   label.m-1.mr-2 해설
                   div.btn-group.btn-group-sm
@@ -75,8 +75,8 @@ div#problem-edit v-cloak=true
                     div.problem-tags v-if="problem.problem_tags"
                       a.badge.badge-secondary.mt-1.mr-1 v-for="tag in problem.problem_tags" :key="tag.id" href="#" @click.prevent="remove(tag)" v-text="tag.name"
                       div.text-right
-                        a.badge.badge-success.mt-1.mr-1 href="#" @click.prevent="open" v-show="!is_opened" == "#{icon 'plus'} 추가"
-                        a.badge.badge-light.mt-1.mr-1 href="#" @click.prevent="close" v-show="is_opened" == "닫기 #{icon 'remove'}"
+                        a.badge.badge-success.mt-1.mr-1 href="#" @click.prevent="open" v-show="!is_opened" == "#{icon 'far', 'plus'} 추가"
+                        a.badge.badge-light.mt-1.mr-1 href="#" @click.prevent="close" v-show="is_opened" == "닫기 #{icon 'far', 'remove'}"
                         div.dropdown.mt-1.d-none ref="tagSearchDropdown"
                           div.input-group
                             input.form-control ref="tagSearchInput" placeholder="태그 추가하기" :value="keyword" @input="typing" @keydown.esc.stop="reset" @keydown.enter.prevent="enter" @keydown.up.prevent="move(false)" @keydown.down.prevent="move(true)"
@@ -95,7 +95,7 @@ div#problem-edit v-cloak=true
           thead.thead-default
             tr
               th.d-flex.justify-content-between.align-items-center
-                span == "#{icon 'caret-down', class: 'p-1'} 최종Data"
+                span == "#{icon 'far', 'caret-down', class: 'p-1'} 최종Data"
                 div
                   = f.hidden_field :is_objective, ':value': 'problem.is_objective'
                   label.m-1.mr-2 타입
@@ -311,8 +311,8 @@ div#problem-edit v-cloak=true
   /             span.input-group-addon.text-muted: i.fa.fa-search
   /             input.form-control ref="subjectModalInput" placeholder="과목 검색하기" autofocus="true" :value="keyword" @input="typing" @keydown.esc.stop="reset" @keydown.enter.prevent="enter" @keydown.up.prevent="move(false)" @keydown.down.prevent="move(true)"
   /             div style="position: absolute; top: 50%; margin-top: -7px; right: 7px; z-index: 100; font-size: 0.5em;"
-  /               kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length > 0 && filtered.length == 0 }" == "#{icon 'caret-up'}"
-  /               kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length > 0 && filtered.length == 0 }" == "#{icon 'caret-down'}"
+  /               kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length > 0 && filtered.length == 0 }" == "#{icon 'far', 'caret-up'}"
+  /               kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length > 0 && filtered.length == 0 }" == "#{icon 'far', 'caret-down'}"
   /               kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length > 0 && filtered.length == 0 }" Enter:저장
   /               kbd.ml-1 :class="{ 'bg-light text-secondary': keyword.length == 0 }" ESC:리셋
   /           div.mt-2 style="max-height: calc(100vh - 280px); overflow-y: scroll;"
